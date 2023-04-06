@@ -1,0 +1,1 @@
+export type DataSource = 'api' | 'ogmios';
