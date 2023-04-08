@@ -1,13 +1,12 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { Asset } from '../types/dex';
+import { BaseProvider } from '../provider/base-provider';
+import { Token } from './models/asset';
 
 export abstract class BaseDex {
 
-    abstract readonly name: string;
+    public abstract readonly name: string;
 
-    abstract liquidityPool(assetA: Asset, assetB: Asset): Promise<LiquidityPool>;
-
-    abstract liquidityPools(): Promise<LiquidityPool[]>;
+    abstract liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]>;
 
     abstract orders(): void;
 

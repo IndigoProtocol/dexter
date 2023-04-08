@@ -192,4 +192,6 @@ export default {
 
   // Whether to use watchman for file crawling
   // watchman: true,
+
+  openHandlesTimeout: 5 * 1000,
 };

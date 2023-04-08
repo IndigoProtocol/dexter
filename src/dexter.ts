@@ -1,9 +1,9 @@
 import { LiquidityPool } from './dex/models/liquidity-pool';
 import { BaseDex } from './dex/base-dex';
-import { Asset } from './types/dex';
 import { Minswap } from './dex/minswap';
 import { BaseProvider } from './provider/base-provider';
 import { DexterResponse } from './types/global';
+import { Token } from './dex/models/asset';
 
 export class Dexter {
 
@@ -11,7 +11,7 @@ export class Dexter {
     onDexs: BaseDex[] = [];
     availableDexes: { [key: string]: BaseDex };
 
-    static new(provider: BaseProvider) {
+    static new(provider: BaseProvider): Dexter {
         let dexter = new this();
 
         dexter.withProvider(provider);
@@ -42,7 +42,7 @@ export class Dexter {
         return this;
     }
 
-    all(): Dexter {
+    forAll(): Dexter {
         this.onDexs = Object.values(this.availableDexes);
 
         return this;
@@ -54,20 +54,20 @@ export class Dexter {
         return this;
     }
 
-    liquidityPool(assetA: Asset, assetB: Asset): Promise<DexterResponse> {
+    liquidityPools(assetA: Token, assetB?: Token): Promise<DexterResponse> {
         return Promise.all(
-            this.onDexs.map((dex: BaseDex) => dex.liquidityPool(assetA, assetB)),
-        ).then((liquidityPools: LiquidityPool[]) => {
-            return liquidityPools.reduce((result: DexterResponse, liquidityPool: LiquidityPool) => {
+            this.onDexs.map((dex: BaseDex) => dex.liquidityPools(this.provider, assetA, assetB)),
+        ).then((mappedLiquidityPools: Awaited<LiquidityPool[]>[]) => {
+            return mappedLiquidityPools.flat().reduce((result: DexterResponse, liquidityPool?: LiquidityPool) => {
+                if (! liquidityPool) {
+                    return result;
+                }
+
                 (result[liquidityPool.dex] = result[liquidityPool.dex] || []).push(liquidityPool);
 
                 return result;
             }, {} as DexterResponse);
         });
-    }
-
-    liquidityPools(asset: Asset): Promise<LiquidityPool[]> {
-        return Promise.resolve([]);
     }
 
 }
