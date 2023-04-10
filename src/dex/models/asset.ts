@@ -1,11 +1,13 @@
 export class Asset {
 
-    policyId: string;
-    assetHex: string;
+    public policyId: string;
+    public assetNameHex: string;
+    public decimals: number;
 
-    constructor(policyId: string, assetHex: string) {
+    constructor(policyId: string, assetNameHex: string, decimals: number = 0) {
         this.policyId = policyId;
-        this.assetHex = assetHex;
+        this.assetNameHex = assetNameHex;
+        this.decimals = decimals;
     }
 
     static fromId(id: string): Asset {
@@ -15,12 +17,12 @@ export class Asset {
         );
     }
 
-    get assetName(): string {
-        return Buffer.from(this.assetHex, 'hex').toString();
+    id(dilimeter: '' | '.' = ''): string {
+        return this.policyId + dilimeter + this.assetNameHex;
     }
 
-    id(dilimeter: '' | '.' = '') {
-        return `${this.policyId}${dilimeter}${this.assetHex}`;
+    get assetName(): string {
+        return Buffer.from(this.assetNameHex, 'hex').toString();
     }
 
 }

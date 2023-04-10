@@ -6,7 +6,12 @@ export type AssetBalance = {
 }
 
 export type UTxO = {
-    txHash: string,
+    address: string,
     outputIndex: number,
     assetBalances: AssetBalance[],
+};
+
+export type Transaction = {
+    txHash: string,
+    txIndex: number,
 };

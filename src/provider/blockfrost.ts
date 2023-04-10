@@ -1,7 +1,6 @@
 import { BaseProvider } from './base-provider';
 import axios, { RawAxiosRequestConfig, AxiosInstance } from 'axios';
-import { UTxO } from '../types/provider';
-import { AssetBalance } from '../types/dex';
+import { AssetBalance, Transaction, UTxO } from '../types/provider';
 import { Asset } from '../dex/models/asset';
 
 export class Blockfrost extends BaseProvider {
@@ -19,13 +18,13 @@ export class Blockfrost extends BaseProvider {
         } as RawAxiosRequestConfig);
     }
 
-    async utxos(address: string, asset: string = ''): Promise<UTxO[]> {
+    async utxos(address: string, assetId: string = ''): Promise<UTxO[]> {
         try {
-            return this.fromPaginatedRequest(`/addresses/${address}/utxos/${asset}`)
+            return this.fromPaginatedRequest(`/addresses/${address}/utxos/${assetId}`)
                 .then((results: any) => {
                     return results.map((utxo: any) => {
                         return {
-                            txHash: utxo.tx_hash,
+                            address: utxo.address,
                             outputIndex: utxo.output_index,
                             assetBalances: utxo.amount.reduce((assets: AssetBalance[], amount: any) => {
                                 assets.push({
@@ -42,11 +41,46 @@ export class Blockfrost extends BaseProvider {
         }
     }
 
+    async transactionUtxos(txHash: string): Promise<UTxO[]> {
+        return this.api.get(`/txs/${txHash}/utxos`)
+            .then((response: any) => {
+                return response.data.outputs.map((utxo: any) => {
+                    return {
+                        address: utxo.address,
+                        outputIndex: utxo.output_index,
+                        assetBalances: utxo.amount.reduce((assets: AssetBalance[], amount: any) => {
+                            assets.push({
+                                asset: amount.unit === 'lovelace' ? amount.unit : Asset.fromId(amount.unit),
+                                quantity: BigInt(amount.quantity),
+                            })
+                            return assets;
+                        }, []),
+                    } as UTxO;
+                }) as UTxO[];
+            });
+    }
+
+    async assetTransactions(assetId: string): Promise<Transaction[]> {
+        try {
+            return this.fromPaginatedRequest(`/assets/${assetId}/transactions`)
+                .then((results: any) => {
+                    return results.map((tx: any) => {
+                        return {
+                            txHash: tx.tx_hash,
+                            txIndex: tx.tx_index,
+                        } as Transaction;
+                    }) as Transaction[];
+                });
+        } catch (e) {
+            return [];
+        }
+    }
+
     private fromPaginatedRequest(url: string, page: number = 1, results: Array<any> = []): Promise<Array<any>> {
         return this.api.get(url, {
             params: {
                 page,
-            }
+            },
         }).then((response: any) => {
             if (response.data.length === 0) {
                 return results;

@@ -9,20 +9,14 @@ import { Asset } from '../src/dex/models/asset';
 describe('Dexter', () => {
 
     test.only('demo', async () => {
-        await Dexter.new((new Blockfrost('https://cardano-mainnet.blockfrost.io/api/v0', 'mainnetph527L8KoiutfNx9ls98lgn1G3IiLhbK')))
-            .for(Minswap.name)
-            .liquidityPools(new Asset('1a71dc14baa0b4fcfb34464adc6656d0e562571e2ac1bc990c9ce5f6', '574f4c46')).then((lps: DexterResponse) => {
-                lps['Minswap'].forEach((lp: LiquidityPool) => {
-                    console.log(lp.name)
-                })
+        const d = await Dexter.new((new Blockfrost('https://cardano-mainnet.blockfrost.io/api/v0', 'mainnetph527L8KoiutfNx9ls98lgn1G3IiLhbK')));
 
-            expect(3).toEqual(3);
+            d.for(Minswap.name)
+            .liquidityPools(new Asset('f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc535', '41474958', 8), 'lovelace').then((lps: DexterResponse) => {
+                lps['Minswap'].forEach((lp) => {
+                    console.log(lp.price)
+                })
             })
-        // (new Blockfrost('https://cardano-mainnet.blockfrost.io/api/v0', 'mainnetph527L8KoiutfNx9ls98lgn1G3IiLhbK'))
-        //     .utxos('addr1z8snz7c4974vzdpxu65ruphl3zjdvtxw8strf2c2tmqnxz2j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq0xmsha')
-        //     .then((utxos) => {
-        //         console.log(utxos.length)
-        //     })
     });
 
     test('can add on DEX', () => {
@@ -43,7 +37,7 @@ describe('Dexter', () => {
     test('can pull a liquidity pool', () => {
         Dexter.new(new Mock())
             .for(Minswap.name)
-            .liquidityPoolsForPair('lovelace', 'lovelace')
+            .liquidityPools('lovelace', 'lovelace')
             .then((response: DexterResponse) => {
                 expect(response[Minswap.name]).toBeDefined();
                 expect(response[Minswap.name].length).toStrictEqual(1);
