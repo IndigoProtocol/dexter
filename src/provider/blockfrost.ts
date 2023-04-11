@@ -7,6 +7,9 @@ export class Blockfrost extends BaseProvider {
 
     private api: AxiosInstance;
 
+    /**
+     * https://docs.blockfrost.io/
+     */
     constructor(url: string, projectId: string) {
         super();
 
@@ -18,6 +21,10 @@ export class Blockfrost extends BaseProvider {
         } as RawAxiosRequestConfig);
     }
 
+    /**
+     * https://docs.blockfrost.io/#tag/Cardano-Addresses/paths/~1addresses~1%7Baddress%7D~1utxos/get
+     * https://docs.blockfrost.io/#tag/Cardano-Addresses/paths/~1addresses~1%7Baddress%7D~1utxos~1%7Basset%7D/get
+     */
     async utxos(address: string, assetId: string = ''): Promise<UTxO[]> {
         try {
             return this.fromPaginatedRequest(`/addresses/${address}/utxos/${assetId}`)
@@ -41,6 +48,9 @@ export class Blockfrost extends BaseProvider {
         }
     }
 
+    /**
+     * https://docs.blockfrost.io/#tag/Cardano-Transactions/paths/~1txs~1%7Bhash%7D~1utxos/get
+     */
     async transactionUtxos(txHash: string): Promise<UTxO[]> {
         return this.api.get(`/txs/${txHash}/utxos`)
             .then((response: any) => {
@@ -60,6 +70,9 @@ export class Blockfrost extends BaseProvider {
             });
     }
 
+    /**
+     * https://docs.blockfrost.io/#tag/Cardano-Assets/paths/~1assets~1%7Basset%7D~1transactions/get
+     */
     async assetTransactions(assetId: string): Promise<Transaction[]> {
         try {
             return this.fromPaginatedRequest(`/assets/${assetId}/transactions`)

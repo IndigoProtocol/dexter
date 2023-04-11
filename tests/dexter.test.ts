@@ -1,7 +1,7 @@
 import { Dexter } from '../src/dexter';
 import { Minswap } from '../src/dex/minswap';
 import { Mock } from '../src/provider/mock';
-import { DexterResponse } from '../src/types/global';
+import { DexterConfig, DexterResponse } from '../src/types/global';
 import { Blockfrost } from '../src/provider/blockfrost';
 import { LiquidityPool } from '../src/dex/models/liquidity-pool';
 import { Asset } from '../src/dex/models/asset';
@@ -12,6 +12,9 @@ describe('Dexter', () => {
         const d = await Dexter.new((new Blockfrost('https://cardano-mainnet.blockfrost.io/api/v0', 'mainnetph527L8KoiutfNx9ls98lgn1G3IiLhbK')));
 
             d.for(Minswap.name)
+            .withConfig({
+                shouldFetchMetadata: true,
+            } as DexterConfig)
             .liquidityPools(new Asset('f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc535', '41474958', 8), 'lovelace').then((lps: DexterResponse) => {
                 lps['Minswap'].forEach((lp) => {
                     console.log(lp.price)
