@@ -85,16 +85,14 @@ export class DexterRequest {
                 relevantUtxo,
                 liquidityPool.assetA,
                 liquidityPool.assetB
-            );
+            ) as LiquidityPool | undefined;
         });
 
         return await Promise.all(liquidityPoolPromises)
             .then((liquidityPools: (LiquidityPool | undefined)[]) => {
-                console.log(liquidityPools)
-                return [];
-                // return liquidityPools.filter((liquidityPool?: LiquidityPool) {
-                //     return liquidityPool !== undefined;
-                // });
+                return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
+                    return liquidityPool !== undefined;
+                }) as LiquidityPool[];
             });
     }
 

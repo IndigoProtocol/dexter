@@ -59,7 +59,7 @@ export class Blockfrost extends BaseProvider {
             .then((response: any) => {
                 return response.data.outputs.map((utxo: any) => {
                     return {
-                        txHash: utxo.txHash,
+                        txHash: response.data.hash,
                         address: utxo.address,
                         datumHash: utxo.data_hash,
                         outputIndex: utxo.output_index,
