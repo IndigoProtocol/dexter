@@ -13,7 +13,7 @@ export abstract class BaseDex {
     /**
      * Fetch all liquidity pools matching assetA & assetB.
      */
-    abstract liquidityPools(provider: BaseProvider, assetA: Token = 'lovelace', assetB?: Token): Promise<LiquidityPool[]>;
+    abstract liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]>;
 
     /**
      * Submit a swap order through this DEX.

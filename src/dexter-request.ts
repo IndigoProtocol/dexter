@@ -1,22 +1,17 @@
 import { BaseDex } from './dex/base-dex';
-import { Token } from './dex/models/asset';
-import { AvailableDexs, DexterConfig, DexterResponse } from './types/global';
+import { Asset, Token } from './dex/models/asset';
+import { DexterResponse } from './types/global';
 import { LiquidityPool } from './dex/models/liquidity-pool';
 import { Transaction, UTxO } from './types/provider';
-import { BaseProvider } from './provider/base-provider';
+import { Dexter } from './dexter';
 
 export class DexterRequest {
 
     private onDexs: BaseDex[] = [];
+    private dexter: Dexter;
 
-    private readonly provider: BaseProvider;
-    private readonly config: DexterConfig;
-    private readonly availableDexs: AvailableDexs;
-
-    constructor(provider: BaseProvider, config: DexterConfig, availableDexs: AvailableDexs) {
-        this.provider = provider;
-        this.config = config;
-        this.availableDexs = availableDexs;
+    constructor(dexter: Dexter) {
+        this.dexter = dexter;
     }
 
     /**
@@ -24,13 +19,13 @@ export class DexterRequest {
      */
     for(dexs: string | string[]): DexterRequest {
         (Array.isArray(dexs) ? dexs : [dexs]).forEach((dexName: string) => {
-            if (! Object.keys(this.availableDexs).includes(dexName)) {
+            if (! Object.keys(this.dexter.availableDexs).includes(dexName)) {
                 throw new Error(`DEX ${dexName} is not available.`);
             }
 
             this.onDexs = this.onDexs.filter((dex: BaseDex) => {
                 return dex.name !== dexName;
-            }).concat(this.availableDexs[dexName]);
+            }).concat(this.dexter.availableDexs[dexName]);
         });
 
         return this;
@@ -40,7 +35,7 @@ export class DexterRequest {
      * Fetch data for all available DEXs.
      */
     forAll(): DexterRequest {
-        this.onDexs = Object.values(this.availableDexs);
+        this.onDexs = Object.values(this.dexter.availableDexs);
 
         return this;
     }
@@ -49,18 +44,20 @@ export class DexterRequest {
      * Fetch all liquidity pools matching assetA & assetB.
      * All liquidity pools will be returned if assetA & assetB are not provided.
      */
-    liquidityPools(assetA: Token = 'lovelace', assetB?: Token): Promise<DexterResponse> {
+    getLiquidityPools(assetA: Token = 'lovelace', assetB?: Token): Promise<DexterResponse> {
         return Promise.all(
-            this.onDexs.map((dex: BaseDex) => dex.liquidityPools(this.provider, assetA, assetB)),
+            this.onDexs.map((dex: BaseDex) => dex.liquidityPools(this.dexter.provider, assetA, assetB)),
         ).then(async (mappedLiquidityPools: Awaited<LiquidityPool[]>[]) => {
             const liquidityPools: LiquidityPool[] = mappedLiquidityPools.flat();
 
-            if (this.config.shouldFetchMetadata) {
+            if (this.dexter.config.shouldFetchMetadata) {
                 await this.fetchAssetMetadata(liquidityPools);
             }
 
             return liquidityPools.reduce((result: DexterResponse, liquidityPool?: LiquidityPool) => {
-                (result[liquidityPool.dex] = result[liquidityPool.dex] || []).push(liquidityPool);
+                if (liquidityPool) {
+                    (result[liquidityPool.dex] = result[liquidityPool.dex] || []).push(liquidityPool);
+                }
 
                 return result;
             }, {} as DexterResponse);
@@ -70,28 +67,35 @@ export class DexterRequest {
     /**
      * Fetch historic states for a liquidity pool.
      */
-    async liquidityPoolHistory(liquidityPool: LiquidityPool): Promise<LiquidityPool[]> {
-        const transactions: Transaction[] = await this.provider.assetTransactions(liquidityPool.lpToken.id());
+    async getLiquidityPoolHistory(liquidityPool: LiquidityPool): Promise<LiquidityPool[]> {
+        const transactions: Transaction[] = await this.dexter.provider.assetTransactions(liquidityPool.lpToken.id());
 
-        const liquidityPoolPromises: Promise<LiquidityPool>[] = transactions.map(async (transaction: Transaction) => {
-            const utxos: UTxO[] = await this.provider.transactionUtxos(transaction.txHash);
+        const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = transactions.map(async (transaction: Transaction) => {
+            const utxos: UTxO[] = await this.dexter.provider.transactionUtxos(transaction.txHash);
 
-            const relevantUtxo: UTxO = utxos.find((utxo: UTxO) => {
+            const relevantUtxo: UTxO | undefined = utxos.find((utxo: UTxO) => {
                 return utxo.address === liquidityPool.address;
             });
 
             if (! relevantUtxo) {
-                throw new Error('Unable to find UTxO for liquidity pool history');
+                return undefined;
             }
 
-            return this.availableDexs[liquidityPool.dex].liquidityPoolFromUtxo(
+            return this.dexter.availableDexs[liquidityPool.dex].liquidityPoolFromUtxo(
                 relevantUtxo,
                 liquidityPool.assetA,
                 liquidityPool.assetB
             );
         });
 
-        return await Promise.all(liquidityPoolPromises);
+        return await Promise.all(liquidityPoolPromises)
+            .then((liquidityPools: (LiquidityPool | undefined)[]) => {
+                console.log(liquidityPools)
+                return [];
+                // return liquidityPools.filter((liquidityPool?: LiquidityPool) {
+                //     return liquidityPool !== undefined;
+                // });
+            });
     }
 
     private async fetchAssetMetadata(liquidityPools: LiquidityPool[]) {
@@ -106,25 +110,25 @@ export class DexterRequest {
             return assetIds;
         }, [] as Array<string>);
 
-        // await this.tokenRegistry.metadataBatch(assetIds)
-        //     .then((response: any) => {
-        //         liquidityPools.forEach((liquidityPool: LiquidityPool) => {
-        //             [liquidityPool.assetA, liquidityPool.assetB].forEach((asset: Token) => {
-        //                 if (! (asset instanceof Asset)) {
-        //                     return;
-        //                 }
-        //
-        //                 const responseAsset = response.find((metadata: any) => {
-        //                     return metadata.subject === asset.id();
-        //                 });
-        //
-        //                 asset.decimals = responseAsset.decimals.value;
-        //                 asset.logo = responseAsset.logo.value;
-        //                 asset.ticker = responseAsset.ticker.value;
-        //                 asset.url = responseAsset.url.value;
-        //             });
-        //         });
-        //     });
+        await this.dexter.tokenRegistry.metadataBatch(assetIds)
+            .then((response: any) => {
+                liquidityPools.forEach((liquidityPool: LiquidityPool) => {
+                    [liquidityPool.assetA, liquidityPool.assetB].forEach((asset: Token) => {
+                        if (! (asset instanceof Asset)) {
+                            return;
+                        }
+
+                        const responseAsset = response.find((metadata: any) => {
+                            return metadata.subject === asset.id();
+                        });
+
+                        asset.decimals = responseAsset.decimals.value;
+                        asset.logo = responseAsset.logo.value;
+                        asset.ticker = responseAsset.ticker.value;
+                        asset.url = responseAsset.url.value;
+                    });
+                });
+            });
     }
 
 }

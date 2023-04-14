@@ -1,15 +1,27 @@
 {
+  "include": ["src"],
   "compilerOptions": {
-    "incremental": true,
+    "outDir": "./dist/src",
+    "noImplicitAny": true,
+    "module": "es2020",
     "target": "es2020",
-    "module": "commonjs",
+    "allowJs": true,
+    "moduleResolution": "node",
     "declaration": true,
-    "outDir": "lib",
+    "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": [
-    "src"
-  ]
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  }
 }

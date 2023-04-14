@@ -1,0 +1,96 @@
+{
+  "constructor": 0,
+  "fields": [
+    {
+      "constructor": 0,
+      "fields": [
+        {
+          "constructor": 0,
+          "fields": [
+            {
+              "bytes": "{PubKeyHash}"
+            }
+          ]
+        },
+        {
+          "constructor": 0,
+          "fields": [
+            {
+              "constructor": 0,
+              "fields": [
+                {
+                  "constructor": 0,
+                  "fields": [
+                    {
+                      "bytes": "{StakingKeyHash}"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "constructor": 0,
+      "fields": [
+        {
+          "constructor": 0,
+          "fields": [
+            {
+              "bytes": "{PubKeyHash}"
+            }
+          ]
+        },
+        {
+          "constructor": 0,
+          "fields": [
+            {
+              "constructor": 0,
+              "fields": [
+                {
+                  "constructor": 0,
+                  "fields": [
+                    {
+                      "bytes": "{StakingKeyHash}"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "constructor": 1,
+      "fields": []
+    },
+    {
+      "constructor": 0,
+      "fields": [
+        {
+          "constructor": 0,
+          "fields": [
+            {
+              "bytes": "{SwapOutTokenPolicyId}"
+            },
+            {
+              "bytes": "{SwapOutTokenPolicyAssetName}"
+            }
+          ]
+        },
+        {
+          "int": "{MinReceive}"
+        }
+      ]
+    },
+    {
+      "int": "{BatcherFee}"
+    },
+    {
+      "int": "{Deposit}"
+    }
+  ]
+}

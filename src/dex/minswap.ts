@@ -22,14 +22,14 @@ export class Minswap extends BaseDex {
                     return this.liquidityPoolFromUtxo(utxo, assetA, assetB);
                 }).filter((liquidityPool?: LiquidityPool) => {
                     return liquidityPool !== undefined;
-                });
+                }) as LiquidityPool[];
             });
     }
 
     submitSwap(): void {
     }
 
-    liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB: Token): LiquidityPool | undefined {
+    liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB?: Token): LiquidityPool | undefined {
         const assetAId: string = assetA === 'lovelace' ? 'lovelace' : assetA.id();
         const assetBId: string = assetB ? (assetB === 'lovelace' ? 'lovelace' : assetB.id()) : '';
 
@@ -78,6 +78,7 @@ export class Minswap extends BaseDex {
             this.name,
             utxo.address,
             lpToken,
+            0n,
             relevantAssets[assetAIndex].asset,
             relevantAssets[assetBIndex].asset,
             relevantAssets[assetAIndex].quantity,

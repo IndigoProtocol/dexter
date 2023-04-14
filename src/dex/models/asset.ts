@@ -7,10 +7,13 @@ export class Asset {
     public logo: string;
     public url: string;
 
-    constructor(policyId: string, assetNameHex: string, decimals: number = 0) {
+    constructor(policyId: string, assetNameHex: string, decimals: number = 0, ticker: string = '', logo: string = '', url: string = '') {
         this.policyId = policyId;
         this.assetNameHex = assetNameHex;
         this.decimals = decimals;
+        this.ticker = ticker;
+        this.logo = logo;
+        this.url = url;
     }
 
     static fromId(id: string): Asset {

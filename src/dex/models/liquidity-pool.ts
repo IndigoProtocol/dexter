@@ -5,15 +5,17 @@ export class LiquidityPool {
     dex: string;
     address: string;
     lpToken: Asset;
+    totalLpTokens: bigint;
     assetA: Token;
     assetB: Token;
     reserveA: bigint;
     reserveB: bigint;
 
-    constructor(dex: string, address: string, lpToken: Asset, assetA: Token, assetB: Token, reserveA: bigint, reserveB: bigint) {
+    constructor(dex: string, address: string, lpToken: Asset, totalLpTokens: bigint, assetA: Token, assetB: Token, reserveA: bigint, reserveB: bigint) {
         this.dex = dex;
         this.address = address;
         this.lpToken = lpToken;
+        this.totalLpTokens = totalLpTokens;
         this.assetA = assetA;
         this.assetB = assetB;
         this.reserveA = reserveA;

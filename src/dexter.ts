@@ -6,25 +6,24 @@ import { DexterRequest } from './dexter-request';
 
 export class Dexter {
 
-    private provider: BaseProvider;
-    private config: DexterConfig;
+    public provider: BaseProvider;
+    public config: DexterConfig;
 
-    private availableDexes: AvailableDexs;
-    private tokenRegistry: TokenRegistry;
+    public availableDexs: AvailableDexs;
+    public tokenRegistry: TokenRegistry;
 
-    static new(provider: BaseProvider, config?: DexterConfig): Dexter {
-        let dexter = new this();
-
-        dexter.switchProvider(provider);
-        dexter.setConfig(config);
-        dexter.tokenRegistry = new TokenRegistry();
-        dexter.availableDexes = {
+    constructor(provider: BaseProvider, config: DexterConfig = {}) {
+        this.provider = provider;
+        this.config = config;
+        this.tokenRegistry = new TokenRegistry();
+        this.availableDexs = {
             [Minswap.name]: new Minswap(),
         };
-
-        return dexter;
     }
 
+    /**
+     * Set config Dexter will use for all requests.
+     */
     setConfig(config: DexterConfig = {}): Dexter {
         this.config = config;
 
@@ -40,12 +39,11 @@ export class Dexter {
         return this;
     }
 
+    /**
+     * New request for data fetching.
+     */
     newRequest(): DexterRequest {
-        return new DexterRequest(
-            this.provider,
-            this.config,
-            this.availableDexes,
-        );
+        return new DexterRequest(this);
     }
 
 }

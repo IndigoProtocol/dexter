@@ -2,6 +2,7 @@ import { BaseProvider } from './base-provider';
 import axios, { RawAxiosRequestConfig, AxiosInstance } from 'axios';
 import { AssetBalance, Transaction, UTxO } from '../types/provider';
 import { Asset } from '../dex/models/asset';
+import { Data, Datum, fromHex } from 'lucid-cardano';
 
 export class Blockfrost extends BaseProvider {
 
@@ -31,7 +32,9 @@ export class Blockfrost extends BaseProvider {
                 .then((results: any) => {
                     return results.map((utxo: any) => {
                         return {
+                            txHash: utxo.tx_hash,
                             address: utxo.address,
+                            datumHash: utxo.data_hash,
                             outputIndex: utxo.output_index,
                             assetBalances: utxo.amount.reduce((assets: AssetBalance[], amount: any) => {
                                 assets.push({
@@ -56,7 +59,9 @@ export class Blockfrost extends BaseProvider {
             .then((response: any) => {
                 return response.data.outputs.map((utxo: any) => {
                     return {
+                        txHash: utxo.txHash,
                         address: utxo.address,
+                        datumHash: utxo.data_hash,
                         outputIndex: utxo.output_index,
                         assetBalances: utxo.amount.reduce((assets: AssetBalance[], amount: any) => {
                             assets.push({
