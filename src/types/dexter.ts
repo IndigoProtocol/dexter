@@ -1,5 +1,6 @@
 import { LiquidityPool } from '../dex/models/liquidity-pool';
 import { BaseDex } from '../dex/base-dex';
+import { DatumKey } from '../constants';
 
 export interface DexterConfig {
     shouldFetchMetadata?: false,
@@ -10,4 +11,8 @@ export type DexterResponse = {
 }
 export type AvailableDexs = {
     [dex: string]: BaseDex,
+}
+
+export type DatumMap = {
+    [key in DatumKey]: string | bigint | number
 }

@@ -1,4 +1,4 @@
-export enum DatumKeys {
+export enum DatumKey {
     PubKeyHash,
     StakingKeyHash,
     MinReceive,
@@ -8,6 +8,6 @@ export enum DatumKeys {
     SwapOutTokenAssetName,
     TotalLpTokens,
     BatcherFee,
-    Deposit,
+    DepositFee,
     Unknown,
 }

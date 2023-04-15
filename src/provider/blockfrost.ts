@@ -2,7 +2,6 @@ import { BaseProvider } from './base-provider';
 import axios, { RawAxiosRequestConfig, AxiosInstance } from 'axios';
 import { AssetBalance, Transaction, UTxO } from '../types/provider';
 import { Asset } from '../dex/models/asset';
-import { Data, Datum, fromHex } from 'lucid-cardano';
 
 export class Blockfrost extends BaseProvider {
 

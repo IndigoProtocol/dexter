@@ -1,6 +1,6 @@
 import { Minswap } from './dex/minswap';
 import { BaseProvider } from './provider/base-provider';
-import { AvailableDexs, DexterConfig } from './types/global';
+import { AvailableDexs, DexterConfig } from './types/dexter';
 import { TokenRegistry } from './services/token-registry';
 import { DexterRequest } from './dexter-request';
 

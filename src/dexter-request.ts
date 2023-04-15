@@ -1,6 +1,6 @@
 import { BaseDex } from './dex/base-dex';
 import { Asset, Token } from './dex/models/asset';
-import { DexterResponse } from './types/global';
+import { DexterResponse } from './types/dexter';
 import { LiquidityPool } from './dex/models/liquidity-pool';
 import { Transaction, UTxO } from './types/provider';
 import { Dexter } from './dexter';
