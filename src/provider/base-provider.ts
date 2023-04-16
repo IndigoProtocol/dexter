@@ -1,4 +1,4 @@
-import { Transaction, UTxO } from '../types/provider';
+import { Transaction, UTxO } from '../types';
 
 export abstract class BaseProvider {
 

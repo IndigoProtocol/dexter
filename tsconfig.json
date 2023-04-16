@@ -1,7 +1,6 @@
 {
-  "include": ["src"],
   "compilerOptions": {
-    "outDir": "./dist/src",
+    "outDir": "./build",
     "noImplicitAny": true,
     "module": "es2020",
     "target": "es2020",
@@ -23,5 +22,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
-  }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "tests"]
 }

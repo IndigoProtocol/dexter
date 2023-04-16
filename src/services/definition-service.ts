@@ -1,5 +1,5 @@
 import { datumJsonToCbor } from 'lucid-cardano';
-import { DatumParameters } from '../types/dexter';
+import { DatumParameters } from '../types';
 
 export class DefinitionService {
 

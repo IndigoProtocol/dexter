@@ -1,5 +1,5 @@
 import { BaseProvider } from './base-provider';
-import { Transaction, UTxO } from '../types/provider';
+import { Transaction, UTxO } from '../types';
 
 export class Mock extends BaseProvider {
 

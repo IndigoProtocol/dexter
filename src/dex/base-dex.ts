@@ -1,7 +1,7 @@
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseProvider } from '../provider/base-provider';
 import { Token } from './models/asset';
-import { UTxO } from '../types/provider';
+import { UTxO } from '../types';
 
 export abstract class BaseDex {
 
