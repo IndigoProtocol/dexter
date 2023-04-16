@@ -1,13 +1,16 @@
 export enum DatumKey {
-    PubKeyHash,
-    StakingKeyHash,
-    MinReceive,
-    SwapInTokenPolicyId,
-    SwapInTokenAssetName,
-    SwapOutTokenPolicyId,
-    SwapOutTokenAssetName,
-    TotalLpTokens,
-    BatcherFee,
-    DepositFee,
-    Unknown,
+    PubKeyHash = 'PubKeyHash',
+    StakingKeyHash = 'StakingKeyHash',
+    MinReceive = 'MinReceive',
+    SwapInTokenPolicyId = 'SwapInTokenPolicyId',
+    SwapInTokenAssetName = 'SwapInTokenAssetName',
+    SwapOutTokenPolicyId = 'SwapOutTokenPolicyId',
+    SwapOutTokenAssetName = 'SwapOutTokenAssetName',
+
+    TotalLpTokens = 'TotalLpTokens',
+
+    BatcherFee = 'BatcherFee',
+    DepositFee = 'DepositFee',
+
+    Unknown = 'Unknown',
 }

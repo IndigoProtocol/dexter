@@ -1,14 +1,15 @@
-import { readFileSync } from 'fs';
-import * as path from 'path';
-import { Data } from 'lucid-cardano';
+import { datumJsonToCbor } from 'lucid-cardano';
+import { DatumParameters } from '../types/dexter';
 
 export class DefinitionService {
 
-    fromDefinitionFile(filePath: string) {
-        import(filePath).then(widget => {
-            console.log(Data.fromJson(widget.default))
-
+    loadDefinition(definitionFilePath: string, parameters: DatumParameters) {
+        import(definitionFilePath).then((definition) => {
+            console.log(definition.default)
+            // console.log(datumJsonToCbor((definition.default)))
         });
     }
+
+
 
 }

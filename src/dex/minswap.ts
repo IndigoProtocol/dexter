@@ -1,8 +1,8 @@
-import { BaseDex } from './base-dex';
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseProvider } from '../provider/base-provider';
 import { Asset, Token } from './models/asset';
 import { AssetBalance, UTxO } from '../types/provider';
+import { BaseDex } from './base-dex';
 
 export class Minswap extends BaseDex {
 

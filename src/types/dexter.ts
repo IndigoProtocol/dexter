@@ -13,6 +13,6 @@ export type AvailableDexs = {
     [dex: string]: BaseDex,
 }
 
-export type DatumMap = {
-    [key in DatumKey]: string | bigint | number
+export type DatumParameters = {
+    [key in DatumKey]?: string | number
 }

@@ -1,19 +1,17 @@
 import { Dexter } from '../src/dexter';
-import { Minswap } from '../src/dex/minswap';
-import { Mock } from '../src/provider/mock';
-import { DexterConfig, DexterResponse } from '../src/types/dexter';
 import { Blockfrost } from '../src/provider/blockfrost';
-import { Asset } from '../src/dex/models/asset';
-import { LiquidityPool } from '../src/dex/models/liquidity-pool';
 import { DefinitionService } from '../src/services/definition-service';
+import { DatumKey } from '../src/constants';
 
 describe('Dexter', () => {
 
-    test.only('demo', async () => {
-        const d = new Dexter(new Blockfrost('https://cardano-mainnet.blockfrost.io/api/v0', 'mainnetph527L8KoiutfNx9ls98lgn1G3IiLhbK'));
+    test('demo', () => {
+        // const d = new Dexter(new Blockfrost('https://cardano-mainnet.blockfrost.io/api/v0', 'mainnetph527L8KoiutfNx9ls98lgn1G3IiLhbK'));
 
         const t = new DefinitionService();
-        t.fromDefinitionFile('definitions/minswap/swap.ts')
+        t.loadDefinition('definitions/minswap/swap.ts', {
+            [DatumKey.PubKeyHash]: '',
+        })
 
         // const lp: LiquidityPool = new LiquidityPool(
         //     Minswap.name,
@@ -39,14 +37,8 @@ describe('Dexter', () => {
             //     // })
             //     console.log(lps['Minswap'][0])
             // })
-    });
 
-    // test('can add on DEX', () => {
-    //     let dexter = Dexter.new(new Mock())
-    //         .for(Minswap.name);
-    //
-    //     expect(dexter.onDexs[0]).toBeInstanceOf(Minswap);
-    // });
+    });
     //
     // test('can reset on DEXs', () => {
     //     let dexter = Dexter.new(new Mock())
