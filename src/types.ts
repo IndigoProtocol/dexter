@@ -35,3 +35,18 @@ export type Transaction = {
     txHash: string,
     txIndex: number,
 };
+
+export type DefinitionBytes = {
+    bytes: string,
+}
+
+export type DefinitionInt = {
+    int: number,
+}
+
+export type DefinitionField = DefinitionConstr | DefinitionBytes | DefinitionInt
+
+export type DefinitionConstr = {
+    constructor: number,
+    fields: DefinitionField[],
+}

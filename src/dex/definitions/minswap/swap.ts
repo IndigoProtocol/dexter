@@ -1,4 +1,4 @@
-import { DatumKey } from '../../constants';
+import { DatumKey } from '../../../constants';
 
 export default {
   constructor: 0,
