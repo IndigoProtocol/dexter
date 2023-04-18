@@ -3,6 +3,7 @@ import { BaseProvider } from './provider/base-provider';
 import { TokenRegistry } from './services/token-registry';
 import { DexterRequest } from './dexter-request';
 import { AvailableDexs, DexterConfig } from './types';
+import { SundaeSwap } from './dex/sundaeswap';
 
 export class Dexter {
 
@@ -18,6 +19,7 @@ export class Dexter {
         this.tokenRegistry = new TokenRegistry();
         this.availableDexs = {
             [Minswap.name]: new Minswap(),
+            [SundaeSwap.name]: new SundaeSwap(),
         };
     }
 

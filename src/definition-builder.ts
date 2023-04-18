@@ -138,7 +138,7 @@ export class DefinitionBuilder {
 
             const datumKeys: string[] = Object.values(DatumParameterKey);
 
-            if (typeof templateDefinition.bytes && datumKeys.includes(templateDefinition.bytes)) {
+            if (datumKeys.includes(templateDefinition.bytes)) {
                 foundParameters[templateDefinition.bytes] = definedDefinition.bytes;
             }
         }

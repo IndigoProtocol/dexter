@@ -4,18 +4,20 @@ import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import { AssetBalance, UTxO } from '../types';
 
-export class Minswap extends BaseDex {
+export class SundaeSwap extends BaseDex {
 
-    public name: string = 'Minswap';
+    public name: string = 'SundaeSwap';
 
-    private readonly poolAddress: string = 'addr1z8snz7c4974vzdpxu65ruphl3zjdvtxw8strf2c2tmqnxz2j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq0xmsha';
-    private readonly marketOrderAddress: string = 'addr1wxn9efv2f6w82hagxqtn62ju4m293tqvw0uhmdl64ch8uwc0h43gt';
-    private readonly limitOrderAddress: string = 'addr1zxn9efv2f6w82hagxqtn62ju4m293tqvw0uhmdl64ch8uw6j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq6s3z70';
-    private readonly validityToken: string = '13aa2accf2e1561723aa26871e071fdf32c867cff7e7d50ad470d62f4d494e53574150';
-    private readonly lpTokenPolicyId: string = 'e4214b7cce62ac6fbba385d164df48e157eae5863521b4b67ca71d86';
-    private readonly poolNftPolicyId: string = '0be55d262b29f564998ff81efe21bdc0022621c12f15af08d0f2ddb1';
+    private readonly poolAddress: string = 'addr1w9qzpelu9hn45pefc0xr4ac4kdxeswq7pndul2vuj59u8tqaxdznu';
+    private readonly orderAddress: string = 'addr1wxaptpmxcxawvr3pzlhgnpmzz3ql43n2tc8mn3av5kx0yzs09tqh8';
+    private readonly validityTokenPolicyId: string = '0029cb7c88c7567b63d1a512c0ed626aa169688ec980730c0473b913';
 
     liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+        provider.utxos(this.orderAddress)
+            .then((utxos: UTxO[]) => {
+                console.log(utxos.length)
+            });
+
         return provider.utxos(this.poolAddress, (assetA === 'lovelace' ? '' : assetA.id()))
             .then((utxos: UTxO[]) => {
                 return utxos.map((utxo: UTxO) => {
@@ -36,9 +38,7 @@ export class Minswap extends BaseDex {
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
             const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
 
-            return assetBalanceId !== this.validityToken
-                && ! assetBalanceId.startsWith(this.lpTokenPolicyId)
-                && ! assetBalanceId.startsWith(this.poolNftPolicyId);
+            return ! assetBalanceId.startsWith(this.validityTokenPolicyId);
         });
 
         // Irrelevant UTxO
@@ -63,14 +63,6 @@ export class Minswap extends BaseDex {
             || !assetBId;
 
         if (! matchesFilter) {
-            return undefined;
-        }
-
-        const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
-            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
-        })?.asset as Asset;
-
-        if (!lpToken) {
             return undefined;
         }
 
