@@ -31,9 +31,20 @@ export class DefinitionBuilder {
             throw new Error(`Please load a definition file before applying parameters`);
         }
 
-        this.definition = this.applyParameters(parameters, this.definition);
+        this.definition = this.applyParameters(this.definition, parameters);
 
         return this;
+    }
+
+    /**
+     * Pull parameters of a datum using a definition template.
+     */
+    public pullParameters(definedDefinition: DefinitionConstr): DatumParameters {
+        if (! this.definition) {
+            throw new Error(`Please load a definition file before pulling parameters`);
+        }
+
+        return this.extractParameters(definedDefinition, this.definition);
     }
 
     /**
@@ -50,7 +61,7 @@ export class DefinitionBuilder {
     /**
      * Recursively set specified parameters.
      */
-    private applyParameters(mappedParameters: DatumParameters, field: DefinitionField): DefinitionConstr {
+    private applyParameters(field: DefinitionField, mappedParameters: DatumParameters): DefinitionConstr {
         if ('fields' in field) {
             if (typeof field.constructor === 'string') {
                 const parameterValue: any = mappedParameters[field.constructor as keyof typeof DatumParameterKey];
@@ -63,7 +74,7 @@ export class DefinitionBuilder {
             }
 
             field.fields = field.fields.map((fieldParameter: DefinitionField) => {
-                return this.applyParameters(mappedParameters, fieldParameter);
+                return this.applyParameters(fieldParameter, mappedParameters);
             });
         }
 
@@ -88,6 +99,51 @@ export class DefinitionBuilder {
         }
 
         return field as DefinitionConstr;
+    }
+
+    /**
+     * Recursively pull parameters from datum using definition template.
+     */
+    private extractParameters(definedDefinition: DefinitionField, templateDefinition: DefinitionField, foundParameters: DatumParameters = {}): DatumParameters {
+        if ('fields' in definedDefinition) {
+            if (! ('fields' in templateDefinition)) {
+                throw new Error("Template definition does not match with 'fields'");
+            }
+
+            if (typeof templateDefinition.constructor !== 'number') {
+                foundParameters[templateDefinition.constructor] = definedDefinition.constructor;
+            }
+
+            definedDefinition.fields.map((fieldParameter: DefinitionField, index: number) => {
+                return this.extractParameters(fieldParameter, templateDefinition.fields[index], foundParameters);
+            }).forEach((parameters: DatumParameters) => {
+                foundParameters = {...foundParameters, ...parameters};
+            });
+        }
+
+        if ('int' in definedDefinition) {
+            if (! ('int' in templateDefinition)) {
+                throw new Error("Template definition does not match with 'int'");
+            }
+
+            if (typeof templateDefinition.int !== 'number') {
+                foundParameters[templateDefinition.int] = definedDefinition.int;
+            }
+        }
+
+        if ('bytes' in definedDefinition) {
+            if (! ('bytes' in templateDefinition)) {
+                throw new Error("Template definition does not match with 'bytes'");
+            }
+
+            const datumKeys: string[] = Object.values(DatumParameterKey);
+
+            if (typeof templateDefinition.bytes && datumKeys.includes(templateDefinition.bytes)) {
+                foundParameters[templateDefinition.bytes] = definedDefinition.bytes;
+            }
+        }
+
+        return foundParameters;
     }
 
 }

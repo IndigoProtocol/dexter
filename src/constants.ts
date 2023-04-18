@@ -14,5 +14,11 @@ export enum DatumParameterKey {
     BatcherFee = 'BatcherFee',
     DepositFee = 'DepositFee',
 
+    PoolAssetAPolicyId = 'PoolAssetAPolicyId',
+    PoolAssetAAssetName = 'PoolAssetAAssetName',
+    PoolAssetBPolicyId = 'PoolAssetBPolicyId',
+    PoolAssetBAssetName = 'PoolAssetBAssetName',
+    RootKLast = 'RootKLast',
+
     Unknown = 'Unknown',
 }
