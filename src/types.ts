@@ -1,4 +1,4 @@
-import { DatumKey } from './constants';
+import { DatumParameterKeys } from './constants';
 import { Token } from './dex/models/asset';
 import { BaseDex } from './dex/base-dex';
 import { LiquidityPool } from './dex/models/liquidity-pool';
@@ -15,7 +15,7 @@ export type AvailableDexs = {
 }
 
 export type DatumParameters = {
-    [key in DatumKey]?: string | number
+    [key in DatumParameterKeys]?: string | number
 }
 
 export type AssetBalance = {

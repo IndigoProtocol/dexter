@@ -1,4 +1,4 @@
-export enum DatumKey {
+export enum DatumParameterKeys {
     PubKeyHash = 'PubKeyHash',
     StakingKeyHash = 'StakingKeyHash',
     MinReceive = 'MinReceive',
