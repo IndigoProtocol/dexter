@@ -13,11 +13,6 @@ export class SundaeSwap extends BaseDex {
     private readonly validityTokenPolicyId: string = '0029cb7c88c7567b63d1a512c0ed626aa169688ec980730c0473b913';
 
     liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        provider.utxos(this.orderAddress)
-            .then((utxos: UTxO[]) => {
-                console.log(utxos.length)
-            });
-
         return provider.utxos(this.poolAddress, (assetA === 'lovelace' ? '' : assetA.id()))
             .then((utxos: UTxO[]) => {
                 return utxos.map((utxo: UTxO) => {
@@ -42,7 +37,7 @@ export class SundaeSwap extends BaseDex {
         });
 
         // Irrelevant UTxO
-        if (relevantAssets.length < 2) {
+        if (! [2, 3].includes(relevantAssets.length)) {
             return undefined;
         }
 

@@ -66,13 +66,13 @@ export class Minswap extends BaseDex {
             return undefined;
         }
 
-        const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
-            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
-        })?.asset as Asset;
-
-        if (!lpToken) {
-            return undefined;
-        }
+        // const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
+        //     return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
+        // })?.asset as Asset;
+        //
+        // if (!lpToken) {
+        //     return undefined;
+        // }
 
         return new LiquidityPool(
             this.name,

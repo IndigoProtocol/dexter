@@ -50,7 +50,7 @@ export class DexterRequest {
             const liquidityPools: LiquidityPool[] = mappedLiquidityPools.flat();
 
             if (this.dexter.config.shouldFetchMetadata) {
-                await this.fetchAssetMetadata(liquidityPools);
+                // await this.fetchAssetMetadata(liquidityPools);
             }
 
             return liquidityPools.reduce((result: DexterResponse, liquidityPool?: LiquidityPool) => {
