@@ -1,4 +1,4 @@
-import { DatumParameterKeys } from '../../../constants';
+import { DatumParameterKey } from '../../../constants';
 
 export default {
   constructor: 0,
@@ -10,7 +10,7 @@ export default {
           constructor: 0,
           fields: [
             {
-              bytes: DatumParameterKeys.PubKeyHash,
+              bytes: DatumParameterKey.PubKeyHash,
             }
           ]
         },
@@ -24,7 +24,7 @@ export default {
                   constructor: 0,
                   fields: [
                     {
-                      bytes: DatumParameterKeys.StakingKeyHash,
+                      bytes: DatumParameterKey.StakingKeyHash,
                     }
                   ]
                 }
@@ -41,7 +41,7 @@ export default {
           constructor: 0,
           fields: [
             {
-              bytes: DatumParameterKeys.PubKeyHash,
+              bytes: DatumParameterKey.PubKeyHash,
             }
           ]
         },
@@ -55,7 +55,7 @@ export default {
                   constructor: 0,
                   fields: [
                     {
-                      bytes: DatumParameterKeys.StakingKeyHash,
+                      bytes: DatumParameterKey.StakingKeyHash,
                     }
                   ]
                 }
@@ -76,23 +76,23 @@ export default {
           constructor: 0,
           fields: [
             {
-              bytes: DatumParameterKeys.SwapOutTokenPolicyId,
+              bytes: DatumParameterKey.SwapOutTokenPolicyId,
             },
             {
-              bytes: DatumParameterKeys.SwapOutTokenAssetName,
+              bytes: DatumParameterKey.SwapOutTokenAssetName,
             }
           ]
         },
         {
-          int: DatumParameterKeys.MinReceive,
+          int: DatumParameterKey.MinReceive,
         }
       ]
     },
     {
-      int: DatumParameterKeys.BatcherFee,
+      int: DatumParameterKey.BatcherFee,
     },
     {
-      int: DatumParameterKeys.DepositFee,
+      int: DatumParameterKey.DepositFee,
     }
   ]
 }

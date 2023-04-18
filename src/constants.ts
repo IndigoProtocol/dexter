@@ -1,4 +1,6 @@
-export enum DatumParameterKeys {
+export const DEFINITION_ROOT: string = './dex/definitions';
+
+export enum DatumParameterKey {
     PubKeyHash = 'PubKeyHash',
     StakingKeyHash = 'StakingKeyHash',
     MinReceive = 'MinReceive',

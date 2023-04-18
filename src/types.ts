@@ -1,4 +1,4 @@
-import { DatumParameterKeys } from './constants';
+import { DatumParameterKey } from './constants';
 import { Token } from './dex/models/asset';
 import { BaseDex } from './dex/base-dex';
 import { LiquidityPool } from './dex/models/liquidity-pool';
@@ -15,7 +15,7 @@ export type AvailableDexs = {
 }
 
 export type DatumParameters = {
-    [key in DatumParameterKeys]?: string | number
+    [key in DatumParameterKey]?: string | number
 }
 
 export type AssetBalance = {
@@ -37,16 +37,16 @@ export type Transaction = {
 };
 
 export type DefinitionBytes = {
-    bytes: string,
+    bytes: string | DatumParameterKey,
 }
 
 export type DefinitionInt = {
-    int: number,
+    int: number | DatumParameterKey,
 }
 
 export type DefinitionField = DefinitionConstr | DefinitionBytes | DefinitionInt
 
 export type DefinitionConstr = {
-    constructor: number,
+    constructor: number | DatumParameterKey,
     fields: DefinitionField[],
 }
