@@ -1,4 +1,4 @@
-import { Transaction, UTxO } from '../types';
+import { DefinitionField, Transaction, UTxO } from '../types';
 
 export abstract class BaseProvider {
 
@@ -17,5 +17,10 @@ export abstract class BaseProvider {
      * Fetch all transactions containing and asset.
      */
     abstract assetTransactions(assetId: string): Promise<Transaction[]>;
+
+    /**
+     * Fetch JSON value of a datum by its hash.
+     */
+    abstract datumValue(datumHash: string): Promise<DefinitionField>;
 
 }

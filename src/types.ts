@@ -15,7 +15,7 @@ export type AvailableDexs = {
 }
 
 export type DatumParameters = {
-    [key in DatumParameterKey]?: string | number
+    [key in DatumParameterKey | string]?: string | number
 }
 
 export type AssetBalance = {

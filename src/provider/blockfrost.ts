@@ -1,7 +1,7 @@
 import { BaseProvider } from './base-provider';
 import axios, { RawAxiosRequestConfig, AxiosInstance } from 'axios';
 import { Asset } from '../dex/models/asset';
-import { AssetBalance, Transaction, UTxO } from '../types';
+import { AssetBalance, DefinitionField, Transaction, UTxO } from '../types';
 
 export class Blockfrost extends BaseProvider {
 
@@ -108,6 +108,13 @@ export class Blockfrost extends BaseProvider {
 
             return this.fromPaginatedRequest(url, page, results);
         });
+    }
+
+    async datumValue(datumHash: string): Promise<DefinitionField> {
+        return this.api.get(`/scripts/datum/${datumHash}`)
+            .then((response: any) => {
+                return response.data.json_value as DefinitionField;
+            });
     }
 
 }

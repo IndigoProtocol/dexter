@@ -10,9 +10,9 @@ export class LiquidityPool {
     reserveB: bigint;
 
     lpToken: Asset;
-    totalLpTokens: bigint;
-    poolIdentifier: string;
-    poolFee: number;
+    totalLpTokens: bigint = 0n;
+    identifier: string = '';
+    poolFee: number = 0;
 
     constructor(dex: string, address: string, assetA: Token, assetB: Token, reserveA: bigint, reserveB: bigint) {
         this.dex = dex;

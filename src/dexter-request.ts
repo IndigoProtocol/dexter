@@ -120,9 +120,6 @@ export class DexterRequest {
                         });
 
                         asset.decimals = responseAsset.decimals.value;
-                        asset.logo = responseAsset.logo.value;
-                        asset.ticker = responseAsset.ticker.value;
-                        asset.url = responseAsset.url.value;
                     });
                 });
             });
