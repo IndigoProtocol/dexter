@@ -1,17 +1,13 @@
 
 # Dexter
 
-
-### Instantiation
+### Dexter Requests
+#### Liquidity Pools
 ```js
 const dexter: Dexter = new Dexter(
     new Blockfrost('https://cardano-mainnet.blockfrost.io/api/v0', '{project-id}')
 );
-```
 
-### Dexter Requests
-#### Liquidity Pools
-```js
 // For a specific DEX
 dexter.newRequest()
     .for(Minswap.name)
@@ -69,7 +65,7 @@ builder.loadDefinition('minswap/swap.js')
         });
 
         // Get the CBOR
-        builder.getCbor()
+        builder.getCbor();
     });
 ```
 
