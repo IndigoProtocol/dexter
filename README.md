@@ -11,17 +11,17 @@ const dexter: Dexter = new Dexter(
 // For a specific DEX
 dexter.newRequest()
     .for(Minswap.name)
-...
+    ...
 
 // For some available DEXs
 dexter.newRequest()
     .for([Minswap.name, SundaeSwap.name])
-...
+    ...
 
 // For all available DEXs
 dexter.newRequest()
     .forAll()
-...
+    ...
 
 // Full request
 dexter.newRequest()
@@ -81,4 +81,38 @@ builder.loadDefinition('minswap/swap.js')
 
         console.log(parameters);
     });
+```
+
+### Models
+#### Asset
+```js
+Asset {
+    policyId: '533bb94a8850ee3ccbe483106489399112b74c905342cb1792a797a0',
+    assetNameHex: '494e4459',
+    decimals: 0
+}
+```
+
+#### Liquidity Pool
+```js
+Liquidity Pool {
+    totalLpTokens: 271937140896n,
+    identifier: 'b003',
+    poolFee: 0.003,
+    dex: 'SundaeSwap',
+    address: 'addr1w9qzpelu9hn45pefc0xr4ac4kdxeswq7pndul2vuj59u8tqaxdznu',
+    assetA: 'lovelace',
+    assetB: Asset {
+      policyId: '533bb94a8850ee3ccbe483106489399112b74c905342cb1792a797a0',
+      assetNameHex: '494e4459',
+      decimals: 0
+    },
+    reserveA: 560644434405n,
+    reserveB: 135657174555n,
+    lpToken: Asset {
+      policyId: '0029cb7c88c7567b63d1a512c0ed626aa169688ec980730c0473b913',
+      assetNameHex: '6c7020b003',
+      decimals: 0
+    }
+}
 ```
