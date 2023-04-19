@@ -55,13 +55,13 @@ builder.loadDefinition('minswap/swap.js')
     .then((builder: DefinitionBuilder) => {
         // Push on your parameters
         builder.pushParameters({
-            [DatumParameterKeys.PubKeyHash]: '9c8cc3ac2810e440ae1d0d41c4d7cbf79b860b5f315f8d4ed8350d81',
-            [DatumParameterKeys.StakingKeyHash]: '9c68111e7899b27497c7d97964488aaa9fe55370d2c5f2d68093e338',
-            [DatumParameterKeys.SwapOutTokenPolicyId]: 'f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880',
-            [DatumParameterKeys.SwapOutTokenAssetName]: '69555344',
-            [DatumParameterKeys.MinReceive]: 123456,
-            [DatumParameterKeys.BatcherFee]: 200000,
-            [DatumParameterKeys.DepositFee]: 200000,
+            [DatumParameterKey.PubKeyHash]: '9c8cc3ac2810e440ae1d0d41c4d7cbf79b860b5f315f8d4ed8350d81',
+            [DatumParameterKey.StakingKeyHash]: '9c68111e7899b27497c7d97964488aaa9fe55370d2c5f2d68093e338',
+            [DatumParameterKey.SwapOutTokenPolicyId]: 'f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880',
+            [DatumParameterKey.SwapOutTokenAssetName]: '69555344',
+            [DatumParameterKey.MinReceive]: 123456,
+            [DatumParameterKey.BatcherFee]: 200000,
+            [DatumParameterKey.DepositFee]: 200000,
         });
 
         // Get the CBOR
