@@ -93,6 +93,19 @@ export class Blockfrost extends BaseProvider {
         }
     }
 
+    /**
+     * https://docs.blockfrost.io/#tag/Cardano-Scripts/paths/~1scripts~1datum~1%7Bdatum_hash%7D/get
+     */
+    async datumValue(datumHash: string): Promise<DefinitionField> {
+        return this.api.get(`/scripts/datum/${datumHash}`)
+            .then((response: any) => {
+                return response.data.json_value as DefinitionField;
+            });
+    }
+
+    /**
+     * https://docs.blockfrost.io/#section/Concepts
+     */
     private fromPaginatedRequest(url: string, page: number = 1, results: Array<any> = []): Promise<Array<any>> {
         return this.api.get(url, {
             params: {
@@ -108,13 +121,6 @@ export class Blockfrost extends BaseProvider {
 
             return this.fromPaginatedRequest(url, page, results);
         });
-    }
-
-    async datumValue(datumHash: string): Promise<DefinitionField> {
-        return this.api.get(`/scripts/datum/${datumHash}`)
-            .then((response: any) => {
-                return response.data.json_value as DefinitionField;
-            });
     }
 
 }
