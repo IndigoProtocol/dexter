@@ -76,23 +76,23 @@ export default {
           constructor: 0,
           fields: [
             {
-              bytes: DatumParameterKey.SwapOutTokenPolicyId,
+              bytes: DatumParameterKey.SwapOutTokenPolicyId
             },
             {
-              bytes: DatumParameterKey.SwapOutTokenAssetName,
+              bytes: DatumParameterKey.SwapOutTokenAssetName
             }
           ]
         },
         {
-          int: DatumParameterKey.MinReceive,
+          int: DatumParameterKey.MinReceive
         }
       ]
     },
     {
-      int: DatumParameterKey.BatcherFee,
+      int: DatumParameterKey.BatcherFee
     },
     {
-      int: DatumParameterKey.DepositFee,
+      int: DatumParameterKey.DepositFee
     }
   ]
 }

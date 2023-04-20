@@ -17,6 +17,7 @@ export enum DatumParameterKey {
     /**
      * Trading fees.
      */
+    TotalFees = 'TotalFees',
     BatcherFee = 'BatcherFee',
     DepositFee = 'DepositFee',
     ScooperFee = 'ScooperFee',
