@@ -1,39 +1,35 @@
-import { LiquidityPool } from './models/liquidity-pool';
-import { BaseProvider } from '../provider/base-provider';
-import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import { AssetBalance, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
+import { Asset, Token } from './models/asset';
+import { LiquidityPool } from './models/liquidity-pool';
+import { BaseProvider } from '../provider/base-provider';
 import { DefinitionBuilder } from '../definition-builder';
 
-export class SundaeSwap extends BaseDex {
+export class MuesliSwap extends BaseDex {
 
-    public readonly name: string = 'SundaeSwap';
+    public readonly name: string = 'MuesliSwap';
 
-    private readonly poolAddress: string = 'addr1w9qzpelu9hn45pefc0xr4ac4kdxeswq7pndul2vuj59u8tqaxdznu';
-    private readonly orderAddress: string = 'addr1wxaptpmxcxawvr3pzlhgnpmzz3ql43n2tc8mn3av5kx0yzs09tqh8';
-    private readonly lpTokenPolicyId: string = '0029cb7c88c7567b63d1a512c0ed626aa169688ec980730c0473b913';
+    private readonly orderAddress: string = 'addr1zyq0kyrml023kwjk8zr86d5gaxrt5w8lxnah8r6m6s4jp4g3r6dxnzml343sx8jweqn4vn3fz2kj8kgu9czghx0jrsyqqktyhv';
+    private readonly poolAddress: string = 'addr1z9cy2gmar6cpn8yymll93lnd7lw96f27kn2p3eq5d4tjr7xnh3gfhnqcwez2pzmr4tryugrr0uahuk49xqw7dc645chscql0d7';
+    private readonly poolContractAddress: string = 'addr1z9cy2gmar6cpn8yymll93lnd7lw96f27kn2p3eq5d4tjr7rshnr04ple6jjfc0cvcmcpcxmsh576v7j2mjk8tw890vespzvgwd';
+    private readonly factoryPolicyId: string = 'de9b756719341e79785aa13c164e7fe68c189ed04d61c9876b2fe53f';
+    private readonly poolNftPolicyId: string = '909133088303c49f3a30f1cc8ed553a73857a29779f6c6561cd8093f';
 
     async liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? '' : assetA.id()));
-        const builder: DefinitionBuilder = await (new DefinitionBuilder())
-            .loadDefinition('/sundaeswap/pool.js');
+        // const builder: DefinitionBuilder = await (new DefinitionBuilder())
+        //     .loadDefinition('/minswap/pool.js');
 
         const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO) => {
             const liquidityPool: LiquidityPool | undefined = this.liquidityPoolFromUtxo(utxo, assetA, assetB);
 
             if (liquidityPool) {
-                const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-                const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
-
-                liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string'
-                    ? parameters.PoolIdentifier
-                    : '';
-                liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
-                    ? BigInt(parameters.TotalLpTokens)
-                    : 0n;
-                liquidityPool.poolFee = typeof parameters.LpFeeNumerator === 'number' && typeof parameters.LpFeeDenominator === 'number'
-                    ? parameters.LpFeeNumerator / parameters.LpFeeDenominator
-                    : 0;
+                // const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+                // const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+                //
+                // liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
+                //     ? BigInt(parameters.TotalLpTokens)
+                //     : 0n;
             }
 
             return liquidityPool;
@@ -43,11 +39,11 @@ export class SundaeSwap extends BaseDex {
             .then((liquidityPools: (LiquidityPool | undefined)[]) => {
                 return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
                     return liquidityPool !== undefined;
-                }) as LiquidityPool[];
+                }) as LiquidityPool[]
             });
     }
 
-    liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB?: Token): LiquidityPool | undefined {
+    liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB: Token): LiquidityPool | undefined {
         if (! utxo.datumHash) {
             return undefined;
         }
@@ -58,14 +54,15 @@ export class SundaeSwap extends BaseDex {
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
             const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
 
-            return ! assetBalanceId.startsWith(this.lpTokenPolicyId);
+            return ! assetBalanceId.startsWith(this.factoryPolicyId)
+                && ! assetBalanceId.startsWith(this.poolNftPolicyId);
         });
 
         // Irrelevant UTxO
-        if (! [2, 3].includes(relevantAssets.length)) {
+        if (relevantAssets.length < 2) {
             return undefined;
         }
-
+console.log(utxo.assetBalances)
         // Could be ADA/X or X/X pool
         const assetAIndex: number = relevantAssets.length === 2 ? 0 : 1;
         const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
@@ -86,13 +83,13 @@ export class SundaeSwap extends BaseDex {
             return undefined;
         }
 
-        const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
-            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
-        })?.asset as Asset;
-
-        if (! lpToken) {
-            return undefined;
-        }
+        // const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
+        //     return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
+        // })?.asset as Asset;
+        //
+        // if (! lpToken) {
+        //     return undefined;
+        // }
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
             this.name,
@@ -103,8 +100,8 @@ export class SundaeSwap extends BaseDex {
             relevantAssets[assetBIndex].quantity,
         );
 
-        lpToken.assetNameHex = '6c' + lpToken.assetNameHex;
-        liquidityPool.lpToken = lpToken;
+        // liquidityPool.lpToken = lpToken;
+        // liquidityPool.identifier = lpToken.policyId;
 
         return liquidityPool;
     }

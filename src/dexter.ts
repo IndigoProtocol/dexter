@@ -4,6 +4,7 @@ import { TokenRegistry } from './services/token-registry';
 import { DexterRequest } from './dexter-request';
 import { AvailableDexs, DexterConfig } from './types';
 import { SundaeSwap } from './dex/sundaeswap';
+import { MuesliSwap } from './dex/muesliswap';
 
 export class Dexter {
 
@@ -20,6 +21,7 @@ export class Dexter {
         this.availableDexs = {
             [Minswap.name]: new Minswap(),
             [SundaeSwap.name]: new SundaeSwap(),
+            [MuesliSwap.name]: new MuesliSwap(),
         };
     }
 

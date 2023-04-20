@@ -16,11 +16,6 @@ export abstract class BaseDex {
     abstract liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]>;
 
     /**
-     * Submit a swap order through this DEX.
-     */
-    abstract submitSwap(): void;
-
-    /**
      * Craft liquidity pool state from a valid UTxO given the matching assetA & assetB.
      */
     abstract liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB: Token): LiquidityPool | undefined;

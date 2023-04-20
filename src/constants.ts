@@ -26,6 +26,7 @@ export enum DatumParameterKey {
      */
     PoolIdentifier = 'PoolIdentifier',
     TotalLpTokens = 'TotalLpTokens',
+    LpFee = 'LpFee',
     LpFeeNumerator = 'LpFeeNumerator',
     LpFeeDenominator = 'LpFeeDenominator',
     PoolAssetAPolicyId = 'PoolAssetAPolicyId',
