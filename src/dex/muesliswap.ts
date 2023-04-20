@@ -11,9 +11,9 @@ export class MuesliSwap extends BaseDex {
 
     private readonly orderAddress: string = 'addr1zyq0kyrml023kwjk8zr86d5gaxrt5w8lxnah8r6m6s4jp4g3r6dxnzml343sx8jweqn4vn3fz2kj8kgu9czghx0jrsyqqktyhv';
     private readonly poolAddress: string = 'addr1z9cy2gmar6cpn8yymll93lnd7lw96f27kn2p3eq5d4tjr7xnh3gfhnqcwez2pzmr4tryugrr0uahuk49xqw7dc645chscql0d7';
-    private readonly poolContractAddress: string = 'addr1z9cy2gmar6cpn8yymll93lnd7lw96f27kn2p3eq5d4tjr7rshnr04ple6jjfc0cvcmcpcxmsh576v7j2mjk8tw890vespzvgwd';
     private readonly factoryPolicyId: string = 'de9b756719341e79785aa13c164e7fe68c189ed04d61c9876b2fe53f';
     private readonly poolNftPolicyId: string = '909133088303c49f3a30f1cc8ed553a73857a29779f6c6561cd8093f';
+    private readonly lpTokenPolicyId: string = 'af3d70acf4bd5b3abb319a7d75c89fb3e56eafcdd46b2e9b57a2557f';
 
     async liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? '' : assetA.id()));
@@ -86,13 +86,13 @@ export class MuesliSwap extends BaseDex {
             return undefined;
         }
 
-        // const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
-        //     return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
-        // })?.asset as Asset;
-        //
-        // if (! lpToken) {
-        //     return undefined;
-        // }
+        const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
+            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.poolNftPolicyId;
+        })?.asset as Asset;
+
+        if (! lpToken) {
+            return undefined;
+        }
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
             this.name,
@@ -103,8 +103,8 @@ export class MuesliSwap extends BaseDex {
             relevantAssets[assetBIndex].quantity,
         );
 
-        // liquidityPool.lpToken = lpToken;
-        // liquidityPool.identifier = lpToken.policyId;
+        lpToken.policyId = this.lpTokenPolicyId;
+        liquidityPool.lpToken = lpToken;
 
         return liquidityPool;
     }
