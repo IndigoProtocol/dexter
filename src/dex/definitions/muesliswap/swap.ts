@@ -58,6 +58,7 @@ export default {
           fields: []
         },
         {
+          // matchMakerFee + deposit
           int: DatumParameterKey.TotalFees
         }
       ]

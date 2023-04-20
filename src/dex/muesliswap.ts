@@ -17,19 +17,22 @@ export class MuesliSwap extends BaseDex {
 
     async liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? '' : assetA.id()));
-        // const builder: DefinitionBuilder = await (new DefinitionBuilder())
-        //     .loadDefinition('/minswap/pool.js');
+        const builder: DefinitionBuilder = await (new DefinitionBuilder())
+            .loadDefinition('/muesliswap/pool.js');
 
         const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO) => {
             const liquidityPool: LiquidityPool | undefined = this.liquidityPoolFromUtxo(utxo, assetA, assetB);
 
             if (liquidityPool) {
-                // const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-                // const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
-                //
-                // liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
-                //     ? BigInt(parameters.TotalLpTokens)
-                //     : 0n;
+                const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+                const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+
+                liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
+                    ? BigInt(parameters.TotalLpTokens)
+                    : 0n;
+                liquidityPool.poolFee = typeof parameters.LpFee === 'number'
+                    ? (parameters.LpFee / 100)
+                    : 0;
             }
 
             return liquidityPool;
@@ -43,7 +46,7 @@ export class MuesliSwap extends BaseDex {
             });
     }
 
-    liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB: Token): LiquidityPool | undefined {
+    liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB?: Token): LiquidityPool | undefined {
         if (! utxo.datumHash) {
             return undefined;
         }
@@ -62,7 +65,7 @@ export class MuesliSwap extends BaseDex {
         if (relevantAssets.length < 2) {
             return undefined;
         }
-console.log(utxo.assetBalances)
+
         // Could be ADA/X or X/X pool
         const assetAIndex: number = relevantAssets.length === 2 ? 0 : 1;
         const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
