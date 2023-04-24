@@ -16,7 +16,7 @@ export class MuesliSwap extends BaseDex {
     private readonly lpTokenPolicyId: string = 'af3d70acf4bd5b3abb319a7d75c89fb3e56eafcdd46b2e9b57a2557f';
 
     async liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? '' : assetA.id()));
+        const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
             .loadDefinition('/muesliswap/pool.js');
 
@@ -80,17 +80,10 @@ export class MuesliSwap extends BaseDex {
         // Only grab requested pools
         const matchesFilter: boolean = (relevantAssetAId === assetAId && relevantAssetBId === assetBId)
             || (relevantAssetAId === assetBId && relevantAssetBId === assetAId)
-            || !assetBId;
+            || (relevantAssetAId === assetAId && ! assetBId)
+            || (relevantAssetBId === assetAId && ! assetBId);
 
         if (! matchesFilter) {
-            return undefined;
-        }
-
-        const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
-            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.poolNftPolicyId;
-        })?.asset as Asset;
-
-        if (! lpToken) {
             return undefined;
         }
 
@@ -103,8 +96,14 @@ export class MuesliSwap extends BaseDex {
             relevantAssets[assetBIndex].quantity,
         );
 
-        lpToken.policyId = this.lpTokenPolicyId;
-        liquidityPool.lpToken = lpToken;
+        const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
+            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.poolNftPolicyId;
+        })?.asset as Asset;
+
+        if (lpToken) {
+            lpToken.policyId = this.lpTokenPolicyId;
+            liquidityPool.lpToken = lpToken;
+        }
 
         return liquidityPool;
     }

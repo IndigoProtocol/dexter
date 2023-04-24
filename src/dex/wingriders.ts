@@ -1,0 +1,101 @@
+import { BaseDex } from './base-dex';
+import { AssetAddress, AssetBalance, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
+import { Asset, Token } from './models/asset';
+import { LiquidityPool } from './models/liquidity-pool';
+import { BaseProvider } from '../provider/base-provider';
+
+export class WingRiders extends BaseDex {
+
+    public readonly name: string = 'WingRiders';
+
+    private readonly orderAddress: string = 'addr1wxr2a8htmzuhj39y2gq7ftkpxv98y2g67tg8zezthgq4jkg0a4ul4';
+    private readonly validityAsset: string = '026a18d04a0c642759bb3d83b12e3344894e5c1c7b2aeb1a2113a5704c';
+
+    async liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+        const validityAsset: Asset = Asset.fromId(this.validityAsset);
+        const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
+
+        const addressPromises: Promise<LiquidityPool[]>[] = assetAddresses.map(async (assetAddress: AssetAddress) => {
+            const utxos: UTxO[] = await provider.utxos(assetAddress.address, validityAsset);
+
+            const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO) => {
+                return this.liquidityPoolFromUtxo(utxo, assetA, assetB);
+            });
+
+            return await Promise.all(liquidityPoolPromises)
+                .then((liquidityPools: (LiquidityPool | undefined)[]) => {
+                    return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
+                        return liquidityPool !== undefined;
+                    }) as LiquidityPool[]
+                });
+        });
+
+        return Promise.all(addressPromises)
+            .then((liquidityPools: (Awaited<LiquidityPool[]>)[]) => liquidityPools.flat());
+    }
+
+    liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB?: Token): LiquidityPool | undefined {
+        if (! utxo.datumHash) {
+            return undefined;
+        }
+
+        const validityAsset: Asset = Asset.fromId(this.validityAsset);
+        const assetAId: string = assetA === 'lovelace' ? 'lovelace' : assetA.id();
+        const assetBId: string = assetB ? (assetB === 'lovelace' ? 'lovelace' : assetB.id()) : '';
+
+        const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
+            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
+
+            return ! assetBalanceId.startsWith(validityAsset.policyId);
+        });
+
+        // Irrelevant UTxO
+        if (relevantAssets.length < 2) {
+            return undefined;
+        }
+
+        // Could be ADA/X or X/X pool
+        const assetAIndex: number = relevantAssets.length === 2 ? 0 : 1;
+        const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
+
+        const relevantAssetAId: string = relevantAssets[assetAIndex].asset === 'lovelace'
+            ? 'lovelace'
+            : (relevantAssets[assetAIndex].asset as Asset).id()
+        const relevantAssetBId: string = relevantAssets[assetBIndex].asset === 'lovelace'
+            ? 'lovelace'
+            : (relevantAssets[assetBIndex].asset as Asset).id()
+
+        // Only grab requested pools
+        const matchesFilter: boolean = (relevantAssetAId === assetAId && relevantAssetBId === assetBId)
+            || (relevantAssetAId === assetBId && relevantAssetBId === assetAId)
+            || (relevantAssetAId === assetAId && ! assetBId)
+            || (relevantAssetBId === assetAId && ! assetBId);
+
+        if (! matchesFilter) {
+            return undefined;
+        }
+
+        const liquidityPool: LiquidityPool = new LiquidityPool(
+            this.name,
+            utxo.address,
+            relevantAssets[assetAIndex].asset,
+            relevantAssets[assetBIndex].asset,
+            relevantAssets[assetAIndex].quantity,
+            relevantAssets[assetBIndex].quantity,
+        );
+
+        const lpTokenBalance: AssetBalance | undefined = utxo.assetBalances.find((assetBalance) => {
+            return assetBalance.asset !== 'lovelace'
+                && assetBalance.asset.policyId === validityAsset.policyId
+                && assetBalance.asset.assetNameHex !== validityAsset.assetNameHex;
+        });
+
+        if (lpTokenBalance) {
+            liquidityPool.lpToken = lpTokenBalance.asset as Asset;
+            liquidityPool.totalLpTokens = 9223372036854775807n - lpTokenBalance.quantity;
+        }
+
+        return liquidityPool;
+    }
+
+}

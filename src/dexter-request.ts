@@ -67,7 +67,7 @@ export class DexterRequest {
      * Fetch historic states for a liquidity pool.
      */
     async getLiquidityPoolHistory(liquidityPool: LiquidityPool): Promise<LiquidityPool[]> {
-        const transactions: Transaction[] = await this.dexter.provider.assetTransactions(liquidityPool.lpToken.id());
+        const transactions: Transaction[] = await this.dexter.provider.assetTransactions(liquidityPool.lpToken);
 
         const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = transactions.map(async (transaction: Transaction) => {
             const utxos: UTxO[] = await this.dexter.provider.transactionUtxos(transaction.txHash);

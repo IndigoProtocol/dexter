@@ -1,10 +1,11 @@
-import { Minswap } from './dex/minswap';
 import { BaseProvider } from './provider/base-provider';
 import { TokenRegistry } from './services/token-registry';
 import { DexterRequest } from './dexter-request';
 import { AvailableDexs, DexterConfig } from './types';
+import { Minswap } from './dex/minswap';
 import { SundaeSwap } from './dex/sundaeswap';
 import { MuesliSwap } from './dex/muesliswap';
+import { WingRiders } from './dex/wingriders';
 
 export class Dexter {
 
@@ -22,6 +23,7 @@ export class Dexter {
             [Minswap.name]: new Minswap(),
             [SundaeSwap.name]: new SundaeSwap(),
             [MuesliSwap.name]: new MuesliSwap(),
+            [WingRiders.name]: new WingRiders(),
         };
     }
 

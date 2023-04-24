@@ -14,7 +14,7 @@ export class SundaeSwap extends BaseDex {
     private readonly lpTokenPolicyId: string = '0029cb7c88c7567b63d1a512c0ed626aa169688ec980730c0473b913';
 
     async liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? '' : assetA.id()));
+        const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
             .loadDefinition('/sundaeswap/pool.js');
 
@@ -80,17 +80,10 @@ export class SundaeSwap extends BaseDex {
         // Only grab requested pools
         const matchesFilter: boolean = (relevantAssetAId === assetAId && relevantAssetBId === assetBId)
             || (relevantAssetAId === assetBId && relevantAssetBId === assetAId)
-            || !assetBId;
+            || (relevantAssetAId === assetAId && ! assetBId)
+            || (relevantAssetBId === assetAId && ! assetBId);
 
         if (! matchesFilter) {
-            return undefined;
-        }
-
-        const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
-            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
-        })?.asset as Asset;
-
-        if (! lpToken) {
             return undefined;
         }
 
@@ -103,8 +96,14 @@ export class SundaeSwap extends BaseDex {
             relevantAssets[assetBIndex].quantity,
         );
 
-        lpToken.assetNameHex = '6c' + lpToken.assetNameHex;
-        liquidityPool.lpToken = lpToken;
+        const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
+            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
+        })?.asset as Asset;
+
+        if (lpToken) {
+            lpToken.assetNameHex = '6c' + lpToken.assetNameHex;
+            liquidityPool.lpToken = lpToken;
+        }
 
         return liquidityPool;
     }

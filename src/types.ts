@@ -36,6 +36,11 @@ export type Transaction = {
     txIndex: number,
 };
 
+export type AssetAddress = {
+    address: string,
+    quantity: bigint,
+}
+
 export type DefinitionBytes = {
     bytes: string | DatumParameterKey,
 }
