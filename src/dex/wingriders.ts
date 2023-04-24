@@ -4,6 +4,9 @@ import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseProvider } from '../provider/base-provider';
 
+const MIN_POOL_ADA: bigint = 3_000_000n;
+const MAX_INT: bigint = 9_223_372_036_854_775_807n;
+
 export class WingRiders extends BaseDex {
 
     public readonly name: string = 'WingRiders';
@@ -75,13 +78,23 @@ export class WingRiders extends BaseDex {
             return undefined;
         }
 
+        const assetAQuantity: bigint = relevantAssets[assetAIndex].quantity;
+        const assetBQuantity: bigint = relevantAssets[assetBIndex].quantity;
         const liquidityPool: LiquidityPool = new LiquidityPool(
             this.name,
             utxo.address,
             relevantAssets[assetAIndex].asset,
             relevantAssets[assetBIndex].asset,
-            relevantAssets[assetAIndex].quantity,
-            relevantAssets[assetBIndex].quantity,
+            relevantAssets[assetAIndex].asset === 'lovelace'
+                ? (assetAQuantity - MIN_POOL_ADA < 1_000_000)
+                    ? assetAQuantity - MIN_POOL_ADA
+                    : assetAQuantity
+                : assetAQuantity,
+            relevantAssets[assetBIndex].asset === 'lovelace'
+                ? (assetBQuantity - MIN_POOL_ADA < 1_000_000)
+                    ? assetBQuantity - MIN_POOL_ADA
+                    : assetBQuantity
+                : assetBQuantity,
         );
 
         const lpTokenBalance: AssetBalance | undefined = utxo.assetBalances.find((assetBalance) => {
@@ -92,7 +105,7 @@ export class WingRiders extends BaseDex {
 
         if (lpTokenBalance) {
             liquidityPool.lpToken = lpTokenBalance.asset as Asset;
-            liquidityPool.totalLpTokens = 9223372036854775807n - lpTokenBalance.quantity;
+            liquidityPool.totalLpTokens = MAX_INT - lpTokenBalance.quantity;
         }
 
         return liquidityPool;
