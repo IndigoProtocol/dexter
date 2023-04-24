@@ -125,7 +125,7 @@ export class Blockfrost extends BaseProvider {
     /**
      * https://docs.blockfrost.io/#section/Concepts
      */
-    private fromPaginatedRequest(url: string, page: number = 1, results: Array<any> = []): Promise<Array<any>> {
+    private fromPaginatedRequest(url: string, page: number = 1, results: any = []): Promise<any> {
         return this.api.get(url, {
             params: {
                 page,

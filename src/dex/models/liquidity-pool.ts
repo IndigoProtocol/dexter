@@ -23,6 +23,10 @@ export class LiquidityPool {
         this.reserveB = reserveB;
     }
 
+    get uuid(): string {
+        return `${this.dex}.${this.name}.${this.identifier}`;
+    }
+
     get name(): string {
         const assetAName: string = this.assetA === 'lovelace' ? 'ADA' : this.assetA.assetName;
         const assetBName: string = this.assetB === 'lovelace' ? 'ADA' : this.assetB.assetName;

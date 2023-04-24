@@ -89,23 +89,23 @@ export class DexterRequest {
 
         return await Promise.all(liquidityPoolPromises)
             .then((liquidityPools: (LiquidityPool | undefined)[]) => {
-                return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
-                    return liquidityPool !== undefined;
+                return liquidityPools.filter((pool?: LiquidityPool) => {
+                    return pool !== undefined;
                 }) as LiquidityPool[];
             });
     }
 
     private async fetchAssetMetadata(liquidityPools: LiquidityPool[]) {
-        const assetIds: Array<string> = liquidityPools.reduce((assetIds: Array<string>, liquidityPool: LiquidityPool) => {
-            if (liquidityPool.assetA !== 'lovelace' && !assetIds.includes(liquidityPool.assetA.id())) {
-                assetIds.push(liquidityPool.assetA.id());
+        const assetIds: string[] = liquidityPools.reduce((results: string[], liquidityPool: LiquidityPool) => {
+            if (liquidityPool.assetA !== 'lovelace' && !results.includes(liquidityPool.assetA.id())) {
+                results.push(liquidityPool.assetA.id());
             }
-            if (liquidityPool.assetB !== 'lovelace' && !assetIds.includes(liquidityPool.assetB.id())) {
-                assetIds.push(liquidityPool.assetB.id());
+            if (liquidityPool.assetB !== 'lovelace' && !results.includes(liquidityPool.assetB.id())) {
+                results.push(liquidityPool.assetB.id());
             }
 
-            return assetIds;
-        }, [] as Array<string>);
+            return results;
+        }, [] as string[]);
 
         await this.dexter.tokenRegistry.metadataBatch(assetIds)
             .then((response: any) => {
