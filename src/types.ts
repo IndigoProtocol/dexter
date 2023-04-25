@@ -7,9 +7,10 @@ export interface DexterConfig {
     shouldFetchMetadata?: false,
 }
 
-export type DexterResponse = {
+export type LiquidityPoolGroups = {
     [dex: string]: LiquidityPool[],
 }
+
 export type AvailableDexs = {
     [dex: string]: BaseDex,
 }

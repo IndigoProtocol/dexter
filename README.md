@@ -29,7 +29,7 @@ dexter.newRequest()
     .getLiquidityPools(
         new Asset('533bb94a8850ee3ccbe483106489399112b74c905342cb1792a797a0', '494e4459')
     )
-    .then((response: DexterResponse) => {
+    .then((response: LiquidityPoolGroups) => {
         console.log(response)
     });
 ```
