@@ -4,8 +4,10 @@ export enum DatumParameterKey {
     /**
      * Swap/wallet info.
      */
-    PubKeyHash = 'PubKeyHash',
-    StakingKeyHash = 'StakingKeyHash',
+    SenderPubKeyHash = 'SenderPubKeyHash',
+    SenderStakingKeyHash = 'SenderStakingKeyHash',
+    ReceiverPubKeyHash = 'ReceiverPubKeyHash',
+    ReceiverStakingKeyHash = 'ReceiverStakingKeyHash',
     SwapDirection = 'SwapDirection',
     SwapInAmount = 'SwapInAmount',
     SwapInTokenPolicyId = 'SwapInTokenPolicyId',
@@ -35,4 +37,14 @@ export enum DatumParameterKey {
     PoolAssetBPolicyId = 'PoolAssetBPolicyId',
     PoolAssetBAssetName = 'PoolAssetBAssetName',
     RootKLast = 'RootKLast',
+}
+
+export enum TransactionStatus {
+    Building,
+    Built,
+    Signing,
+    Signed,
+    Submitting,
+    Submitted,
+    Errored,
 }

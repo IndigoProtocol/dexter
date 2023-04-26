@@ -13,7 +13,7 @@ export default {
           constructor: 0,
           fields: [
             {
-              bytes: DatumParameterKey.PubKeyHash,
+              bytes: DatumParameterKey.SenderPubKeyHash,
             }
           ]
         },
@@ -27,7 +27,7 @@ export default {
                   constructor: 0,
                   fields: [
                     {
-                      bytes: DatumParameterKey.StakingKeyHash,
+                      bytes: DatumParameterKey.SenderStakingKeyHash,
                     }
                   ]
                 }
@@ -44,7 +44,7 @@ export default {
           constructor: 0,
           fields: [
             {
-              bytes: DatumParameterKey.PubKeyHash,
+              bytes: DatumParameterKey.ReceiverPubKeyHash,
             }
           ]
         },
@@ -58,7 +58,7 @@ export default {
                   constructor: 0,
                   fields: [
                     {
-                      bytes: DatumParameterKey.StakingKeyHash,
+                      bytes: DatumParameterKey.ReceiverStakingKeyHash,
                     }
                   ]
                 }

@@ -6,6 +6,9 @@ import { Minswap } from './dex/minswap';
 import { SundaeSwap } from './dex/sundaeswap';
 import { MuesliSwap } from './dex/muesliswap';
 import { WingRiders } from './dex/wingriders';
+import { LiquidityPool } from './dex/models/liquidity-pool';
+import { Token } from './dex/models/asset';
+import { SwapTransaction } from './dex/swap-transaction';
 
 export class Dexter {
 
@@ -48,8 +51,18 @@ export class Dexter {
     /**
      * New request for data fetching.
      */
-    newRequest(): DexterRequest {
+    newFetchRequest(): DexterRequest {
         return new DexterRequest(this);
     }
+
+    newSwapRequest(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint) {
+        if (! Object.keys(this.availableDexs).includes(liquidityPool.dex)) {
+            throw new Error(`DEX ${liquidityPool.dex} provided with the liquidity pool is not available.`);
+        }
+
+        return new SwapTransaction(liquidityPool, swapInToken, swapInAmount);
+    }
+
+    // submitSwap - order ^
 
 }
