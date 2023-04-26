@@ -32,7 +32,7 @@ export class SundaeSwap extends BaseDex {
                     ? BigInt(parameters.TotalLpTokens)
                     : 0n;
                 liquidityPool.poolFee = typeof parameters.LpFeeNumerator === 'number' && typeof parameters.LpFeeDenominator === 'number'
-                    ? parameters.LpFeeNumerator / parameters.LpFeeDenominator
+                    ? (parameters.LpFeeNumerator / parameters.LpFeeDenominator) * 100
                     : 0;
             }
 
@@ -106,6 +106,14 @@ export class SundaeSwap extends BaseDex {
         }
 
         return liquidityPool;
+    }
+
+    estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
+        return 0n;
+    }
+
+    priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
+        return 0;
     }
 
 }

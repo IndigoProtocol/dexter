@@ -1,4 +1,4 @@
-import { TransactionStatus } from '../constants';
+import { TransactionStatus } from '../../constants';
 
 export interface TransactionCallback {
     (x: DexTransaction): void;

@@ -1,6 +1,6 @@
 import { DexTransaction } from './dex-transaction';
-import { LiquidityPool } from './models/liquidity-pool';
-import { Token } from './models/asset';
+import { LiquidityPool } from './liquidity-pool';
+import { Token } from './asset';
 
 export class SwapTransaction extends DexTransaction {
 

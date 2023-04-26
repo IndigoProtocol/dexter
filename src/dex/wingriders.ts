@@ -111,4 +111,12 @@ export class WingRiders extends BaseDex {
         return liquidityPool;
     }
 
+    estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
+        return 0n;
+    }
+
+    priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
+        return 0;
+    }
+
 }

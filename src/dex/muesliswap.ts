@@ -31,7 +31,7 @@ export class MuesliSwap extends BaseDex {
                     ? BigInt(parameters.TotalLpTokens)
                     : 0n;
                 liquidityPool.poolFee = typeof parameters.LpFee === 'number'
-                    ? (parameters.LpFee / 100)
+                    ? parameters.LpFee
                     : 0;
             }
 
@@ -106,6 +106,14 @@ export class MuesliSwap extends BaseDex {
         }
 
         return liquidityPool;
+    }
+
+    estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
+        return 0n;
+    }
+
+    priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
+        return 0;
     }
 
 }

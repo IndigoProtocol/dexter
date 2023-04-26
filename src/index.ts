@@ -14,3 +14,6 @@ export * from "./dex/wingriders";
 export * from "./provider/base-provider";
 export * from "./provider/blockfrost";
 export * from "./provider/mock";
+
+export * from "./requests/swap-request";
+export * from "./requests/fetch-request";

@@ -1,14 +1,12 @@
 import { BaseProvider } from './provider/base-provider';
 import { TokenRegistry } from './services/token-registry';
-import { DexterRequest } from './dexter-request';
+import { FetchRequest } from './requests/fetch-request';
 import { AvailableDexs, DexterConfig } from './types';
 import { Minswap } from './dex/minswap';
 import { SundaeSwap } from './dex/sundaeswap';
 import { MuesliSwap } from './dex/muesliswap';
 import { WingRiders } from './dex/wingriders';
-import { LiquidityPool } from './dex/models/liquidity-pool';
-import { Token } from './dex/models/asset';
-import { SwapTransaction } from './dex/swap-transaction';
+import { SwapRequest } from './requests/swap-request';
 
 export class Dexter {
 
@@ -51,18 +49,15 @@ export class Dexter {
     /**
      * New request for data fetching.
      */
-    newFetchRequest(): DexterRequest {
-        return new DexterRequest(this);
+    newFetchRequest(): FetchRequest {
+        return new FetchRequest(this);
     }
 
-    newSwapRequest(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint) {
-        if (! Object.keys(this.availableDexs).includes(liquidityPool.dex)) {
-            throw new Error(`DEX ${liquidityPool.dex} provided with the liquidity pool is not available.`);
-        }
-
-        return new SwapTransaction(liquidityPool, swapInToken, swapInAmount);
+    /**
+     * New request for a swap order.
+     */
+    newSwapRequest() {
+        return new SwapRequest(this);
     }
-
-    // submitSwap - order ^
 
 }

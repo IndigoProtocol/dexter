@@ -20,4 +20,14 @@ export abstract class BaseDex {
      */
     abstract liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB: Token): LiquidityPool | undefined;
 
+    /**
+     * Estimated swap out amount received for a swap in token & amount on a liquidity pool.
+     */
+    abstract estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint;
+
+    /**
+     *
+     */
+    abstract priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number;
+
 }

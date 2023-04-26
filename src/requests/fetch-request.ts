@@ -1,10 +1,10 @@
-import { BaseDex } from './dex/base-dex';
-import { Asset, Token } from './dex/models/asset';
-import { LiquidityPool } from './dex/models/liquidity-pool';
-import { Dexter } from './dexter';
-import { LiquidityPoolGroups, Transaction, UTxO } from './types';
+import { BaseDex } from '../dex/base-dex';
+import { Asset, Token } from '../dex/models/asset';
+import { LiquidityPool } from '../dex/models/liquidity-pool';
+import { Dexter } from '../dexter';
+import { LiquidityPoolGroups, Transaction, UTxO } from '../types';
 
-export class DexterRequest {
+export class FetchRequest {
 
     private onDexs: BaseDex[] = [];
     private dexter: Dexter;
@@ -16,7 +16,7 @@ export class DexterRequest {
     /**
      * Set the DEX(s) Dexter will fetch data for.
      */
-    for(dexs: string | string[]): DexterRequest {
+    forDexs(dexs: string | string[]): FetchRequest {
         (Array.isArray(dexs) ? dexs : [dexs]).forEach((dexName: string) => {
             if (! Object.keys(this.dexter.availableDexs).includes(dexName)) {
                 throw new Error(`DEX ${dexName} is not available.`);
@@ -33,7 +33,7 @@ export class DexterRequest {
     /**
      * Fetch data for all available DEXs.
      */
-    forAll(): DexterRequest {
+    forAllDexs(): FetchRequest {
         this.onDexs = Object.values(this.dexter.availableDexs);
 
         return this;
