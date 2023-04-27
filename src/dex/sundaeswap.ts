@@ -4,7 +4,7 @@ import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import { AssetBalance, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
 import { DefinitionBuilder } from '../definition-builder';
-import { tokensMatch } from '../utils';
+import { correspondingReserves, tokensMatch } from '../utils';
 
 export class SundaeSwap extends BaseDex {
 
@@ -110,9 +110,7 @@ export class SundaeSwap extends BaseDex {
     }
 
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
-        const [reserveIn, reserveOut]: bigint[] = tokensMatch(swapInToken, liquidityPool.assetA)
-            ? [liquidityPool.reserveA, liquidityPool.reserveB]
-            : [liquidityPool.reserveB, liquidityPool.reserveA];
+        const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
         const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFee * 100)) + BigInt(10000) - 1n) / 10000n;
         const adjustedSwapInAmount: bigint = swapInAmount - swapFee;

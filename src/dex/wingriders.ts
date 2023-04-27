@@ -3,7 +3,7 @@ import { AssetAddress, AssetBalance, DatumParameters, DefinitionConstr, Definiti
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseProvider } from '../provider/base-provider';
-import { tokensMatch } from '../utils';
+import { correspondingReserves, tokensMatch } from '../utils';
 
 const MIN_POOL_ADA: bigint = 3_000_000n;
 const MAX_INT: bigint = 9_223_372_036_854_775_807n;
@@ -114,9 +114,7 @@ export class WingRiders extends BaseDex {
     }
 
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
-        const [reserveIn, reserveOut]: bigint[] = tokensMatch(swapInToken, liquidityPool.assetA)
-            ? [liquidityPool.reserveA, liquidityPool.reserveB]
-            : [liquidityPool.reserveB, liquidityPool.reserveA];
+        const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
         const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFee * 100)) + BigInt(10000) - 1n) / 10000n;
 

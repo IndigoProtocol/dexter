@@ -4,7 +4,7 @@ import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import { AssetBalance, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
 import { DefinitionBuilder } from '../definition-builder';
-import { tokensMatch } from '../utils';
+import { correspondingReserves, tokensMatch } from '../utils';
 
 export class Minswap extends BaseDex {
 
@@ -114,9 +114,7 @@ export class Minswap extends BaseDex {
         const poolFeeMultiplier: bigint = 1000n;
         const poolFeeModifier: bigint = poolFeeMultiplier - BigInt((liquidityPool.poolFee / 100) * Number(poolFeeMultiplier));
 
-        const [reserveIn, reserveOut]: bigint[] = tokensMatch(swapInToken, liquidityPool.assetA)
-            ? [liquidityPool.reserveA, liquidityPool.reserveB]
-            : [liquidityPool.reserveB, liquidityPool.reserveA];
+        const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
         const swapOutNumerator: bigint = swapInAmount * poolFeeModifier * reserveOut;
         const swapOutDenominator: bigint = swapInAmount * poolFeeModifier + reserveIn * poolFeeMultiplier;
@@ -128,9 +126,7 @@ export class Minswap extends BaseDex {
         const poolFeeMultiplier: bigint = 1000n;
         const poolFeeModifier: bigint = poolFeeMultiplier - BigInt((liquidityPool.poolFee / 100) * Number(poolFeeMultiplier));
 
-        const [reserveIn, reserveOut]: bigint[] = tokensMatch(swapInToken, liquidityPool.assetA)
-            ? [liquidityPool.reserveA, liquidityPool.reserveB]
-            : [liquidityPool.reserveB, liquidityPool.reserveA];
+        const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
         const swapOutNumerator: bigint = swapInAmount * poolFeeModifier * reserveOut;
         const swapOutDenominator: bigint = swapInAmount * poolFeeModifier + reserveIn * poolFeeMultiplier;

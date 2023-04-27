@@ -6,7 +6,7 @@ describe('SwapRequest', () => {
     const dexter: Dexter = new Dexter(new Mock());
     const swapRequest: SwapRequest = dexter.newSwapRequest();
 
-    it('Can calculate Minswap parameters', () => {
+    it('Can calculate Minswap swap parameters', () => {
         const liquidityPool: LiquidityPool = new LiquidityPool(
             Minswap.name,
             'addr1',
@@ -28,7 +28,7 @@ describe('SwapRequest', () => {
         expect(swapRequest.getMinimumReceive()).toEqual(85_080_824_691501n);
     });
 
-    it('Can calculate WingRiders parameters', () => {
+    it('Can calculate WingRiders swap parameters', () => {
         const liquidityPool: LiquidityPool = new LiquidityPool(
             WingRiders.name,
             'addr1',
@@ -50,7 +50,7 @@ describe('SwapRequest', () => {
         expect(swapRequest.getMinimumReceive()).toEqual(2_489037n);
     });
 
-    it('Can calculate SundaeSwap parameters', () => {
+    it('Can calculate SundaeSwap swap parameters', () => {
         const liquidityPool: LiquidityPool = new LiquidityPool(
             SundaeSwap.name,
             'addr1',
@@ -72,7 +72,7 @@ describe('SwapRequest', () => {
         expect(swapRequest.getMinimumReceive()).toEqual(208_598_693711n);
     });
 
-    it('Can calculate MuesliSwap parameters', () => {
+    it('Can calculate MuesliSwap swap parameters', () => {
         const liquidityPool: LiquidityPool = new LiquidityPool(
             MuesliSwap.name,
             'addr1',
