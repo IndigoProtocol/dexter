@@ -1,5 +1,5 @@
 import { Dexter, LiquidityPool, Minswap, Mock, SwapRequest, Asset } from '../src';
-import { SundaeSwap, WingRiders } from '../build';
+import { MuesliSwap, SundaeSwap, WingRiders } from '../build';
 
 describe('SwapRequest', () => {
 
@@ -70,6 +70,28 @@ describe('SwapRequest', () => {
         expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(0.27);
         expect(swapRequest.getEstimatedReceive()).toEqual(210_684_680649n);
         expect(swapRequest.getMinimumReceive()).toEqual(208_598_693711n);
+    });
+
+    it('Can calculate MuesliSwap parameters', () => {
+        const liquidityPool: LiquidityPool = new LiquidityPool(
+            MuesliSwap.name,
+            'addr1',
+            'lovelace',
+            new Asset('', '', 6),
+            1386837721743n,
+            485925n,
+        );
+        liquidityPool.poolFee = 0.3;
+
+        swapRequest
+            .forLiquidityPool(liquidityPool)
+            .withSwapInToken('lovelace')
+            .withSwapInAmount(100_000_000000n)
+            .withSlippagePercent(3.0);
+
+        expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(7.51);
+        expect(swapRequest.getEstimatedReceive()).toEqual(32590n);
+        expect(swapRequest.getMinimumReceive()).toEqual(31640n);
     });
 
 });

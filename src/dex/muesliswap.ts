@@ -4,6 +4,7 @@ import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseProvider } from '../provider/base-provider';
 import { DefinitionBuilder } from '../definition-builder';
+import { tokensMatch } from '../utils';
 
 export class MuesliSwap extends BaseDex {
 
@@ -109,11 +110,29 @@ export class MuesliSwap extends BaseDex {
     }
 
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
-        return 0n;
+        const [reserveIn, reserveOut]: bigint[] = tokensMatch(swapInToken, liquidityPool.assetA)
+            ? [liquidityPool.reserveA, liquidityPool.reserveB]
+            : [liquidityPool.reserveB, liquidityPool.reserveA];
+
+        const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFee * 100)) + BigInt(10000) - 1n) / 10000n;
+        const adjustedSwapInAmount: bigint = swapInAmount - swapFee;
+
+        const estimatedReceive: number = Number(reserveOut) - (Number(reserveIn) * Number(reserveOut)) / (Number(reserveIn) + Number(adjustedSwapInAmount));
+
+        return BigInt(Math.floor(estimatedReceive));
     }
 
     priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
-        return 0;
+        const [reserveIn, reserveOut]: bigint[] = tokensMatch(swapInToken, liquidityPool.assetA)
+            ? [liquidityPool.reserveA, liquidityPool.reserveB]
+            : [liquidityPool.reserveB, liquidityPool.reserveA];
+
+        const estimatedReceive: bigint = this.estimatedReceive(liquidityPool, swapInToken, swapInAmount);
+
+        const oldPrice: number = Number(reserveIn) / Number(reserveOut);
+        const swapPrice: number = Number(swapInAmount) / Number(estimatedReceive);
+
+        return(swapPrice - oldPrice) / oldPrice * 100;
     }
 
 }
