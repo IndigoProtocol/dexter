@@ -1,5 +1,5 @@
 import { Dexter, LiquidityPool, Minswap, Mock, SwapRequest, Asset } from '../src';
-import { WingRiders } from '../build';
+import { SundaeSwap, WingRiders } from '../build';
 
 describe('SwapRequest', () => {
 
@@ -11,7 +11,7 @@ describe('SwapRequest', () => {
             Minswap.name,
             'addr1',
             'lovelace',
-            new Asset('29d222ce763455e3d7a09a665ce554f00ac89d2e99a1a83d267170c6', '4d494e', 6),
+            new Asset('', '', 6),
             30817255371488n,
             349805856622734n,
         );
@@ -33,7 +33,7 @@ describe('SwapRequest', () => {
             WingRiders.name,
             'addr1',
             'lovelace',
-            new Asset('533bb94a8850ee3ccbe483106489399112b74c905342cb1792a797a0', '494e4459', 6),
+            new Asset('', '', 6),
             50491527399n,
             12677234723n,
         );
@@ -48,6 +48,33 @@ describe('SwapRequest', () => {
         expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(0.37);
         expect(swapRequest.getEstimatedReceive()).toEqual(2_501483n);
         expect(swapRequest.getMinimumReceive()).toEqual(2_489037n);
+    });
+
+    it.only('Can calculate SundaeSwap parameters', () => {
+        const liquidityPool: LiquidityPool = new LiquidityPool(
+            SundaeSwap.name,
+            'addr1',
+            'lovelace',
+            new Asset('', '', 6),
+            3699642000000n,//3,699,642
+            78391015000000n,//78391015
+        );
+        liquidityPool.poolFee = 0.3;
+
+        swapRequest
+            .forLiquidityPool(liquidityPool)
+            .withSwapInToken('lovelace')
+            .withSwapInAmount(1000_000_000000n)
+            .withSlippagePercent(1.0);
+
+        console.log(swapRequest.getPriceImpactPercent())
+        // est: 16630169.332237
+        // 21.28 PI
+        // min: 16,463,867
+        //fee = 3000
+        // expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(0.37);
+        // expect(swapRequest.getEstimatedReceive()).toEqual(2_501483n);
+        // expect(swapRequest.getMinimumReceive()).toEqual(2_489037n);
     });
 
 });

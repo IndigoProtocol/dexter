@@ -4,6 +4,7 @@ import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import { AssetBalance, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
 import { DefinitionBuilder } from '../definition-builder';
+import { tokensMatch } from '../utils';
 
 export class SundaeSwap extends BaseDex {
 
@@ -109,11 +110,27 @@ export class SundaeSwap extends BaseDex {
     }
 
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
-        return 0n;
+        const [reserveIn, reserveOut]: bigint[] = tokensMatch(swapInToken, liquidityPool.assetA)
+            ? [liquidityPool.reserveA, liquidityPool.reserveB]
+            : [liquidityPool.reserveB, liquidityPool.reserveA];
+
+        const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFee * 100)) + BigInt(10000) - 1n) / 10000n;
+        const adjustedSwapInAmount: bigint = swapInAmount - swapFee;
+
+        return reserveOut - (reserveIn * reserveOut) / (reserveIn + adjustedSwapInAmount);
     }
 
     priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
-        return 0;
+        const estimatedReceive: bigint = this.estimatedReceive(liquidityPool, swapInToken, swapInAmount);
+        const [reserveIn, reserveOut]: bigint[] = tokensMatch(swapInToken, liquidityPool.assetA)
+            ? [liquidityPool.reserveA, liquidityPool.reserveB]
+            : [liquidityPool.reserveB, liquidityPool.reserveA];
+
+        const oldPrice: number = Number(reserveIn) / Number(reserveOut);
+        const newPrice: number = Number(reserveIn + swapInAmount) / Number(reserveOut - estimatedReceive);
+        const test: number = Number(swapInAmount)/ Number(estimatedReceive);
+
+        return (newPrice - test) / test * 100;
     }
 
 }
