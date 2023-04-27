@@ -3,6 +3,7 @@ import { AssetAddress, AssetBalance, DatumParameters, DefinitionConstr, Definiti
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseProvider } from '../provider/base-provider';
+import { tokensMatch } from '../utils';
 
 const MIN_POOL_ADA: bigint = 3_000_000n;
 const MAX_INT: bigint = 9_223_372_036_854_775_807n;
@@ -107,16 +108,28 @@ export class WingRiders extends BaseDex {
             liquidityPool.lpToken = lpTokenBalance.asset as Asset;
             liquidityPool.totalLpTokens = MAX_INT - lpTokenBalance.quantity;
         }
+        liquidityPool.poolFee = 0.35;
 
         return liquidityPool;
     }
 
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
-        return 0n;
+        const [reserveIn, reserveOut]: bigint[] = tokensMatch(swapInToken, liquidityPool.assetA)
+            ? [liquidityPool.reserveA, liquidityPool.reserveB]
+            : [liquidityPool.reserveB, liquidityPool.reserveA];
+
+        const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFee * 100)) + BigInt(10000) - 1n) / 10000n;
+
+        return reserveOut - (reserveIn * reserveOut - 1n) / (reserveIn + swapInAmount - swapFee) - 1n;
     }
 
     priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
-        return 0;
+        const estimatedReceive: bigint = this.estimatedReceive(liquidityPool, swapInToken, swapInAmount);
+        const swapPrice: number = Number(swapInAmount) / Number(estimatedReceive);
+
+        return Math.abs(swapPrice - liquidityPool.price)
+            / ((swapPrice + liquidityPool.price) / 2)
+            * 100;
     }
 
 }
