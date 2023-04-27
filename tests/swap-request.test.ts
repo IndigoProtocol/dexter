@@ -50,31 +50,26 @@ describe('SwapRequest', () => {
         expect(swapRequest.getMinimumReceive()).toEqual(2_489037n);
     });
 
-    it.only('Can calculate SundaeSwap parameters', () => {
+    it('Can calculate SundaeSwap parameters', () => {
         const liquidityPool: LiquidityPool = new LiquidityPool(
             SundaeSwap.name,
             'addr1',
             'lovelace',
             new Asset('', '', 6),
-            3699642000000n,//3,699,642
-            78391015000000n,//78391015
+            3699642000000n,
+            78391015000000n,
         );
         liquidityPool.poolFee = 0.3;
 
         swapRequest
             .forLiquidityPool(liquidityPool)
             .withSwapInToken('lovelace')
-            .withSwapInAmount(1000_000_000000n)
+            .withSwapInAmount(10_000_000000n)
             .withSlippagePercent(1.0);
 
-        console.log(swapRequest.getPriceImpactPercent())
-        // est: 16630169.332237
-        // 21.28 PI
-        // min: 16,463,867
-        //fee = 3000
-        // expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(0.37);
-        // expect(swapRequest.getEstimatedReceive()).toEqual(2_501483n);
-        // expect(swapRequest.getMinimumReceive()).toEqual(2_489037n);
+        expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(0.27);
+        expect(swapRequest.getEstimatedReceive()).toEqual(210_684_680649n);
+        expect(swapRequest.getMinimumReceive()).toEqual(208_598_693711n);
     });
 
 });

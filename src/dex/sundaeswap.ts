@@ -121,16 +121,11 @@ export class SundaeSwap extends BaseDex {
     }
 
     priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
-        const estimatedReceive: bigint = this.estimatedReceive(liquidityPool, swapInToken, swapInAmount);
-        const [reserveIn, reserveOut]: bigint[] = tokensMatch(swapInToken, liquidityPool.assetA)
-            ? [liquidityPool.reserveA, liquidityPool.reserveB]
-            : [liquidityPool.reserveB, liquidityPool.reserveA];
+        const reserveIn: bigint = tokensMatch(swapInToken, liquidityPool.assetA)
+            ? liquidityPool.reserveA
+            : liquidityPool.reserveB;
 
-        const oldPrice: number = Number(reserveIn) / Number(reserveOut);
-        const newPrice: number = Number(reserveIn + swapInAmount) / Number(reserveOut - estimatedReceive);
-        const test: number = Number(swapInAmount)/ Number(estimatedReceive);
-
-        return (newPrice - test) / test * 100;
+        return (1 - (Number(reserveIn) / Number(reserveIn + swapInAmount))) * 100;
     }
 
 }
