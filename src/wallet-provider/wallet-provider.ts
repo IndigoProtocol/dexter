@@ -7,7 +7,7 @@ export abstract class WalletProvider {
 
     abstract stakingKeyHash(): string;
 
-    abstract createTransaction(): Promise<DexTransaction>;
+    abstract createTransaction(): DexTransaction;
 
     abstract payToAddresses(payToAddresses: PayToAddress[]): WalletProvider;
 

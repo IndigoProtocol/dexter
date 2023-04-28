@@ -1,10 +1,19 @@
 import { TransactionStatus } from '../../constants';
+import { WalletProvider } from '../../wallet-provider/wallet-provider';
+import { PayToAddress } from '../../types';
 
 export interface TransactionCallback {
     (x: DexTransaction): void;
 }
 
+export type DexTransactionError = {
+    step: TransactionStatus,
+    reason: string,
+};
+
 export class DexTransaction {
+
+    public error: DexTransactionError | undefined = undefined;
 
     private txStatus: TransactionStatus = TransactionStatus.Building;
     private listeners: TransactionCallback[] = [];
@@ -13,12 +22,24 @@ export class DexTransaction {
         return this.txStatus;
     }
 
-    set status(s: TransactionStatus) {
-        this.txStatus = s;
+    set status(status: TransactionStatus) {
+        this.txStatus = status;
 
-        this.listeners.forEach((c: TransactionCallback) => {
-            c(this);
+        this.listeners.forEach((callback: TransactionCallback) => {
+            callback(this);
         });
+    }
+
+    public payToAddresses(payToAddresses: PayToAddress[]): Promise<any> {
+        return Promise.resolve();
+    }
+
+    public sign(): Promise<any> {
+        return Promise.resolve();
+    }
+
+    public submit(): Promise<any> {
+        return Promise.resolve();
     }
 
     public onBuilding(callback: TransactionCallback): DexTransaction {

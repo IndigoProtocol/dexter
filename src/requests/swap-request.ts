@@ -3,8 +3,9 @@ import { Token } from '../dex/models/asset';
 import { Dexter } from '../dexter';
 import { tokensMatch } from '../utils';
 import { BuiltSwapOrder, DatumParameters } from '../types';
-import { DatumParameterKey } from '../constants';
+import { DatumParameterKey, TransactionStatus } from '../constants';
 import { SwapTransaction } from '../dex/models/swap-transaction';
+import { DexTransaction } from '../dex/models/dex-transaction';
 
 export class SwapRequest {
 
@@ -109,7 +110,7 @@ export class SwapRequest {
         );
     }
 
-    submit() {
+    submit(): DexTransaction {
         if (! this.dexter.walletProvider) {
             throw new Error('Please set a wallet provider before submitting a swap order.');
         }
@@ -138,7 +139,7 @@ export class SwapRequest {
         };
 
         const builtSwapOrder: BuiltSwapOrder = this.dexter.availableDexs[this.liquidityPool.dex].buildSwapOrder(defaultSwapParameters);
-        const swapTransaction: SwapTransaction = new SwapTransaction();
+        const swapTransaction: SwapTransaction = this.dexter.walletProvider.createTransaction();
 
         // onRetry
 
@@ -148,7 +149,44 @@ export class SwapRequest {
     }
 
     private sendSwapOrder(swapTransaction: SwapTransaction, builtSwapOrder: BuiltSwapOrder) {
-        // build payments
+        swapTransaction.status = TransactionStatus.Building;
+
+        // Build transaction
+        swapTransaction.payToAddresses(builtSwapOrder.payToAddresses)
+            .then(() => {
+                swapTransaction.status = TransactionStatus.Signing;
+
+                // Sign transaction
+                swapTransaction.sign()
+                    .then(() => {
+                        swapTransaction.status = TransactionStatus.Submitting;
+
+                        // Submit transaction
+                        swapTransaction.submit()
+                            .then(() => {
+                                swapTransaction.status = TransactionStatus.Submitted;
+
+                            }).catch(() => {
+                                swapTransaction.status = TransactionStatus.Errored;
+                                swapTransaction.error = {
+                                    step: TransactionStatus.Submitting,
+                                    reason: 'Failed to submit transaction.',
+                                };
+                            });
+                    }).catch(() => {
+                        swapTransaction.status = TransactionStatus.Errored;
+                        swapTransaction.error = {
+                            step: TransactionStatus.Signing,
+                            reason: 'User failed to sign transaction.',
+                        };
+                    });
+            }).catch(() => {
+                swapTransaction.status = TransactionStatus.Errored;
+                swapTransaction.error = {
+                    step: TransactionStatus.Building,
+                    reason: 'Failed to build transaction.',
+                };
+            });
     }
 
 }

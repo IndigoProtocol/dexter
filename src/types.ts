@@ -8,6 +8,11 @@ export interface DexterConfig {
     shouldFetchMetadata?: false,
 }
 
+export interface BlockfrostConfig {
+    url: string,
+    projectId: string,
+}
+
 export type LiquidityPoolGroups = {
     [dex: string]: LiquidityPool[],
 }
@@ -62,9 +67,10 @@ export type PayToAddress = {
     address: string,
     addressType: AddressType,
     assetBalances: AssetBalance[],
+    datum?: string,
 };
 
 export type BuiltSwapOrder = {
     definitionBuilder: DefinitionBuilder,
-    payToAddress: PayToAddress[],
+    payToAddresses: PayToAddress[],
 };
