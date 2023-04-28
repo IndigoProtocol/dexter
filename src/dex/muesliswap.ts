@@ -1,8 +1,8 @@
 import { BaseDex } from './base-dex';
-import { AssetBalance, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
+import { AssetBalance, BuiltSwapOrder, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
-import { BaseProvider } from '../provider/base-provider';
+import { DataProvider } from '../data-provider/data-provider';
 import { DefinitionBuilder } from '../definition-builder';
 import { correspondingReserves, tokensMatch } from '../utils';
 
@@ -16,7 +16,7 @@ export class MuesliSwap extends BaseDex {
     private readonly poolNftPolicyId: string = '909133088303c49f3a30f1cc8ed553a73857a29779f6c6561cd8093f';
     private readonly lpTokenPolicyId: string = 'af3d70acf4bd5b3abb319a7d75c89fb3e56eafcdd46b2e9b57a2557f';
 
-    async liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+    async liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
             .loadDefinition('/muesliswap/pool.js');
@@ -129,6 +129,13 @@ export class MuesliSwap extends BaseDex {
         const swapPrice: number = Number(swapInAmount) / Number(estimatedReceive);
 
         return(swapPrice - oldPrice) / oldPrice * 100;
+    }
+
+    buildSwapOrder(defaultParameters: DatumParameters): BuiltSwapOrder {
+        return {
+            definitionBuilder: new DefinitionBuilder(),
+            payToAddress: [],
+        }
     }
 
 }

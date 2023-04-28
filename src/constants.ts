@@ -47,4 +47,10 @@ export enum TransactionStatus {
     Submitting,
     Submitted,
     Errored,
+    Retrying,
+}
+
+export enum AddressType {
+    Contract,
+    Address,
 }

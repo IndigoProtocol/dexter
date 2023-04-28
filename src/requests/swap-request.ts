@@ -2,6 +2,9 @@ import { LiquidityPool } from '../dex/models/liquidity-pool';
 import { Token } from '../dex/models/asset';
 import { Dexter } from '../dexter';
 import { tokensMatch } from '../utils';
+import { BuiltSwapOrder, DatumParameters } from '../types';
+import { DatumParameterKey } from '../constants';
+import { SwapTransaction } from '../dex/models/swap-transaction';
 
 export class SwapRequest {
 
@@ -104,6 +107,48 @@ export class SwapRequest {
             this.swapInToken,
             this.swapInAmount,
         );
+    }
+
+    submit() {
+        if (! this.dexter.walletProvider) {
+            throw new Error('Please set a wallet provider before submitting a swap order.');
+        }
+        if (! this.liquidityPool) {
+            throw new Error('Please set a liquidity pool before submitting a swap order.');
+        }
+        if (! this.swapInToken) {
+            throw new Error('Please set a swap in token before submitting a swap order.');
+        }
+        if (this.swapInAmount <= 0n) {
+            throw new Error('Please set a swap in amount before submitting a swap order.');
+        }
+
+        const defaultSwapParameters: DatumParameters = {
+            [DatumParameterKey.SenderPubKeyHash]: this.dexter.walletProvider.publicKeyHash(),
+            [DatumParameterKey.SenderStakingKeyHash]: this.dexter.walletProvider.stakingKeyHash(),
+            [DatumParameterKey.ReceiverPubKeyHash]: this.dexter.walletProvider.publicKeyHash(),
+            [DatumParameterKey.ReceiverStakingKeyHash]: this.dexter.walletProvider.stakingKeyHash(),
+            [DatumParameterKey.PoolIdentifier]: this.liquidityPool.identifier,
+            [DatumParameterKey.SwapInAmount]: Number(this.swapInAmount),
+            [DatumParameterKey.MinReceive]: Number(this.getMinimumReceive()),
+            [DatumParameterKey.SwapInTokenPolicyId]: this.swapInToken === 'lovelace' ? '' : this.swapInToken.policyId,
+            [DatumParameterKey.SwapInTokenAssetName]: this.swapInToken === 'lovelace' ? '' : this.swapInToken.assetNameHex,
+            [DatumParameterKey.SwapOutTokenPolicyId]: this.swapOutToken === 'lovelace' ? '' : this.swapOutToken.policyId,
+            [DatumParameterKey.SwapOutTokenAssetName]: this.swapOutToken === 'lovelace' ? '' : this.swapOutToken.assetNameHex,
+        };
+
+        const builtSwapOrder: BuiltSwapOrder = this.dexter.availableDexs[this.liquidityPool.dex].buildSwapOrder(defaultSwapParameters);
+        const swapTransaction: SwapTransaction = new SwapTransaction();
+
+        // onRetry
+
+        this.sendSwapOrder(swapTransaction, builtSwapOrder);
+
+        return swapTransaction;
+    }
+
+    private sendSwapOrder(swapTransaction: SwapTransaction, builtSwapOrder: BuiltSwapOrder) {
+        // build payments
     }
 
 }

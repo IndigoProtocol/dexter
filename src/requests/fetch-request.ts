@@ -3,9 +3,11 @@ import { Asset, Token } from '../dex/models/asset';
 import { LiquidityPool } from '../dex/models/liquidity-pool';
 import { Dexter } from '../dexter';
 import { LiquidityPoolGroups, Transaction, UTxO } from '../types';
+import { DataProvider } from '../data-provider/data-provider';
 
 export class FetchRequest {
 
+    private dataProvider: DataProvider;
     private onDexs: BaseDex[] = [];
     private dexter: Dexter;
 
@@ -45,7 +47,7 @@ export class FetchRequest {
      */
     getLiquidityPools(assetA: Token = 'lovelace', assetB?: Token, groupByDex: boolean = false): Promise<LiquidityPoolGroups | LiquidityPool[]> {
         return Promise.all(
-            this.onDexs.map((dex: BaseDex) => dex.liquidityPools(this.dexter.provider, assetA, assetB)),
+            this.onDexs.map((dex: BaseDex) => dex.liquidityPools(this.dexter.dataProvider, assetA, assetB)),
         ).then(async (mappedLiquidityPools: Awaited<LiquidityPool[]>[]) => {
             const liquidityPools: LiquidityPool[] = mappedLiquidityPools.flat();
 
@@ -71,10 +73,10 @@ export class FetchRequest {
      * Fetch historic states for a liquidity pool.
      */
     async getLiquidityPoolHistory(liquidityPool: LiquidityPool): Promise<LiquidityPool[]> {
-        const transactions: Transaction[] = await this.dexter.provider.assetTransactions(liquidityPool.lpToken);
+        const transactions: Transaction[] = await this.dexter.dataProvider.assetTransactions(liquidityPool.lpToken);
 
         const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = transactions.map(async (transaction: Transaction) => {
-            const utxos: UTxO[] = await this.dexter.provider.transactionUtxos(transaction.txHash);
+            const utxos: UTxO[] = await this.dexter.dataProvider.transactionUtxos(transaction.txHash);
 
             const relevantUtxo: UTxO | undefined = utxos.find((utxo: UTxO) => {
                 return utxo.address === liquidityPool.address;

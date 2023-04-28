@@ -3,8 +3,8 @@ export * from "./types";
 export * from "./dexter";
 export * from "./definition-builder";
 
-export * from "./provider/base-provider";
-export * from "./provider/blockfrost";
+export * from "./data-provider/data-provider";
+export * from "./data-provider/blockfrost";
 
 export * from "./requests/swap-request";
 export * from "./requests/fetch-request";

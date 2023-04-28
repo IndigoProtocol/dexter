@@ -1,7 +1,7 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { BaseProvider } from '../provider/base-provider';
+import { DataProvider } from '../data-provider/data-provider';
 import { Token } from './models/asset';
-import { UTxO } from '../types';
+import { BuiltSwapOrder, DatumParameters, UTxO } from '../types';
 
 export abstract class BaseDex {
 
@@ -13,7 +13,7 @@ export abstract class BaseDex {
     /**
      * Fetch all liquidity pools matching assetA & assetB.
      */
-    abstract liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]>;
+    abstract liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]>;
 
     /**
      * Craft liquidity pool state from a valid UTxO given the matching assetA & assetB.
@@ -26,8 +26,13 @@ export abstract class BaseDex {
     abstract estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint;
 
     /**
-     *
+     * Calculated price impact after for swap order.
      */
     abstract priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number;
+
+    /**
+     * Craft a swap order for this DEX.
+     */
+    abstract buildSwapOrder(defaultParameters: DatumParameters): BuiltSwapOrder;
 
 }

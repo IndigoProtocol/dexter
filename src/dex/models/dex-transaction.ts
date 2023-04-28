@@ -91,6 +91,16 @@ export class DexTransaction {
         return this;
     }
 
+    public onRetry(callback: TransactionCallback): DexTransaction {
+        this.addListener((transaction: DexTransaction) => {
+            if (transaction.status === TransactionStatus.Retrying) {
+                callback(transaction);
+            }
+        });
+
+        return this;
+    }
+
     public onFinally(callback: TransactionCallback): DexTransaction {
         this.addListener((transaction: DexTransaction) => {
             if (transaction.status === TransactionStatus.Submitted || transaction.status === TransactionStatus.Errored) {

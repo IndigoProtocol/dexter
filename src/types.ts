@@ -1,7 +1,8 @@
-import { DatumParameterKey } from './constants';
+import { AddressType, DatumParameterKey } from './constants';
 import { Token } from './dex/models/asset';
 import { BaseDex } from './dex/base-dex';
 import { LiquidityPool } from './dex/models/liquidity-pool';
+import { DefinitionBuilder } from './definition-builder';
 
 export interface DexterConfig {
     shouldFetchMetadata?: false,
@@ -56,3 +57,14 @@ export type DefinitionConstr = {
     constructor: number | DatumParameterKey,
     fields: DefinitionField[],
 }
+
+export type PayToAddress = {
+    address: string,
+    addressType: AddressType,
+    assetBalances: AssetBalance[],
+};
+
+export type BuiltSwapOrder = {
+    definitionBuilder: DefinitionBuilder,
+    payToAddress: PayToAddress[],
+};

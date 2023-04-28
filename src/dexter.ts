@@ -1,4 +1,4 @@
-import { BaseProvider } from './provider/base-provider';
+import { DataProvider } from './data-provider/data-provider';
 import { TokenRegistry } from './services/token-registry';
 import { FetchRequest } from './requests/fetch-request';
 import { AvailableDexs, DexterConfig } from './types';
@@ -7,18 +7,22 @@ import { SundaeSwap } from './dex/sundaeswap';
 import { MuesliSwap } from './dex/muesliswap';
 import { WingRiders } from './dex/wingriders';
 import { SwapRequest } from './requests/swap-request';
+import { WalletProvider } from './wallet-provider/wallet-provider';
 
 export class Dexter {
 
-    public provider: BaseProvider;
+    public dataProvider: DataProvider;
+    public walletProvider?: WalletProvider;
     public config: DexterConfig;
 
     public availableDexs: AvailableDexs;
     public tokenRegistry: TokenRegistry;
 
-    constructor(provider: BaseProvider, config: DexterConfig = {}) {
-        this.provider = provider;
+    constructor(dataProvider: DataProvider, config: DexterConfig = {}, walletProvider?: WalletProvider) {
+        this.dataProvider = dataProvider;
         this.config = config;
+        this.walletProvider = walletProvider;
+
         this.tokenRegistry = new TokenRegistry();
         this.availableDexs = {
             [Minswap.name]: new Minswap(),
@@ -38,10 +42,19 @@ export class Dexter {
     }
 
     /**
-     * Switch to a new provider.
+     * Switch to a new data provider.
      */
-    switchProvider(provider: BaseProvider): Dexter {
-        this.provider = provider;
+    switchDataProvider(dataProvider: DataProvider): Dexter {
+        this.dataProvider = dataProvider;
+
+        return this;
+    }
+
+    /**
+     * Switch to a new wallet provider.
+     */
+    switchWalletProvider(walletProvider: WalletProvider): Dexter {
+        this.walletProvider = walletProvider;
 
         return this;
     }

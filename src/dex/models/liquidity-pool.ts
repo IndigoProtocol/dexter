@@ -44,4 +44,11 @@ export class LiquidityPool {
         return adjustedReserveA / adjustedReserveB;
     }
 
+    get totalValueLocked(): number {
+        const assetADecimals: number = this.assetA === 'lovelace' ? 6 : this.assetA.decimals;
+        const assetBDecimals: number = this.assetB === 'lovelace' ? 6 : this.assetB.decimals;
+
+        return ((Number(this.reserveA) / 10**assetADecimals) * this.price) * ((Number(this.reserveB) / 10**assetBDecimals) * (1 / this.price));
+    }
+
 }

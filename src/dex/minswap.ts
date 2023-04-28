@@ -1,8 +1,8 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { BaseProvider } from '../provider/base-provider';
+import { DataProvider } from '../data-provider/data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
-import { AssetBalance, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
+import { AssetBalance, BuiltSwapOrder, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
 import { DefinitionBuilder } from '../definition-builder';
 import { correspondingReserves, tokensMatch } from '../utils';
 
@@ -17,7 +17,7 @@ export class Minswap extends BaseDex {
     private readonly lpTokenPolicyId: string = 'e4214b7cce62ac6fbba385d164df48e157eae5863521b4b67ca71d86';
     private readonly poolNftPolicyId: string = '0be55d262b29f564998ff81efe21bdc0022621c12f15af08d0f2ddb1';
 
-    async liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+    async liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
             .loadDefinition('/minswap/pool.js');
@@ -136,6 +136,13 @@ export class Minswap extends BaseDex {
         const priceImpactDenominator: bigint = reserveOut * swapInAmount * swapOutDenominator * poolFeeMultiplier;
 
         return Number(priceImpactNumerator * 100n) / Number(priceImpactDenominator);
+    }
+
+    buildSwapOrder(defaultParameters: DatumParameters): BuiltSwapOrder {
+        return {
+            definitionBuilder: new DefinitionBuilder(),
+            payToAddress: [],
+        }
     }
 
 }

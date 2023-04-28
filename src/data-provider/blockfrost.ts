@@ -1,9 +1,9 @@
-import { BaseProvider } from './base-provider';
+import { DataProvider } from './data-provider';
 import axios, { RawAxiosRequestConfig, AxiosInstance } from 'axios';
 import { Asset } from '../dex/models/asset';
 import { AssetAddress, AssetBalance, DefinitionField, Transaction, UTxO } from '../types';
 
-export class Blockfrost extends BaseProvider {
+export class Blockfrost extends DataProvider {
 
     private api: AxiosInstance;
 

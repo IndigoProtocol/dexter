@@ -1,8 +1,8 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { BaseProvider } from '../provider/base-provider';
+import { DataProvider } from '../data-provider/data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
-import { AssetBalance, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
+import { AssetBalance, BuiltSwapOrder, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
 import { DefinitionBuilder } from '../definition-builder';
 import { correspondingReserves, tokensMatch } from '../utils';
 
@@ -14,7 +14,7 @@ export class SundaeSwap extends BaseDex {
     private readonly orderAddress: string = 'addr1wxaptpmxcxawvr3pzlhgnpmzz3ql43n2tc8mn3av5kx0yzs09tqh8';
     private readonly lpTokenPolicyId: string = '0029cb7c88c7567b63d1a512c0ed626aa169688ec980730c0473b913';
 
-    async liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+    async liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
             .loadDefinition('/sundaeswap/pool.js');
@@ -124,6 +124,13 @@ export class SundaeSwap extends BaseDex {
             : liquidityPool.reserveB;
 
         return (1 - (Number(reserveIn) / Number(reserveIn + swapInAmount))) * 100;
+    }
+
+    buildSwapOrder(defaultParameters: DatumParameters): BuiltSwapOrder {
+        return {
+            definitionBuilder: new DefinitionBuilder(),
+            payToAddress: [],
+        }
     }
 
 }

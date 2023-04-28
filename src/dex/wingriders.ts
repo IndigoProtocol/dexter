@@ -1,9 +1,18 @@
 import { BaseDex } from './base-dex';
-import { AssetAddress, AssetBalance, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
+import {
+    AssetAddress,
+    AssetBalance,
+    BuiltSwapOrder,
+    DatumParameters,
+    DefinitionConstr,
+    DefinitionField,
+    UTxO
+} from '../types';
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
-import { BaseProvider } from '../provider/base-provider';
+import { DataProvider } from '../data-provider/data-provider';
 import { correspondingReserves, tokensMatch } from '../utils';
+import { DefinitionBuilder } from '../definition-builder';
 
 const MIN_POOL_ADA: bigint = 3_000_000n;
 const MAX_INT: bigint = 9_223_372_036_854_775_807n;
@@ -15,7 +24,7 @@ export class WingRiders extends BaseDex {
     private readonly orderAddress: string = 'addr1wxr2a8htmzuhj39y2gq7ftkpxv98y2g67tg8zezthgq4jkg0a4ul4';
     private readonly validityAsset: string = '026a18d04a0c642759bb3d83b12e3344894e5c1c7b2aeb1a2113a5704c';
 
-    async liquidityPools(provider: BaseProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+    async liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const validityAsset: Asset = Asset.fromId(this.validityAsset);
         const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
 
@@ -128,6 +137,13 @@ export class WingRiders extends BaseDex {
         return Math.abs(swapPrice - liquidityPool.price)
             / ((swapPrice + liquidityPool.price) / 2)
             * 100;
+    }
+
+    buildSwapOrder(defaultParameters: DatumParameters): BuiltSwapOrder {
+        return {
+            definitionBuilder: new DefinitionBuilder(),
+            payToAddress: [],
+        }
     }
 
 }

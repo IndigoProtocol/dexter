@@ -1,8 +1,8 @@
-import { BaseProvider } from './base-provider';
+import { DataProvider } from './data-provider';
 import { AssetAddress, DefinitionField, Transaction, UTxO } from '../types';
 import { Asset } from '../dex/models/asset';
 
-export class Mock extends BaseProvider {
+export class Mock extends DataProvider {
 
     async utxos(address: string, asset?: Asset): Promise<UTxO[]> {
         return Promise.resolve([]);
