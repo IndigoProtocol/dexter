@@ -53,10 +53,10 @@ export default {
               constructor: 0,
               fields: [
                 {
-                  bytes: ""
+                  bytes: DatumParameterKey.PoolAssetAPolicyId
                 },
                 {
-                  bytes: ""
+                  bytes: DatumParameterKey.PoolAssetAAssetName
                 }
               ]
             },
@@ -64,10 +64,10 @@ export default {
               constructor: 0,
               fields: [
                 {
-                  bytes: DatumParameterKey.TokenPolicyId
+                  bytes: DatumParameterKey.PoolAssetBPolicyId
                 },
                 {
-                  bytes: DatumParameterKey.TokenAssetName
+                  bytes: DatumParameterKey.PoolAssetBAssetName
                 }
               ]
             }

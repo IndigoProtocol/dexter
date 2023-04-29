@@ -2,7 +2,7 @@ import { LiquidityPool } from '../dex/models/liquidity-pool';
 import { Token } from '../dex/models/asset';
 import { Dexter } from '../dexter';
 import { tokensMatch } from '../utils';
-import { BuiltSwapOrder, DatumParameters } from '../types';
+import { DatumParameters, PayToAddress } from '../types';
 import { DatumParameterKey, TransactionStatus } from '../constants';
 import { DexTransaction } from '../dex/models/dex-transaction';
 
@@ -157,21 +157,19 @@ export class SwapRequest {
             [DatumParameterKey.SwapOutTokenAssetName]: this._swapOutToken === 'lovelace' ? '' : this._swapOutToken.assetNameHex,
         };
 
-        const builtSwapOrder: BuiltSwapOrder = this._dexter.availableDexs[this._liquidityPool.dex].buildSwapOrder(defaultSwapParameters);
+        const payToAddresses: PayToAddress[] = this._dexter.availableDexs[this._liquidityPool.dex].buildSwapOrder(defaultSwapParameters);
         const swapTransaction: DexTransaction = this._dexter.walletProvider.createTransaction();
 
-        // onRetry
-
-        this.sendSwapOrder(swapTransaction, builtSwapOrder);
+        this.sendSwapOrder(swapTransaction, payToAddresses);
 
         return swapTransaction;
     }
 
-    private sendSwapOrder(swapTransaction: DexTransaction, builtSwapOrder: BuiltSwapOrder) {
+    private sendSwapOrder(swapTransaction: DexTransaction, payToAddresses: PayToAddress[]) {
         swapTransaction.status = TransactionStatus.Building;
 
         // Build transaction
-        swapTransaction.payToAddresses(builtSwapOrder.payToAddresses)
+        swapTransaction.payToAddresses(payToAddresses)
             .then(() => {
                 swapTransaction.status = TransactionStatus.Signing;
 

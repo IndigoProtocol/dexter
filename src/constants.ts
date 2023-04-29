@@ -2,16 +2,20 @@ export const DEFINITION_ROOT: string = './dex/definitions';
 
 export enum DatumParameterKey {
     /**
+     * Generics.
+     */
+    Action = 'Action',
+    TokenPolicyId = 'TokenPolicyId',
+    TokenAssetName = 'TokenAssetName',
+
+    /**
      * Swap/wallet info.
      */
     SenderPubKeyHash = 'SenderPubKeyHash',
     SenderStakingKeyHash = 'SenderStakingKeyHash',
     ReceiverPubKeyHash = 'ReceiverPubKeyHash',
     ReceiverStakingKeyHash = 'ReceiverStakingKeyHash',
-    Action = 'Action',
     SwapInAmount = 'SwapInAmount',
-    TokenPolicyId = 'TokenPolicyId',
-    TokenAssetName = 'TokenAssetName',
     SwapInTokenPolicyId = 'SwapInTokenPolicyId',
     SwapInTokenAssetName = 'SwapInTokenAssetName',
     SwapOutTokenPolicyId = 'SwapOutTokenPolicyId',

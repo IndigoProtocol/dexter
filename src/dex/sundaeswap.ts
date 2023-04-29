@@ -2,20 +2,31 @@ import { LiquidityPool } from './models/liquidity-pool';
 import { DataProvider } from '../providers/data/data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
-import { AssetBalance, BuiltSwapOrder, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
+import {
+    AssetBalance,
+    DatumParameters,
+    DefinitionConstr,
+    DefinitionField,
+    PayToAddress, SwapFee,
+    UTxO
+} from '../types';
 import { DefinitionBuilder } from '../definition-builder';
 import { correspondingReserves, tokensMatch } from '../utils';
+import { AddressType, DatumParameterKey } from '../constants';
+
+/**
+ * SundaeSwap constants.
+ */
+const ORDER_ADDRESS: string = 'addr1wxaptpmxcxawvr3pzlhgnpmzz3ql43n2tc8mn3av5kx0yzs09tqh8';
+const POOL_ADDRESS: string = 'addr1w9qzpelu9hn45pefc0xr4ac4kdxeswq7pndul2vuj59u8tqaxdznu';
+const LP_TOKEN_POLICY_ID: string = '0029cb7c88c7567b63d1a512c0ed626aa169688ec980730c0473b913';
 
 export class SundaeSwap extends BaseDex {
 
     public readonly name: string = 'SundaeSwap';
 
-    private readonly poolAddress: string = 'addr1w9qzpelu9hn45pefc0xr4ac4kdxeswq7pndul2vuj59u8tqaxdznu';
-    private readonly orderAddress: string = 'addr1wxaptpmxcxawvr3pzlhgnpmzz3ql43n2tc8mn3av5kx0yzs09tqh8';
-    private readonly lpTokenPolicyId: string = '0029cb7c88c7567b63d1a512c0ed626aa169688ec980730c0473b913';
-
     async liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? undefined : assetA));
+        const utxos: UTxO[] = await provider.utxos(POOL_ADDRESS, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
             .loadDefinition('/sundaeswap/pool.js');
 
@@ -59,7 +70,7 @@ export class SundaeSwap extends BaseDex {
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
             const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
 
-            return ! assetBalanceId.startsWith(this.lpTokenPolicyId);
+            return ! assetBalanceId.startsWith(LP_TOKEN_POLICY_ID);
         });
 
         // Irrelevant UTxO
@@ -98,7 +109,7 @@ export class SundaeSwap extends BaseDex {
         );
 
         const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
-            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
+            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === LP_TOKEN_POLICY_ID;
         })?.asset as Asset;
 
         if (lpToken) {
@@ -126,11 +137,67 @@ export class SundaeSwap extends BaseDex {
         return (1 - (Number(reserveIn) / Number(reserveIn + swapInAmount))) * 100;
     }
 
-    buildSwapOrder(defaultParameters: DatumParameters): BuiltSwapOrder {
-        return {
-            definitionBuilder: new DefinitionBuilder(),
-            payToAddresses: [],
+    buildSwapOrder(swapParameters: DatumParameters): PayToAddress[] {
+        const scooperFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'scooperFee');
+        const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
+
+        if (! scooperFee || ! deposit) {
+            throw new Error('Parameters for datum are not set.');
         }
+
+        const swapInToken: string = (swapParameters.SwapInTokenPolicyId as string) + (swapParameters.SwapInTokenAssetName as string);
+        const swapOutToken: string = (swapParameters.SwapOutTokenPolicyId as string) + (swapParameters.SwapOutTokenAssetName as string);
+        const swapDirection: number = [swapInToken, swapOutToken].sort((a: string, b: string) => {
+            return a.localeCompare(b);
+        })[0] === swapInToken ? 0 : 1;
+
+        swapParameters = {
+            ...swapParameters,
+            [DatumParameterKey.ScooperFee]: scooperFee.value,
+            [DatumParameterKey.Action]: swapDirection,
+        };
+
+        const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
+        datumBuilder.loadDefinition('/sundaeswap/swap.ts')
+            .then((builder: DefinitionBuilder) => {
+                builder.pushParameters(swapParameters);
+            });
+
+        return [
+            this.buildSwapOrderPayment(
+                swapParameters,
+                {
+                    address: ORDER_ADDRESS,
+                    addressType: AddressType.Contract,
+                    assetBalances: [
+                        {
+                            asset: 'lovelace',
+                            quantity: scooperFee.value + deposit.value,
+                        },
+                    ],
+                    datum: datumBuilder.getCbor(),
+                }
+            )
+        ];
+    }
+
+    public swapOrderFees(): SwapFee[] {
+        return [
+            {
+                id: 'scooperFee',
+                title: 'Scooper Processing Fee',
+                description: 'An ADA fee paid to the Sundae Scooper Network for processing your order.',
+                value: 2_500000n,
+                isReturned: false,
+            },
+            {
+                id: 'deposit',
+                title: 'Deposit',
+                description: 'A small ADA deposit that you will get back when your order is processed or cancelled.',
+                value: 2_000000n,
+                isReturned: true,
+            },
+        ];
     }
 
 }

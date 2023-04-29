@@ -2,30 +2,31 @@ import { BaseDex } from './base-dex';
 import {
     AssetAddress,
     AssetBalance,
-    BuiltSwapOrder,
     DatumParameters,
-    DefinitionConstr,
-    DefinitionField,
+    PayToAddress, SwapFee,
     UTxO
 } from '../types';
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
 import { DataProvider } from '../providers/data/data-provider';
-import { correspondingReserves, tokensMatch } from '../utils';
+import { correspondingReserves } from '../utils';
+import { AddressType, DatumParameterKey } from '../constants';
 import { DefinitionBuilder } from '../definition-builder';
 
+/**
+ * WingRiders constants.
+ */
 const MIN_POOL_ADA: bigint = 3_000_000n;
 const MAX_INT: bigint = 9_223_372_036_854_775_807n;
+const ORDER_ADDRESS: string = 'addr1wxr2a8htmzuhj39y2gq7ftkpxv98y2g67tg8zezthgq4jkg0a4ul4';
+const POOL_VALIDITY_ASSET: string = '026a18d04a0c642759bb3d83b12e3344894e5c1c7b2aeb1a2113a5704c';
 
 export class WingRiders extends BaseDex {
 
     public readonly name: string = 'WingRiders';
 
-    private readonly orderAddress: string = 'addr1wxr2a8htmzuhj39y2gq7ftkpxv98y2g67tg8zezthgq4jkg0a4ul4';
-    private readonly validityAsset: string = '026a18d04a0c642759bb3d83b12e3344894e5c1c7b2aeb1a2113a5704c';
-
     async liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const validityAsset: Asset = Asset.fromId(this.validityAsset);
+        const validityAsset: Asset = Asset.fromId(POOL_VALIDITY_ASSET);
         const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
 
         const addressPromises: Promise<LiquidityPool[]>[] = assetAddresses.map(async (assetAddress: AssetAddress) => {
@@ -52,7 +53,7 @@ export class WingRiders extends BaseDex {
             return undefined;
         }
 
-        const validityAsset: Asset = Asset.fromId(this.validityAsset);
+        const validityAsset: Asset = Asset.fromId(POOL_VALIDITY_ASSET);
         const assetAId: string = assetA === 'lovelace' ? 'lovelace' : assetA.id();
         const assetBId: string = assetB ? (assetB === 'lovelace' ? 'lovelace' : assetB.id()) : '';
 
@@ -139,11 +140,78 @@ export class WingRiders extends BaseDex {
             * 100;
     }
 
-    buildSwapOrder(defaultParameters: DatumParameters): BuiltSwapOrder {
-        return {
-            definitionBuilder: new DefinitionBuilder(),
-            payToAddresses: [],
+    buildSwapOrder(swapParameters: DatumParameters): PayToAddress[] {
+        const agentFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'scooperFee');
+        const oil: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'oil');
+
+        if (! agentFee || ! oil) {
+            throw new Error('Parameters for datum are not set.');
         }
+
+        const swapInToken: string = (swapParameters.SwapInTokenPolicyId as string) + (swapParameters.SwapInTokenAssetName as string);
+        const swapOutToken: string = (swapParameters.SwapOutTokenPolicyId as string) + (swapParameters.SwapOutTokenAssetName as string);
+        const swapDirection: number = [swapInToken, swapOutToken].sort((a: string, b: string) => {
+            return a.localeCompare(b);
+        })[0] === swapInToken ? 0 : 1;
+
+        swapParameters = {
+            ...swapParameters,
+            [DatumParameterKey.Action]: swapDirection,
+            [DatumParameterKey.PoolAssetAPolicyId]: swapDirection === 0
+                ? swapParameters.SwapInTokenPolicyId
+                : swapParameters.SwapOutTokenPolicyId,
+            [DatumParameterKey.PoolAssetAAssetName]: swapDirection === 0
+                ? swapParameters.SwapInTokenAssetName
+                : swapParameters.SwapOutTokenAssetName,
+            [DatumParameterKey.PoolAssetBPolicyId]: swapDirection === 0
+                ? swapParameters.SwapOutTokenPolicyId
+                : swapParameters.SwapInTokenPolicyId,
+            [DatumParameterKey.PoolAssetBAssetName]: swapDirection === 0
+                ? swapParameters.SwapOutTokenAssetName
+                : swapParameters.SwapInTokenAssetName,
+        };
+
+        const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
+        datumBuilder.loadDefinition('/wingriders/swap.ts')
+            .then((builder: DefinitionBuilder) => {
+                builder.pushParameters(swapParameters);
+            });
+
+        return [
+            this.buildSwapOrderPayment(
+                swapParameters,
+                {
+                    address: ORDER_ADDRESS,
+                    addressType: AddressType.Contract,
+                    assetBalances: [
+                        {
+                            asset: 'lovelace',
+                            quantity: agentFee.value + oil.value,
+                        },
+                    ],
+                    datum: datumBuilder.getCbor(),
+                }
+            )
+        ];
+    }
+
+    public swapOrderFees(): SwapFee[] {
+        return [
+            {
+                id: 'agentFee',
+                title: 'Agent Fee',
+                description: 'WingRiders DEX employs decentralized Agents to ensure equal access, strict fulfillment ordering and protection to every party involved in exchange for a small fee.',
+                value: 2_000000n,
+                isReturned: false,
+            },
+            {
+                id: 'oil',
+                title: 'Oil',
+                description: 'A small amount of ADA has to be bundled with all token transfers on the Cardano Blockchain. We call this "Oil ADA" and it is always returned to the owner when the request gets fulfilled. If the request expires and the funds are reclaimed, the Oil ADA is returned as well.',
+                value: 2_000000n,
+                isReturned: true,
+            },
+        ];
     }
 
 }

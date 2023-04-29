@@ -2,7 +2,6 @@ import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
 import { Token } from './dex/models/asset';
 import { BaseDex } from './dex/base-dex';
 import { LiquidityPool } from './dex/models/liquidity-pool';
-import { DefinitionBuilder } from './definition-builder';
 
 export interface DexterConfig {
     shouldFetchMetadata?: false,
@@ -22,7 +21,7 @@ export type AvailableDexs = {
 }
 
 export type DatumParameters = {
-    [key in DatumParameterKey | string]?: string | number
+    [key in DatumParameterKey | string]?: string | number | bigint
 }
 
 export type AssetBalance = {
@@ -70,9 +69,12 @@ export type PayToAddress = {
     datum?: string,
 };
 
-export type BuiltSwapOrder = {
-    definitionBuilder: DefinitionBuilder, // todo: dont need?
-    payToAddresses: PayToAddress[],
+export type SwapFee = {
+    id: string,
+    title: string,
+    description: string,
+    value: bigint,
+    isReturned: boolean,
 };
 
 export type DexTransactionError = {

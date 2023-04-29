@@ -1,7 +1,9 @@
 import { LiquidityPool } from './models/liquidity-pool';
 import { DataProvider } from '../providers/data/data-provider';
-import { Token } from './models/asset';
-import { BuiltSwapOrder, DatumParameters, UTxO } from '../types';
+import { Asset, Token } from './models/asset';
+import { AssetBalance, DatumParameters, PayToAddress, SwapFee, UTxO } from '../types';
+import { DatumParameterKey } from '../constants';
+import { tokensMatch } from '../utils';
 
 export abstract class BaseDex {
 
@@ -33,6 +35,39 @@ export abstract class BaseDex {
     /**
      * Craft a swap order for this DEX.
      */
-    abstract buildSwapOrder(defaultParameters: DatumParameters): BuiltSwapOrder;
+    abstract buildSwapOrder(swapParameters: DatumParameters): PayToAddress[];
+
+    /**
+     * Fees associated with submitting a swap order.
+     */
+    abstract swapOrderFees(): SwapFee[];
+
+    /**
+     * Adjust the payment for the DEX order address to include the swap in amount.
+     */
+    protected buildSwapOrderPayment(swapParameters: DatumParameters, orderPayment: PayToAddress): PayToAddress {
+        const swapInAmount: bigint = swapParameters[DatumParameterKey.SwapInAmount] as bigint;
+        const swapInToken: Token = swapParameters[DatumParameterKey.SwapInTokenPolicyId]
+            ? new Asset(
+                swapParameters[DatumParameterKey.SwapInTokenPolicyId] as string,
+                swapParameters[DatumParameterKey.SwapInTokenAssetName] as string,
+            )
+            : 'lovelace';
+
+        let assetBalance: AssetBalance | undefined = orderPayment.assetBalances.find((payment: AssetBalance) => {
+            return tokensMatch(payment.asset, swapInToken);
+        });
+
+        if (! assetBalance) {
+            orderPayment.assetBalances.push({
+                asset: swapInToken,
+                quantity: swapInAmount,
+            });
+        } else {
+            assetBalance.quantity += swapInAmount;
+        }
+
+        return orderPayment;
+    }
 
 }
