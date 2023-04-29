@@ -41,9 +41,7 @@ export enum DatumParameterKey {
 
 export enum TransactionStatus {
     Building,
-    Built, //
     Signing,
-    Signed, //
     Submitting,
     Submitted,
     Errored,

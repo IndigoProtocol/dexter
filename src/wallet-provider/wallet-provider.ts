@@ -3,14 +3,16 @@ import { DexTransaction } from '../dex/models/dex-transaction';
 
 export abstract class WalletProvider {
 
-    abstract publicKeyHash(): string;
+    public abstract publicKeyHash(): string;
 
-    abstract stakingKeyHash(): string;
+    public abstract stakingKeyHash(): string;
 
-    abstract createTransaction(): DexTransaction;
+    public abstract createTransaction(): DexTransaction;
 
-    abstract payToAddresses(payToAddresses: PayToAddress[]): WalletProvider;
+    public abstract paymentsForTransaction(transaction: DexTransaction, payToAddresses: PayToAddress[]): Promise<DexTransaction>;
 
-    abstract submitTransaction(): WalletProvider;
+    public abstract signTransaction(transaction: DexTransaction): Promise<DexTransaction>;
+
+    public abstract submitTransaction(transaction: DexTransaction): Promise<string>;
 
 }

@@ -142,7 +142,7 @@ export class WingRiders extends BaseDex {
     buildSwapOrder(defaultParameters: DatumParameters): BuiltSwapOrder {
         return {
             definitionBuilder: new DefinitionBuilder(),
-            payToAddress: [],
+            payToAddresses: [],
         }
     }
 

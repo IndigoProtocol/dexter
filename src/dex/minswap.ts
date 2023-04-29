@@ -4,7 +4,7 @@ import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import { AssetBalance, BuiltSwapOrder, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
 import { DefinitionBuilder } from '../definition-builder';
-import { correspondingReserves, tokensMatch } from '../utils';
+import { correspondingReserves } from '../utils';
 
 export class Minswap extends BaseDex {
 
@@ -141,7 +141,7 @@ export class Minswap extends BaseDex {
     buildSwapOrder(defaultParameters: DatumParameters): BuiltSwapOrder {
         return {
             definitionBuilder: new DefinitionBuilder(),
-            payToAddress: [],
+            payToAddresses: [],
         }
     }
 

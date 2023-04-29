@@ -1,45 +1,63 @@
 import { TransactionStatus } from '../../constants';
 import { WalletProvider } from '../../wallet-provider/wallet-provider';
-import { PayToAddress } from '../../types';
+import { DexTransactionError, PayToAddress } from '../../types';
 
-export interface TransactionCallback {
-    (x: DexTransaction): void;
+interface TransactionCallback {
+    (transaction: DexTransaction): void;
 }
-
-export type DexTransactionError = {
-    step: TransactionStatus,
-    reason: string,
-};
 
 export class DexTransaction {
 
+    public hash: string;
+    public providerData: any;
     public error: DexTransactionError | undefined = undefined;
 
-    private txStatus: TransactionStatus = TransactionStatus.Building;
+    private walletProvider: WalletProvider;
+    private isSigned: boolean = false;
+    private currentStatus: TransactionStatus = TransactionStatus.Building;
     private listeners: TransactionCallback[] = [];
 
+    constructor(walletProvider: WalletProvider) {
+        this.walletProvider = walletProvider;
+    }
+
     get status(): TransactionStatus {
-        return this.txStatus;
+        return this.currentStatus;
     }
 
     set status(status: TransactionStatus) {
-        this.txStatus = status;
+        this.currentStatus = status;
 
         this.listeners.forEach((callback: TransactionCallback) => {
             callback(this);
         });
     }
 
-    public payToAddresses(payToAddresses: PayToAddress[]): Promise<any> {
-        return Promise.resolve();
+    public payToAddresses(payToAddresses: PayToAddress[]): Promise<DexTransaction> {
+        return this.walletProvider.paymentsForTransaction(this, payToAddresses)
+            .then(() => this as DexTransaction);
     }
 
-    public sign(): Promise<any> {
-        return Promise.resolve();
+    public sign(): Promise<DexTransaction> {
+        return this.walletProvider.signTransaction(this)
+            .then(() => {
+                this.isSigned = true;
+
+                return this as DexTransaction;
+            });
     }
 
-    public submit(): Promise<any> {
-        return Promise.resolve();
+    public submit(): Promise<DexTransaction> {
+        if (this.isSigned) {
+            throw new Error('Must sign transactions before submitting.');
+        }
+
+        return this.walletProvider.submitTransaction(this)
+            .then((txHash: string) => {
+                this.hash = txHash;
+
+                return this as DexTransaction;
+            });
     }
 
     public onBuilding(callback: TransactionCallback): DexTransaction {
@@ -52,29 +70,9 @@ export class DexTransaction {
         return this;
     }
 
-    public onBuilt(callback: TransactionCallback): DexTransaction {
-        this.addListener((transaction: DexTransaction) => {
-            if (transaction.status === TransactionStatus.Built) {
-                callback(transaction);
-            }
-        });
-
-        return this;
-    }
-
     public onSigning(callback: TransactionCallback): DexTransaction {
         this.addListener((transaction: DexTransaction) => {
             if (transaction.status === TransactionStatus.Signing) {
-                callback(transaction);
-            }
-        });
-
-        return this;
-    }
-
-    public onSigned(callback: TransactionCallback): DexTransaction {
-        this.addListener((transaction: DexTransaction) => {
-            if (transaction.status === TransactionStatus.Signed) {
                 callback(transaction);
             }
         });

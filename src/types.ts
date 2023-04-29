@@ -1,4 +1,4 @@
-import { AddressType, DatumParameterKey } from './constants';
+import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
 import { Token } from './dex/models/asset';
 import { BaseDex } from './dex/base-dex';
 import { LiquidityPool } from './dex/models/liquidity-pool';
@@ -71,6 +71,12 @@ export type PayToAddress = {
 };
 
 export type BuiltSwapOrder = {
-    definitionBuilder: DefinitionBuilder,
+    definitionBuilder: DefinitionBuilder, // todo: dont need?
     payToAddresses: PayToAddress[],
+};
+
+export type DexTransactionError = {
+    step: TransactionStatus,
+    reason: string,
+    reasonRaw: string,
 };

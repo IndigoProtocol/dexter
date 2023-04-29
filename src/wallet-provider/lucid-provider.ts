@@ -1,76 +1,101 @@
 import { AssetBalance, BlockfrostConfig, PayToAddress } from '../types';
 import { DexTransaction } from '../dex/models/dex-transaction';
 import { WalletProvider } from './wallet-provider';
-import { Blockfrost, Datum, Lucid, Tx, Unit } from 'lucid-cardano';
+import { Blockfrost, Datum, Lucid, TxComplete, TxHash, TxSigned, Unit } from 'lucid-cardano';
 import { AddressType } from '../constants';
 
 export class LucidProvider extends WalletProvider {
 
     private api: Lucid;
+
+    private usableAddress: string;
     private paymentCredential: string;
     private stakingCredential: string;
-    private tx: Tx;
 
-    async constructor(config: BlockfrostConfig) {
+    constructor(config: BlockfrostConfig) {
         super();
 
-        if (config.projectId) {
-            this.api = await Lucid.new(
-                new Blockfrost(
-                    config.url,
-                    config.projectId
-                ),
-            );
-        } else {
-            this.api = await Lucid.new();
-        }
+        Lucid.new(
+            new Blockfrost(
+                config.url,
+                config.projectId
+            ),
+        ).then((lucid: Lucid) => {
+            this.api = lucid;
+        });
+
+        //todo: need to load wallet
     }
 
-    publicKeyHash(): string {
+    public address(): string {
+        return this.usableAddress;
+    }
+
+    public publicKeyHash(): string {
         return this.paymentCredential;
     }
 
-    stakingKeyHash(): string {
+    public stakingKeyHash(): string {
         return this.stakingCredential;
     }
 
-    createTransaction(): DexTransaction {
-        this.tx = this.api.newTx();
+    public createTransaction(): DexTransaction {
+        const transaction: DexTransaction = new DexTransaction(this);
+        transaction.providerData.tx = this.api.newTx();
 
-        return new DexTransaction();
+        return transaction;
     }
 
-    payToAddresses(payToAddresses: PayToAddress[]): WalletProvider {
+    public paymentsForTransaction(transaction: DexTransaction, payToAddresses: PayToAddress[]): Promise<DexTransaction> {
         payToAddresses.forEach((payToAddress: PayToAddress) => {
-            // const payment: Record<Unit | 'lovelace', bigint> = {
-            //     lovelace: payToAddress.assetBalances.reduce((total: bigint, assetBalance: AssetBalance) => {
-            //         return assetBalance.asset === 'lovelace' ? total + assetBalance.quantity : total;
-            //     }, 0n),
-            // };
-
             const payment: Record<Unit | 'lovelace', bigint> = payToAddress.assetBalances
                 .reduce((payment: Record<Unit | 'lovelace', bigint>, assetBalance: AssetBalance) => {
-                    if (assetBalance.asset === 'lovelace') {
-                        payment['lovelace'] = assetBalance.quantity;
-                    }
+                    payment[assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id()] = assetBalance.quantity;
 
                     return payment;
-                }, { lovelace: 0n });
+                }, {} as Record<Unit | 'lovelace', bigint>);
 
-            if (payToAddress.addressType === AddressType.Contract) {
-                this.tx.payToContract(
-                    payToAddress.address,
-                    payToAddress.datum as Datum,
-                    payment,
-                )
+            switch (payToAddress.addressType) {
+                case AddressType.Contract:
+                    transaction.providerData.tx.payToContract(
+                        payToAddress.address,
+                        payToAddress.datum as Datum,
+                        payment,
+                    );
+                    break;
+                case AddressType.Address:
+                    transaction.providerData.tx.payToAddress(
+                        payToAddress.address,
+                        payment,
+                    );
+                    break;
+                default:
+                    throw new Error('Encountered unknown address type.');
             }
         });
 
-        return this;
+        return transaction.providerData.tx.complete()
+            .then((tx: TxComplete) => {
+                transaction.providerData.tx = tx;
+
+                return transaction;
+            });
     }
 
-    submitTransaction(): WalletProvider {
-        return this;
+    public signTransaction(transaction: DexTransaction): Promise<DexTransaction> {
+        return transaction.providerData.tx.sign().complete()
+            .then((signedTx: TxSigned) => {
+                transaction.providerData.tx = signedTx;
+
+                return transaction;
+            });
+    }
+
+    public submitTransaction(transaction: DexTransaction): Promise<string> {
+        return transaction.providerData.tx.submit()
+            .then((txHash: TxHash) => {
+                return txHash;
+            });
     }
 
 }

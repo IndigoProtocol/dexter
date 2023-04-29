@@ -134,7 +134,7 @@ export class MuesliSwap extends BaseDex {
     buildSwapOrder(defaultParameters: DatumParameters): BuiltSwapOrder {
         return {
             definitionBuilder: new DefinitionBuilder(),
-            payToAddress: [],
+            payToAddresses: [],
         }
     }
 
