@@ -1,16 +1,15 @@
-import { AssetBalance, BlockfrostConfig, PayToAddress } from '../types';
-import { DexTransaction } from '../dex/models/dex-transaction';
+import { AssetBalance, BlockfrostConfig, PayToAddress } from '../../types';
+import { DexTransaction } from '../../dex/models/dex-transaction';
 import { WalletProvider } from './wallet-provider';
 import { Blockfrost, Datum, Lucid, TxComplete, TxHash, TxSigned, Unit } from 'lucid-cardano';
-import { AddressType } from '../constants';
+import { AddressType } from '../../constants';
 
 export class LucidProvider extends WalletProvider {
 
-    private api: Lucid;
-
-    private usableAddress: string;
-    private paymentCredential: string;
-    private stakingCredential: string;
+    private _api: Lucid;
+    private _usableAddress: string;
+    private _paymentCredential: string;
+    private _stakingCredential: string;
 
     constructor(config: BlockfrostConfig) {
         super();
@@ -21,27 +20,27 @@ export class LucidProvider extends WalletProvider {
                 config.projectId
             ),
         ).then((lucid: Lucid) => {
-            this.api = lucid;
+            this._api = lucid;
         });
 
         //todo: need to load wallet
     }
 
     public address(): string {
-        return this.usableAddress;
+        return this._usableAddress;
     }
 
     public publicKeyHash(): string {
-        return this.paymentCredential;
+        return this._paymentCredential;
     }
 
     public stakingKeyHash(): string {
-        return this.stakingCredential;
+        return this._stakingCredential;
     }
 
     public createTransaction(): DexTransaction {
         const transaction: DexTransaction = new DexTransaction(this);
-        transaction.providerData.tx = this.api.newTx();
+        transaction.providerData.tx = this._api.newTx();
 
         return transaction;
     }

@@ -1,5 +1,5 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { DataProvider } from '../data-provider/data-provider';
+import { DataProvider } from '../providers/data/data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import { AssetBalance, BuiltSwapOrder, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';

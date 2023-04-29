@@ -8,13 +8,16 @@ export enum DatumParameterKey {
     SenderStakingKeyHash = 'SenderStakingKeyHash',
     ReceiverPubKeyHash = 'ReceiverPubKeyHash',
     ReceiverStakingKeyHash = 'ReceiverStakingKeyHash',
-    SwapDirection = 'SwapDirection',
+    Action = 'Action',
     SwapInAmount = 'SwapInAmount',
+    TokenPolicyId = 'TokenPolicyId',
+    TokenAssetName = 'TokenAssetName',
     SwapInTokenPolicyId = 'SwapInTokenPolicyId',
     SwapInTokenAssetName = 'SwapInTokenAssetName',
     SwapOutTokenPolicyId = 'SwapOutTokenPolicyId',
     SwapOutTokenAssetName = 'SwapOutTokenAssetName',
     MinReceive = 'MinReceive',
+    Expiration = 'Expiration',
 
     /**
      * Trading fees.
@@ -45,7 +48,6 @@ export enum TransactionStatus {
     Submitting,
     Submitted,
     Errored,
-    Retrying,
 }
 
 export enum AddressType {

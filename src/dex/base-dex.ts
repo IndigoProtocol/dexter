@@ -1,5 +1,5 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { DataProvider } from '../data-provider/data-provider';
+import { DataProvider } from '../providers/data/data-provider';
 import { Token } from './models/asset';
 import { BuiltSwapOrder, DatumParameters, UTxO } from '../types';
 

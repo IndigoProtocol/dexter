@@ -3,8 +3,11 @@ export * from "./types";
 export * from "./dexter";
 export * from "./definition-builder";
 
-export * from "./data-provider/data-provider";
-export * from "./data-provider/blockfrost";
+export * from "./providers/data/data-provider";
+export * from "./providers/data/blockfrost";
+export * from "./providers/data/mock";
+export * from "./providers/wallet/wallet-provider";
+export * from "./providers/wallet/lucid-provider";
 
 export * from "./requests/swap-request";
 export * from "./requests/fetch-request";

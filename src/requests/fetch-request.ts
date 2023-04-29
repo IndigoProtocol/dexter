@@ -3,30 +3,30 @@ import { Asset, Token } from '../dex/models/asset';
 import { LiquidityPool } from '../dex/models/liquidity-pool';
 import { Dexter } from '../dexter';
 import { LiquidityPoolGroups, Transaction, UTxO } from '../types';
-import { DataProvider } from '../data-provider/data-provider';
+import { DataProvider } from '../providers/data/data-provider';
 
 export class FetchRequest {
 
-    private dataProvider: DataProvider;
-    private onDexs: BaseDex[] = [];
-    private dexter: Dexter;
+    private _dexter: Dexter;
+    private _dataProvider: DataProvider;
+    private _onDexs: BaseDex[] = [];
 
     constructor(dexter: Dexter) {
-        this.dexter = dexter;
+        this._dexter = dexter;
     }
 
     /**
      * Set the DEX(s) Dexter will fetch data for.
      */
-    forDexs(dexs: string | string[]): FetchRequest {
+    public forDexs(dexs: string | string[]): FetchRequest {
         (Array.isArray(dexs) ? dexs : [dexs]).forEach((dexName: string) => {
-            if (! Object.keys(this.dexter.availableDexs).includes(dexName)) {
+            if (! Object.keys(this._dexter.availableDexs).includes(dexName)) {
                 throw new Error(`DEX ${dexName} is not available.`);
             }
 
-            this.onDexs = this.onDexs.filter((dex: BaseDex) => {
+            this._onDexs = this._onDexs.filter((dex: BaseDex) => {
                 return dex.name !== dexName;
-            }).concat(this.dexter.availableDexs[dexName]);
+            }).concat(this._dexter.availableDexs[dexName]);
         });
 
         return this;
@@ -35,8 +35,8 @@ export class FetchRequest {
     /**
      * Fetch data for all available DEXs.
      */
-    forAllDexs(): FetchRequest {
-        this.onDexs = Object.values(this.dexter.availableDexs);
+    public forAllDexs(): FetchRequest {
+        this._onDexs = Object.values(this._dexter.availableDexs);
 
         return this;
     }
@@ -45,13 +45,13 @@ export class FetchRequest {
      * Fetch all liquidity pools matching assetA & assetB.
      * All liquidity pools will be returned if assetA & assetB are not provided.
      */
-    getLiquidityPools(assetA: Token = 'lovelace', assetB?: Token, groupByDex: boolean = false): Promise<LiquidityPoolGroups | LiquidityPool[]> {
+    public getLiquidityPools(assetA: Token = 'lovelace', assetB?: Token, groupByDex: boolean = false): Promise<LiquidityPoolGroups | LiquidityPool[]> {
         return Promise.all(
-            this.onDexs.map((dex: BaseDex) => dex.liquidityPools(this.dexter.dataProvider, assetA, assetB)),
+            this._onDexs.map((dex: BaseDex) => dex.liquidityPools(this._dexter.dataProvider, assetA, assetB)),
         ).then(async (mappedLiquidityPools: Awaited<LiquidityPool[]>[]) => {
             const liquidityPools: LiquidityPool[] = mappedLiquidityPools.flat();
 
-            if (this.dexter.config.shouldFetchMetadata) {
+            if (this._dexter.config.shouldFetchMetadata) {
                 // await this.fetchAssetMetadata(liquidityPools);
             }
 
@@ -72,11 +72,11 @@ export class FetchRequest {
     /**
      * Fetch historic states for a liquidity pool.
      */
-    async getLiquidityPoolHistory(liquidityPool: LiquidityPool): Promise<LiquidityPool[]> {
-        const transactions: Transaction[] = await this.dexter.dataProvider.assetTransactions(liquidityPool.lpToken);
+    public async getLiquidityPoolHistory(liquidityPool: LiquidityPool): Promise<LiquidityPool[]> {
+        const transactions: Transaction[] = await this._dexter.dataProvider.assetTransactions(liquidityPool.lpToken);
 
         const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = transactions.map(async (transaction: Transaction) => {
-            const utxos: UTxO[] = await this.dexter.dataProvider.transactionUtxos(transaction.txHash);
+            const utxos: UTxO[] = await this._dexter.dataProvider.transactionUtxos(transaction.txHash);
 
             const relevantUtxo: UTxO | undefined = utxos.find((utxo: UTxO) => {
                 return utxo.address === liquidityPool.address;
@@ -86,7 +86,7 @@ export class FetchRequest {
                 return undefined;
             }
 
-            return this.dexter.availableDexs[liquidityPool.dex].liquidityPoolFromUtxo(
+            return this._dexter.availableDexs[liquidityPool.dex].liquidityPoolFromUtxo(
                 relevantUtxo,
                 liquidityPool.assetA,
                 liquidityPool.assetB
@@ -113,7 +113,7 @@ export class FetchRequest {
             return results;
         }, [] as string[]);
 
-        await this.dexter.tokenRegistry.metadataBatch(assetIds)
+        await this._dexter.tokenRegistry.metadataBatch(assetIds)
             .then((response: any) => {
                 liquidityPools.forEach((liquidityPool: LiquidityPool) => {
                     [liquidityPool.assetA, liquidityPool.assetB].forEach((asset: Token) => {

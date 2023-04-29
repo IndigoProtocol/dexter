@@ -1,4 +1,4 @@
-import { DataProvider } from './data-provider/data-provider';
+import { DataProvider } from './providers/data/data-provider';
 import { TokenRegistry } from './services/token-registry';
 import { FetchRequest } from './requests/fetch-request';
 import { AvailableDexs, DexterConfig } from './types';
@@ -7,7 +7,7 @@ import { SundaeSwap } from './dex/sundaeswap';
 import { MuesliSwap } from './dex/muesliswap';
 import { WingRiders } from './dex/wingriders';
 import { SwapRequest } from './requests/swap-request';
-import { WalletProvider } from './wallet-provider/wallet-provider';
+import { WalletProvider } from './providers/wallet/wallet-provider';
 
 export class Dexter {
 
@@ -70,6 +70,10 @@ export class Dexter {
      * New request for a swap order.
      */
     newSwapRequest() {
+        if (! this.walletProvider) {
+            throw new Error('Please set a wallet provider before creating a swap request.');
+        }
+
         return new SwapRequest(this);
     }
 

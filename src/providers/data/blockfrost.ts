@@ -1,7 +1,7 @@
 import { DataProvider } from './data-provider';
 import axios, { RawAxiosRequestConfig, AxiosInstance } from 'axios';
-import { Asset } from '../dex/models/asset';
-import { AssetAddress, AssetBalance, DefinitionField, Transaction, UTxO } from '../types';
+import { Asset } from '../../dex/models/asset';
+import { AssetAddress, AssetBalance, BlockfrostConfig, DefinitionField, Transaction, UTxO } from '../../types';
 
 export class Blockfrost extends DataProvider {
 
@@ -10,13 +10,13 @@ export class Blockfrost extends DataProvider {
     /**
      * https://docs.blockfrost.io/
      */
-    constructor(url: string, projectId: string) {
+    constructor(config: BlockfrostConfig) {
         super();
 
         this.api = axios.create({
-            baseURL: url,
+            baseURL: config.url,
             headers: {
-                'project_id': projectId,
+                'project_id': config.projectId,
             },
         } as RawAxiosRequestConfig);
     }
@@ -25,7 +25,7 @@ export class Blockfrost extends DataProvider {
      * https://docs.blockfrost.io/#tag/Cardano-Addresses/paths/~1addresses~1%7Baddress%7D~1utxos/get
      * https://docs.blockfrost.io/#tag/Cardano-Addresses/paths/~1addresses~1%7Baddress%7D~1utxos~1%7Basset%7D/get
      */
-    async utxos(address: string, asset?: Asset): Promise<UTxO[]> {
+    public async utxos(address: string, asset?: Asset): Promise<UTxO[]> {
         try {
             return this.fromPaginatedRequest(`/addresses/${address}/utxos/${asset ? asset.id() : ''}`)
                 .then((results: any) => {
@@ -53,7 +53,7 @@ export class Blockfrost extends DataProvider {
     /**
      * https://docs.blockfrost.io/#tag/Cardano-Transactions/paths/~1txs~1%7Bhash%7D~1utxos/get
      */
-    async transactionUtxos(txHash: string): Promise<UTxO[]> {
+    public async transactionUtxos(txHash: string): Promise<UTxO[]> {
         return this.api.get(`/txs/${txHash}/utxos`)
             .then((response: any) => {
                 return response.data.outputs.map((utxo: any) => {
@@ -77,7 +77,7 @@ export class Blockfrost extends DataProvider {
     /**
      * https://docs.blockfrost.io/#tag/Cardano-Assets/paths/~1assets~1%7Basset%7D~1transactions/get
      */
-    async assetTransactions(asset: Asset): Promise<Transaction[]> {
+    public async assetTransactions(asset: Asset): Promise<Transaction[]> {
         try {
             return this.fromPaginatedRequest(`/assets/${asset.id()}/transactions`)
                 .then((results: any) => {
@@ -96,7 +96,7 @@ export class Blockfrost extends DataProvider {
     /**
      * https://docs.blockfrost.io/#tag/Cardano-Assets/paths/~1assets~1%7Basset%7D~1transactions/get
      */
-    async assetAddresses(asset: Asset): Promise<AssetAddress[]> {
+    public async assetAddresses(asset: Asset): Promise<AssetAddress[]> {
         try {
             return this.fromPaginatedRequest(`/assets/${asset.id()}/addresses`)
                 .then((results: any) => {
@@ -115,7 +115,7 @@ export class Blockfrost extends DataProvider {
     /**
      * https://docs.blockfrost.io/#tag/Cardano-Scripts/paths/~1scripts~1datum~1%7Bdatum_hash%7D/get
      */
-    async datumValue(datumHash: string): Promise<DefinitionField> {
+    public async datumValue(datumHash: string): Promise<DefinitionField> {
         return this.api.get(`/scripts/datum/${datumHash}`)
             .then((response: any) => {
                 return response.data.json_value as DefinitionField;

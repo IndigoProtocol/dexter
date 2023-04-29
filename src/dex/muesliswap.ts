@@ -2,7 +2,7 @@ import { BaseDex } from './base-dex';
 import { AssetBalance, BuiltSwapOrder, DatumParameters, DefinitionConstr, DefinitionField, UTxO } from '../types';
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
-import { DataProvider } from '../data-provider/data-provider';
+import { DataProvider } from '../providers/data/data-provider';
 import { DefinitionBuilder } from '../definition-builder';
 import { correspondingReserves, tokensMatch } from '../utils';
 

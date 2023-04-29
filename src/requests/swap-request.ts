@@ -8,137 +8,157 @@ import { DexTransaction } from '../dex/models/dex-transaction';
 
 export class SwapRequest {
 
-    private dexter: Dexter;
-    private liquidityPool: LiquidityPool;
-    private swapInToken: Token;
-    private swapOutToken: Token;
-    private swapInAmount: bigint = 0n;
-    private slippagePercent: number = 1.0;
+    private _dexter: Dexter;
+    private _liquidityPool: LiquidityPool;
+    private _swapInToken: Token;
+    private _swapOutToken: Token;
+    private _swapInAmount: bigint = 0n;
+    private _slippagePercent: number = 1.0;
 
     constructor(dexter: Dexter) {
-        this.dexter = dexter;
+        this._dexter = dexter;
     }
 
-    forLiquidityPool(liquidityPool: LiquidityPool): SwapRequest {
-        if (! Object.keys(this.dexter.availableDexs).includes(liquidityPool.dex)) {
+    get liquidityPool(): LiquidityPool {
+        return this._liquidityPool;
+    }
+
+    get swapInToken(): Token {
+        return this._swapInToken;
+    }
+
+    get swapOutToken(): Token {
+        return this._swapOutToken;
+    }
+
+    get swapInAmount(): bigint {
+        return this._swapInAmount;
+    }
+
+    get slippagePercent(): number {
+        return this._slippagePercent;
+    }
+
+    public forLiquidityPool(liquidityPool: LiquidityPool): SwapRequest {
+        if (! Object.keys(this._dexter.availableDexs).includes(liquidityPool.dex)) {
             throw new Error(`DEX ${liquidityPool.dex} provided with the liquidity pool is not available.`);
         }
 
-        this.liquidityPool = liquidityPool;
+        this._liquidityPool = liquidityPool;
 
         return this;
     }
 
-    withSwapInToken(swapInToken: Token): SwapRequest {
-        if (! this.liquidityPool) {
+    public withSwapInToken(swapInToken: Token): SwapRequest {
+        if (! this._liquidityPool) {
             throw new Error('Liquidity pool must be set before providing an input token.');
         }
 
-        if (tokensMatch(swapInToken, this.liquidityPool.assetA)) {
-            this.swapOutToken = this.liquidityPool.assetB;
-        } else if (tokensMatch(swapInToken, this.liquidityPool.assetB)) {
-            this.swapOutToken = this.liquidityPool.assetA;
+        if (tokensMatch(swapInToken, this._liquidityPool.assetA)) {
+            this._swapOutToken = this._liquidityPool.assetB;
+        } else if (tokensMatch(swapInToken, this._liquidityPool.assetB)) {
+            this._swapOutToken = this._liquidityPool.assetA;
         } else {
             throw new Error("Input token doesn't exist in the set liquidity pool.");
         }
 
-        this.swapInToken = swapInToken;
+        this._swapInToken = swapInToken;
 
         return this;
     }
 
-    flip(): SwapRequest {
-        if (this.swapInToken) {
-            [this.swapInToken, this.swapOutToken] = [this.swapOutToken, this.swapInToken];
+    public flip(): SwapRequest {
+        if (this._swapInToken) {
+            [this._swapInToken, this._swapOutToken] = [this._swapOutToken, this._swapInToken];
         }
 
         return this;
     }
 
-    withSwapInAmount(swapInAmount: bigint): SwapRequest {
+    public withSwapInAmount(swapInAmount: bigint): SwapRequest {
         if (swapInAmount < 0n) {
             throw new Error('Swap in amount must be a positive number.');
         }
 
-        this.swapInAmount = swapInAmount;
+        this._swapInAmount = swapInAmount;
 
         return this;
     }
 
-    withSlippagePercent(slippagePercent: number): SwapRequest {
+    public withSlippagePercent(slippagePercent: number): SwapRequest {
         if (slippagePercent < 0) {
             throw new Error('Swap in amount must be a positive number.');
         }
 
-        this.slippagePercent = slippagePercent;
+        this._slippagePercent = slippagePercent;
 
         return this;
     }
 
-    getEstimatedReceive(): bigint {
-        if (! this.liquidityPool) {
+    public getEstimatedReceive(): bigint {
+        if (! this._liquidityPool) {
             throw new Error('Liquidity pool must be set before providing calculating the estimated receive.');
-        } else if (! this.swapInToken) {
+        } else if (! this._swapInToken) {
             throw new Error('Swap in token must be set before providing calculating the estimated receive.');
         }
 
-        return this.dexter.availableDexs[this.liquidityPool.dex].estimatedReceive(
-            this.liquidityPool,
-            this.swapInToken,
-            this.swapInAmount,
+        return this._dexter.availableDexs[this._liquidityPool.dex].estimatedReceive(
+            this._liquidityPool,
+            this._swapInToken,
+            this._swapInAmount,
         );
     }
 
-    getMinimumReceive(): bigint {
+    public getMinimumReceive(): bigint {
         return BigInt(
-            Math.floor(Number(this.getEstimatedReceive()) / (1 + (this.slippagePercent / 100)))
+            Math.floor(Number(this.getEstimatedReceive()) / (1 + (this._slippagePercent / 100)))
         );
     }
 
-    getPriceImpactPercent(): number {
-        if (! this.liquidityPool) {
+    public getPriceImpactPercent(): number {
+        if (! this._liquidityPool) {
             throw new Error('Liquidity pool must be set before providing calculating the price impact.');
-        } else if (! this.swapInToken) {
+        } else if (! this._swapInToken) {
             throw new Error('Swap in token must be set before providing calculating the price impact.');
         }
 
-        return this.dexter.availableDexs[this.liquidityPool.dex].priceImpactPercent(
-            this.liquidityPool,
-            this.swapInToken,
-            this.swapInAmount,
+        return this._dexter.availableDexs[this._liquidityPool.dex].priceImpactPercent(
+            this._liquidityPool,
+            this._swapInToken,
+            this._swapInAmount,
         );
     }
 
-    submit(): DexTransaction {
-        if (! this.dexter.walletProvider) {
+    public submit(): DexTransaction {
+        if (! this._dexter.walletProvider) {
             throw new Error('Please set a wallet provider before submitting a swap order.');
         }
-        if (! this.liquidityPool) {
+        if (! this._liquidityPool) {
             throw new Error('Please set a liquidity pool before submitting a swap order.');
         }
-        if (! this.swapInToken) {
+        if (! this._swapInToken) {
             throw new Error('Please set a swap in token before submitting a swap order.');
         }
-        if (this.swapInAmount <= 0n) {
+        if (this._swapInAmount <= 0n) {
             throw new Error('Please set a swap in amount before submitting a swap order.');
         }
 
         const defaultSwapParameters: DatumParameters = {
-            [DatumParameterKey.SenderPubKeyHash]: this.dexter.walletProvider.publicKeyHash(),
-            [DatumParameterKey.SenderStakingKeyHash]: this.dexter.walletProvider.stakingKeyHash(),
-            [DatumParameterKey.ReceiverPubKeyHash]: this.dexter.walletProvider.publicKeyHash(),
-            [DatumParameterKey.ReceiverStakingKeyHash]: this.dexter.walletProvider.stakingKeyHash(),
-            [DatumParameterKey.PoolIdentifier]: this.liquidityPool.identifier,
-            [DatumParameterKey.SwapInAmount]: Number(this.swapInAmount),
+            [DatumParameterKey.SenderPubKeyHash]: this._dexter.walletProvider.publicKeyHash(),
+            [DatumParameterKey.SenderStakingKeyHash]: this._dexter.walletProvider.stakingKeyHash(),
+            [DatumParameterKey.ReceiverPubKeyHash]: this._dexter.walletProvider.publicKeyHash(),
+            [DatumParameterKey.ReceiverStakingKeyHash]: this._dexter.walletProvider.stakingKeyHash(),
+            [DatumParameterKey.PoolIdentifier]: this._liquidityPool.identifier,
+            [DatumParameterKey.SwapInAmount]: Number(this._swapInAmount),
             [DatumParameterKey.MinReceive]: Number(this.getMinimumReceive()),
-            [DatumParameterKey.SwapInTokenPolicyId]: this.swapInToken === 'lovelace' ? '' : this.swapInToken.policyId,
-            [DatumParameterKey.SwapInTokenAssetName]: this.swapInToken === 'lovelace' ? '' : this.swapInToken.assetNameHex,
-            [DatumParameterKey.SwapOutTokenPolicyId]: this.swapOutToken === 'lovelace' ? '' : this.swapOutToken.policyId,
-            [DatumParameterKey.SwapOutTokenAssetName]: this.swapOutToken === 'lovelace' ? '' : this.swapOutToken.assetNameHex,
+            [DatumParameterKey.SwapInTokenPolicyId]: this._swapInToken === 'lovelace' ? '' : this._swapInToken.policyId,
+            [DatumParameterKey.SwapInTokenAssetName]: this._swapInToken === 'lovelace' ? '' : this._swapInToken.assetNameHex,
+            [DatumParameterKey.SwapOutTokenPolicyId]: this._swapOutToken === 'lovelace' ? '' : this._swapOutToken.policyId,
+            [DatumParameterKey.SwapOutTokenAssetName]: this._swapOutToken === 'lovelace' ? '' : this._swapOutToken.assetNameHex,
         };
 
-        const builtSwapOrder: BuiltSwapOrder = this.dexter.availableDexs[this.liquidityPool.dex].buildSwapOrder(defaultSwapParameters);
-        const swapTransaction: DexTransaction = this.dexter.walletProvider.createTransaction();
+        const builtSwapOrder: BuiltSwapOrder = this._dexter.availableDexs[this._liquidityPool.dex].buildSwapOrder(defaultSwapParameters);
+        const swapTransaction: DexTransaction = this._dexter.walletProvider.createTransaction();
 
         // onRetry
 
@@ -177,7 +197,7 @@ export class SwapRequest {
                         swapTransaction.status = TransactionStatus.Errored;
                         swapTransaction.error = {
                             step: TransactionStatus.Signing,
-                            reason: 'User failed to sign transaction.',
+                            reason: 'Failed to sign transaction.',
                             reasonRaw: error,
                         };
                     });

@@ -62,7 +62,7 @@ export default {
       constructor: 0,
       fields: [
         {
-          constructor: DatumParameterKey.SwapDirection,
+          constructor: DatumParameterKey.Action,
           fields: []
         },
         {

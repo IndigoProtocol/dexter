@@ -4,18 +4,18 @@ import { DatumParameterKey, DEFINITION_ROOT } from './constants';
 
 export class DefinitionBuilder {
 
-    private filePath: string;
-    private definition: DefinitionConstr;
+    private _filePath: string;
+    private _definition: DefinitionConstr;
 
     /**
      * Load a DEX definition file as a template for this builder.
      */
     public async loadDefinition(definitionFilePath: string): Promise<DefinitionBuilder> {
-        this.filePath = definitionFilePath;
+        this._filePath = definitionFilePath;
 
         await import(DEFINITION_ROOT + definitionFilePath)
             .then((definition) => {
-                this.definition = definition.default as DefinitionConstr;
+                this._definition = definition.default as DefinitionConstr;
             }).catch(() => {
                 throw new Error(`Unable to load definition file '${definitionFilePath}'`);
             });
@@ -27,11 +27,11 @@ export class DefinitionBuilder {
      * Push specified parameters to the definition template.
      */
     public pushParameters(parameters: DatumParameters): DefinitionBuilder {
-        if (! this.definition) {
+        if (! this._definition) {
             throw new Error(`Please load a definition file before applying parameters`);
         }
 
-        this.definition = this.applyParameters(this.definition, parameters);
+        this._definition = this.applyParameters(this._definition, parameters);
 
         return this;
     }
@@ -40,11 +40,11 @@ export class DefinitionBuilder {
      * Pull parameters of a datum using a definition template.
      */
     public pullParameters(definedDefinition: DefinitionConstr): DatumParameters {
-        if (! this.definition) {
+        if (! this._definition) {
             throw new Error(`Please load a definition file before pulling parameters`);
         }
 
-        return this.extractParameters(definedDefinition, this.definition);
+        return this.extractParameters(definedDefinition, this._definition);
     }
 
     /**
@@ -53,7 +53,7 @@ export class DefinitionBuilder {
     public getCbor(): string {
         return datumJsonToCbor(
             JSON.parse(
-                JSON.stringify(this.definition)
+                JSON.stringify(this._definition)
             )
         );
     }
@@ -89,7 +89,7 @@ export class DefinitionBuilder {
         }
 
         if ('bytes' in field) {
-            const parameterValue: any = mappedParameters[field.bytes as keyof typeof DatumParameterKey];
+            const parameterValue: any = mappedParameters[field.bytes as keyof typeof DatumParameterKey] ?? '';
 
             if (typeof parameterValue !== 'string') {
                 throw new Error(`Invalid parameter value '${parameterValue}' for type 'bytes'`);

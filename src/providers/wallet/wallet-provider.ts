@@ -1,5 +1,5 @@
-import { PayToAddress } from '../types';
-import { DexTransaction } from '../dex/models/dex-transaction';
+import { PayToAddress } from '../../types';
+import { DexTransaction } from '../../dex/models/dex-transaction';
 
 export abstract class WalletProvider {
 
