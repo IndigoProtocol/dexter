@@ -137,7 +137,7 @@ export class SundaeSwap extends BaseDex {
         return (1 - (Number(reserveIn) / Number(reserveIn + swapInAmount))) * 100;
     }
 
-    buildSwapOrder(swapParameters: DatumParameters): PayToAddress[] {
+    public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
         const scooperFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'scooperFee');
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
 
@@ -158,7 +158,7 @@ export class SundaeSwap extends BaseDex {
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        datumBuilder.loadDefinition('/sundaeswap/swap.ts')
+        await datumBuilder.loadDefinition('/sundaeswap/swap.ts')
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });

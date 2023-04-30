@@ -79,8 +79,11 @@ export class DefinitionBuilder {
         }
 
         if ('int' in field) {
-            const parameterValue: any = mappedParameters[field.int as keyof typeof DatumParameterKey];
+            let parameterValue: any = mappedParameters[field.int as keyof typeof DatumParameterKey];
 
+            if (typeof parameterValue === 'bigint') {
+                parameterValue = Number(parameterValue);
+            }
             if (typeof parameterValue !== 'number') {
                 throw new Error(`Invalid parameter value '${parameterValue}' for type 'int'`);
             }

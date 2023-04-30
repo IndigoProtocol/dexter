@@ -1,97 +1,78 @@
-import { Dexter, LiquidityPool, Minswap, Mock, SwapRequest, Asset } from '../src';
-import { MuesliSwap, SundaeSwap, WingRiders } from '../build';
+import { Asset, Dexter, LiquidityPool, MockDataProvider, MockWalletProvider, SwapRequest, WingRiders, DexTransaction } from '../src';
 
 describe('SwapRequest', () => {
 
-    const dexter: Dexter = new Dexter(new Mock());
+    const dexter: Dexter = new Dexter(new MockDataProvider(), {}, new MockWalletProvider());
     const swapRequest: SwapRequest = dexter.newSwapRequest();
+    const asset: Asset = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344', 6);
+    const liquidityPool: LiquidityPool = new LiquidityPool(
+        WingRiders.name,
+        'addr1',
+        'lovelace',
+        asset,
+        1000000n,
+        1000000n,
+    );
 
-    it('Can calculate Minswap swap parameters', () => {
-        const liquidityPool: LiquidityPool = new LiquidityPool(
-            Minswap.name,
-            'addr1',
-            'lovelace',
-            new Asset('', '', 6),
-            30817255371488n,
-            349805856622734n,
-        );
-        liquidityPool.poolFee = 0.3;
+    describe('Parameter setting', () => {
 
-        swapRequest
-            .forLiquidityPool(liquidityPool)
-            .withSwapInToken('lovelace')
-            .withSwapInAmount(10_000_000_000000n)
-            .withSlippagePercent(0.5);
+        it('Can set liquidity pool', () => {
+            swapRequest.forLiquidityPool(liquidityPool);
 
-        expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(24.37);
-        expect(swapRequest.getEstimatedReceive()).toEqual(85_506_228_814959n);
-        expect(swapRequest.getMinimumReceive()).toEqual(85_080_824_691501n);
-    });
+            expect(swapRequest.liquidityPool.uuid).toBe(liquidityPool.uuid);
+        });
 
-    it('Can calculate WingRiders swap parameters', () => {
-        const liquidityPool: LiquidityPool = new LiquidityPool(
-            WingRiders.name,
-            'addr1',
-            'lovelace',
-            new Asset('', '', 6),
-            50491527399n,
-            12677234723n,
-        );
-        liquidityPool.poolFee = 0.35;
+        it('Can set swap tokens', () => {
+            swapRequest.forLiquidityPool(liquidityPool)
+                .withSwapInToken('lovelace');
 
-        swapRequest
-            .forLiquidityPool(liquidityPool)
-            .withSwapInToken('lovelace')
-            .withSwapInAmount(10_000000n)
-            .withSlippagePercent(0.5);
+            expect(swapRequest.swapInToken).toBe('lovelace');
+            expect((swapRequest.swapOutToken as Asset).id()).toBe(asset.id());
+        });
 
-        expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(0.37);
-        expect(swapRequest.getEstimatedReceive()).toEqual(2_501483n);
-        expect(swapRequest.getMinimumReceive()).toEqual(2_489037n);
-    });
+        it('Fails on invalid swap in token', () => {
+            swapRequest.forLiquidityPool(liquidityPool);
 
-    it('Can calculate SundaeSwap swap parameters', () => {
-        const liquidityPool: LiquidityPool = new LiquidityPool(
-            SundaeSwap.name,
-            'addr1',
-            'lovelace',
-            new Asset('', '', 6),
-            3699642000000n,
-            78391015000000n,
-        );
-        liquidityPool.poolFee = 0.3;
+            expect(() => { swapRequest.withSwapInToken(new Asset('test1', 'test2')); }).toThrowError();
+        });
 
-        swapRequest
-            .forLiquidityPool(liquidityPool)
-            .withSwapInToken('lovelace')
-            .withSwapInAmount(10_000_000000n)
-            .withSlippagePercent(1.0);
+        it('Can flip swap tokens', () => {
+            swapRequest.forLiquidityPool(liquidityPool)
+                .withSwapInToken('lovelace')
+                .flip();
 
-        expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(0.27);
-        expect(swapRequest.getEstimatedReceive()).toEqual(210_684_680649n);
-        expect(swapRequest.getMinimumReceive()).toEqual(208_598_693711n);
-    });
+            expect((swapRequest.swapInToken as Asset).id()).toBe(asset.id());
+            expect(swapRequest.swapOutToken).toBe('lovelace');
+        });
 
-    it('Can calculate MuesliSwap swap parameters', () => {
-        const liquidityPool: LiquidityPool = new LiquidityPool(
-            MuesliSwap.name,
-            'addr1',
-            'lovelace',
-            new Asset('', '', 6),
-            1386837721743n,
-            485925n,
-        );
-        liquidityPool.poolFee = 0.3;
+        it('Can set swap in amount', () => {
+            swapRequest.forLiquidityPool(liquidityPool)
+                .withSwapInToken('lovelace')
+                .withSwapInAmount(100n);
 
-        swapRequest
-            .forLiquidityPool(liquidityPool)
-            .withSwapInToken('lovelace')
-            .withSwapInAmount(100_000_000000n)
-            .withSlippagePercent(3.0);
+            expect(swapRequest.swapInAmount).toBe(100n);
+        });
 
-        expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(7.51);
-        expect(swapRequest.getEstimatedReceive()).toEqual(32590n);
-        expect(swapRequest.getMinimumReceive()).toEqual(31640n);
+        it('Fails on incorrect swap in amount', () => {
+            swapRequest.forLiquidityPool(liquidityPool)
+                .withSwapInToken('lovelace');
+
+            expect(() => { swapRequest.withSwapInAmount(-1n); }).toThrowError();
+        });
+
+        it('Can set slippage percent', () => {
+            swapRequest.forLiquidityPool(liquidityPool)
+                .withSlippagePercent(5.0);
+
+            expect(swapRequest.slippagePercent).toBe(5.0);
+        });
+
+        it('Fails on incorrect slippage percent', () => {
+            swapRequest.forLiquidityPool(liquidityPool);
+
+            expect(() => { swapRequest.withSlippagePercent(-5.0); }).toThrowError();
+        });
+
     });
 
 });

@@ -140,8 +140,8 @@ export class WingRiders extends BaseDex {
             * 100;
     }
 
-    buildSwapOrder(swapParameters: DatumParameters): PayToAddress[] {
-        const agentFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'scooperFee');
+    public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
+        const agentFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'agentFee');
         const oil: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'oil');
 
         if (! agentFee || ! oil) {
@@ -157,6 +157,7 @@ export class WingRiders extends BaseDex {
         swapParameters = {
             ...swapParameters,
             [DatumParameterKey.Action]: swapDirection,
+            [DatumParameterKey.Expiration]: new Date().getTime() + (60 * 60 * 6 * 1000),
             [DatumParameterKey.PoolAssetAPolicyId]: swapDirection === 0
                 ? swapParameters.SwapInTokenPolicyId
                 : swapParameters.SwapOutTokenPolicyId,
@@ -172,7 +173,7 @@ export class WingRiders extends BaseDex {
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        datumBuilder.loadDefinition('/wingriders/swap.ts')
+        await datumBuilder.loadDefinition('/wingriders/swap.ts')
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });

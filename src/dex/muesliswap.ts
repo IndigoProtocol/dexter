@@ -142,7 +142,7 @@ export class MuesliSwap extends BaseDex {
         return(swapPrice - oldPrice) / oldPrice * 100;
     }
 
-    buildSwapOrder(swapParameters: DatumParameters): PayToAddress[] {
+    public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
         const matchMakerFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'matchmakerFee');
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
 
@@ -157,7 +157,7 @@ export class MuesliSwap extends BaseDex {
         (swapParameters[DatumParameterKey.MinReceive] as bigint) -= (matchMakerFee.value + deposit.value);
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        datumBuilder.loadDefinition('/muesliswap/swap.ts')
+        await datumBuilder.loadDefinition('/muesliswap/swap.ts')
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });

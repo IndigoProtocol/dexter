@@ -5,8 +5,9 @@ export * from "./definition-builder";
 
 export * from "./providers/data/data-provider";
 export * from "./providers/data/blockfrost";
-export * from "./providers/data/mock";
+export * from "./providers/data/mock-data-provider";
 export * from "./providers/wallet/wallet-provider";
+export * from "./providers/wallet/mock-wallet-provider";
 export * from "./providers/wallet/lucid-provider";
 
 export * from "./requests/swap-request";
@@ -14,6 +15,7 @@ export * from "./requests/fetch-request";
 
 export * from "./dex/models/asset";
 export * from "./dex/models/liquidity-pool";
+export * from "./dex/models/dex-transaction";
 export * from "./dex/base-dex";
 export * from "./dex/minswap";
 export * from "./dex/sundaeswap";

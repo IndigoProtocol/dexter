@@ -150,7 +150,7 @@ export class Minswap extends BaseDex {
         return Number(priceImpactNumerator * 100n) / Number(priceImpactDenominator);
     }
 
-    public buildSwapOrder(swapParameters: DatumParameters): PayToAddress[] {
+    public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
         const batcherFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'batcherFee');
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
 
@@ -165,7 +165,7 @@ export class Minswap extends BaseDex {
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        datumBuilder.loadDefinition('/minswap/swap.ts')
+        await datumBuilder.loadDefinition('/minswap/swap.ts')
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });

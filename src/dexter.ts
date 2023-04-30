@@ -33,15 +33,6 @@ export class Dexter {
     }
 
     /**
-     * Set config Dexter will use for all requests.
-     */
-    setConfig(config: DexterConfig = {}): Dexter {
-        this.config = config;
-
-        return this;
-    }
-
-    /**
      * Switch to a new data provider.
      */
     switchDataProvider(dataProvider: DataProvider): Dexter {
@@ -70,10 +61,6 @@ export class Dexter {
      * New request for a swap order.
      */
     newSwapRequest() {
-        if (! this.walletProvider) {
-            throw new Error('Please set a wallet provider before creating a swap request.');
-        }
-
         return new SwapRequest(this);
     }
 

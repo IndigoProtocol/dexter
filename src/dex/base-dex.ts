@@ -35,7 +35,7 @@ export abstract class BaseDex {
     /**
      * Craft a swap order for this DEX.
      */
-    abstract buildSwapOrder(swapParameters: DatumParameters): PayToAddress[];
+    abstract buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]>;
 
     /**
      * Fees associated with submitting a swap order.
