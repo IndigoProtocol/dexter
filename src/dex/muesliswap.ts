@@ -153,8 +153,13 @@ export class MuesliSwap extends BaseDex {
         swapParameters = {
             ...swapParameters,
             [DatumParameterKey.TotalFees]: matchMakerFee.value + deposit.value,
+            [DatumParameterKey.AllowPartialFill]: 1,
         };
-        (swapParameters[DatumParameterKey.MinReceive] as bigint) -= (matchMakerFee.value + deposit.value);
+
+        // Asset -> ADA swap
+        if (! swapParameters[DatumParameterKey.SwapOutTokenPolicyId]) {
+            (swapParameters[DatumParameterKey.MinReceive] as bigint) -= matchMakerFee.value;
+        }
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
         await datumBuilder.loadDefinition('/muesliswap/swap.ts')

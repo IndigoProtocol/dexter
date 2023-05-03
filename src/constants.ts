@@ -22,6 +22,7 @@ export enum DatumParameterKey {
     SwapOutTokenAssetName = 'SwapOutTokenAssetName',
     MinReceive = 'MinReceive',
     Expiration = 'Expiration',
+    AllowPartialFill = 'AllowPartialFill',
 
     /**
      * Trading fees.

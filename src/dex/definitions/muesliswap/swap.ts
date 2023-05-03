@@ -50,11 +50,10 @@ export default {
           bytes: DatumParameterKey.SwapInTokenAssetName
         },
         {
-          // minReceive - matchMakerFee - deposit
           int: DatumParameterKey.MinReceive
         },
         {
-          constructor: 1,
+          constructor: DatumParameterKey.AllowPartialFill,
           fields: []
         },
         {
