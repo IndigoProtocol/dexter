@@ -155,7 +155,7 @@ export class Minswap extends BaseDex {
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
 
         if (! batcherFee || ! deposit) {
-            throw new Error('Parameters for datum are not set.');
+            return Promise.reject('Parameters for datum are not set.');
         }
 
         swapParameters = {
@@ -185,6 +185,25 @@ export class Minswap extends BaseDex {
                     datum: datumBuilder.getCbor(),
                 }
             )
+        ];
+    }
+
+    public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
+        const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
+            return [MARKET_ORDER_ADDRESS, LIMIT_ORDER_ADDRESS].includes(utxo.address);
+        });
+
+        if (! relevantUtxo) {
+            return Promise.reject('Unable to find relevant UTxO for cancelling the swap order.');
+        }
+
+        return [
+            {
+                address: returnAddress,
+                addressType: AddressType.Base,
+                assetBalances: relevantUtxo.assetBalances,
+                spendUtxos: [relevantUtxo],
+            }
         ];
     }
 

@@ -1,7 +1,18 @@
-import { AssetBalance, BlockfrostConfig, PayToAddress } from '../../types';
+import { AssetBalance, BlockfrostConfig, Cip30Api, PayToAddress, UTxO, WalletOptions } from '../../types';
 import { DexTransaction } from '../../dex/models/dex-transaction';
 import { WalletProvider } from './wallet-provider';
-import { Blockfrost, Datum, Lucid, TxComplete, TxHash, TxSigned, Unit } from 'lucid-cardano';
+import {
+    Address,
+    AddressDetails,
+    Assets,
+    Blockfrost,
+    Datum,
+    Lucid,
+    TxComplete,
+    TxHash,
+    TxSigned,
+    Unit
+} from 'lucid-cardano';
 import { AddressType } from '../../constants';
 
 export class LucidProvider extends WalletProvider {
@@ -9,7 +20,7 @@ export class LucidProvider extends WalletProvider {
     private _api: Lucid;
     private _usableAddress: string;
     private _paymentCredential: string;
-    private _stakingCredential: string;
+    private _stakingCredential: string | undefined;
 
     constructor(config: BlockfrostConfig) {
         super();
@@ -22,8 +33,6 @@ export class LucidProvider extends WalletProvider {
         ).then((lucid: Lucid) => {
             this._api = lucid;
         });
-
-        //todo: need to load wallet
     }
 
     public address(): string {
@@ -35,7 +44,29 @@ export class LucidProvider extends WalletProvider {
     }
 
     public stakingKeyHash(): string {
-        return this._stakingCredential;
+        return this._stakingCredential ?? '';
+    }
+
+    public loadWallet(walletApi: Cip30Api): Promise<WalletProvider> {
+        this._api.selectWallet(walletApi);
+
+        return this.loadWalletInformation();
+    }
+
+    public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions): Promise<WalletProvider> {
+        const addressType: 'Base' | 'Enterprise' = options.addressType === AddressType.Enterprise
+            ? 'Enterprise'
+            : 'Base';
+
+        this._api.selectWalletFromSeed(
+            seed.join(' '),
+            {
+                addressType: addressType,
+                accountIndex: options.accountIndex ?? 0,
+            },
+        );
+
+        return this.loadWalletInformation();
     }
 
     public createTransaction(): DexTransaction {
@@ -47,12 +78,22 @@ export class LucidProvider extends WalletProvider {
 
     public paymentsForTransaction(transaction: DexTransaction, payToAddresses: PayToAddress[]): Promise<DexTransaction> {
         payToAddresses.forEach((payToAddress: PayToAddress) => {
-            const payment: Record<Unit | 'lovelace', bigint> = payToAddress.assetBalances
-                .reduce((payment: Record<Unit | 'lovelace', bigint>, assetBalance: AssetBalance) => {
-                    payment[assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id()] = assetBalance.quantity;
+            const payment: Assets = this.paymentFromAssets(payToAddress.assetBalances);
 
-                    return payment;
-                }, {} as Record<Unit | 'lovelace', bigint>);
+            // Include UTxOs to spend
+            if (payToAddress.spendUtxos && payToAddress.spendUtxos.length > 0) {
+                transaction.providerData.tx.collectFrom(
+                    payToAddress.spendUtxos.map((utxo: UTxO) => {
+                        return {
+                            txHash: utxo.txHash,
+                            outputIndex: utxo.outputIndex,
+                            address: utxo.address,
+                            datumHash: utxo.datumHash,
+                            assets: this.paymentFromAssets(utxo.assetBalances)
+                        };
+                    })
+                );
+            }
 
             switch (payToAddress.addressType) {
                 case AddressType.Contract:
@@ -62,7 +103,8 @@ export class LucidProvider extends WalletProvider {
                         payment,
                     );
                     break;
-                case AddressType.Address:
+                case AddressType.Base:
+                case AddressType.Enterprise:
                     transaction.providerData.tx.payToAddress(
                         payToAddress.address,
                         payment,
@@ -94,6 +136,30 @@ export class LucidProvider extends WalletProvider {
         return transaction.providerData.tx.submit()
             .then((txHash: TxHash) => {
                 return txHash;
+            });
+    }
+
+    private paymentFromAssets(assetBalances: AssetBalance[]): Assets {
+        return assetBalances
+            .reduce((payment: Record<Unit | 'lovelace', bigint>, assetBalance: AssetBalance) => {
+                payment[assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id()] = assetBalance.quantity;
+
+                return payment;
+            }, {} as Assets);
+    }
+
+    private loadWalletInformation(): Promise<WalletProvider> {
+        return this._api.wallet.address()
+            .then((address: Address) => {
+                const details: AddressDetails = this._api.utils.getAddressDetails(
+                    address,
+                );
+
+                this._usableAddress = address;
+                this._paymentCredential = details.paymentCredential?.hash ?? '';
+                this._stakingCredential = details.stakeCredential?.hash ?? '';
+
+                return this as WalletProvider;
             });
     }
 

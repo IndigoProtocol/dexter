@@ -147,7 +147,7 @@ export class MuesliSwap extends BaseDex {
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
 
         if (! matchMakerFee || ! deposit || ! swapParameters[DatumParameterKey.MinReceive]) {
-            throw new Error('Parameters for datum are not set.');
+            return Promise.reject('Parameters for datum are not set.');
         }
 
         swapParameters = {
@@ -183,6 +183,10 @@ export class MuesliSwap extends BaseDex {
                 }
             )
         ];
+    }
+
+    public buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
+        return Promise.resolve([]);
     }
 
     public swapOrderFees(): SwapFee[] {

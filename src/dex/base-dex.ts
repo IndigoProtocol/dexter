@@ -38,6 +38,11 @@ export abstract class BaseDex {
     abstract buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]>;
 
     /**
+     * Craft a swap order cancellation for this DEX.
+     */
+    abstract buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]>;
+
+    /**
      * Fees associated with submitting a swap order.
      */
     abstract swapOrderFees(): SwapFee[];

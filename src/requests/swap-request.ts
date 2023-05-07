@@ -143,6 +143,7 @@ export class SwapRequest {
             throw new Error('Please set a swap in amount before submitting a swap order.');
         }
 
+        // Standard parameters for a swap order
         const defaultSwapParameters: DatumParameters = {
             [DatumParameterKey.SenderPubKeyHash]: this._dexter.walletProvider.publicKeyHash(),
             [DatumParameterKey.SenderStakingKeyHash]: this._dexter.walletProvider.stakingKeyHash(),

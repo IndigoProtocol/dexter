@@ -8,6 +8,8 @@ import { MuesliSwap } from './dex/muesliswap';
 import { WingRiders } from './dex/wingriders';
 import { SwapRequest } from './requests/swap-request';
 import { WalletProvider } from './providers/wallet/wallet-provider';
+import { BaseDex } from './dex/base-dex';
+import { CancelRequest } from './requests/cancel-request';
 
 export class Dexter {
 
@@ -32,10 +34,14 @@ export class Dexter {
         };
     }
 
+    public dexByName(name: string): BaseDex | undefined {
+        return this.availableDexs[name];
+    }
+
     /**
      * Switch to a new data provider.
      */
-    switchDataProvider(dataProvider: DataProvider): Dexter {
+    public switchDataProvider(dataProvider: DataProvider): Dexter {
         this.dataProvider = dataProvider;
 
         return this;
@@ -44,7 +50,7 @@ export class Dexter {
     /**
      * Switch to a new wallet provider.
      */
-    switchWalletProvider(walletProvider: WalletProvider): Dexter {
+    public switchWalletProvider(walletProvider: WalletProvider): Dexter {
         this.walletProvider = walletProvider;
 
         return this;
@@ -53,15 +59,22 @@ export class Dexter {
     /**
      * New request for data fetching.
      */
-    newFetchRequest(): FetchRequest {
+    public newFetchRequest(): FetchRequest {
         return new FetchRequest(this);
     }
 
     /**
      * New request for a swap order.
      */
-    newSwapRequest() {
+    public newSwapRequest() {
         return new SwapRequest(this);
+    }
+
+    /**
+     * New request for cancelling a swap order.
+     */
+    public newCancelRequest() {
+        return new CancelRequest(this);
     }
 
 }

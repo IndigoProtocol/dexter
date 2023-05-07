@@ -142,7 +142,7 @@ export class SundaeSwap extends BaseDex {
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
 
         if (! scooperFee || ! deposit) {
-            throw new Error('Parameters for datum are not set.');
+            return Promise.reject('Parameters for datum are not set.');
         }
 
         const swapInToken: string = (swapParameters.SwapInTokenPolicyId as string) + (swapParameters.SwapInTokenAssetName as string);
@@ -179,6 +179,10 @@ export class SundaeSwap extends BaseDex {
                 }
             )
         ];
+    }
+
+    public buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
+        return Promise.resolve([]);
     }
 
     public swapOrderFees(): SwapFee[] {

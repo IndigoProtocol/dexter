@@ -1,4 +1,4 @@
-import { PayToAddress } from '../../types';
+import { Cip30Api, PayToAddress, WalletOptions } from '../../types';
 import { DexTransaction } from '../../dex/models/dex-transaction';
 import { WalletProvider } from './wallet-provider';
 
@@ -26,6 +26,14 @@ export class MockWalletProvider extends WalletProvider {
 
     public stakingKeyHash(): string {
         return this._stakingCredential;
+    }
+
+    public loadWallet(walletApi: Cip30Api): Promise<WalletProvider> {
+        return Promise.resolve(this as WalletProvider);
+    }
+
+    public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions): Promise<WalletProvider> {
+        return Promise.resolve(this as WalletProvider);
     }
 
     public createTransaction(): DexTransaction {

@@ -57,5 +57,6 @@ export enum TransactionStatus {
 
 export enum AddressType {
     Contract,
-    Address,
+    Base,
+    Enterprise,
 }
