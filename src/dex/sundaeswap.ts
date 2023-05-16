@@ -181,8 +181,23 @@ export class SundaeSwap extends BaseDex {
         ];
     }
 
-    public buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
-        return Promise.resolve([]);
+    public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
+        const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
+            return utxo.address === ORDER_ADDRESS;
+        });
+
+        if (! relevantUtxo) {
+            return Promise.reject('Unable to find relevant UTxO for cancelling the swap order.');
+        }
+
+        return [
+            {
+                address: returnAddress,
+                addressType: AddressType.Base,
+                assetBalances: relevantUtxo.assetBalances,
+                spendUtxos: [relevantUtxo],
+            }
+        ];
     }
 
     public swapOrderFees(): SwapFee[] {
