@@ -1,6 +1,6 @@
 {
-  "name": "dexter",
-  "version": "1.0",
+  "name": "@sluder/dexter",
+  "version": "1.0.0",
   "license": "MIT",
   "author": "Zachary Sluder",
   "description": "",
