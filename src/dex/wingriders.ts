@@ -173,7 +173,7 @@ export class WingRiders extends BaseDex {
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        await datumBuilder.loadDefinition('/wingriders/swap.ts')
+        await datumBuilder.loadDefinition('/wingriders/order.ts')
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });

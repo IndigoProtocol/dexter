@@ -158,7 +158,7 @@ export class SundaeSwap extends BaseDex {
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        await datumBuilder.loadDefinition('/sundaeswap/swap.ts')
+        await datumBuilder.loadDefinition('/sundaeswap/order.ts')
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });

@@ -165,7 +165,7 @@ export class Minswap extends BaseDex {
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        await datumBuilder.loadDefinition('/minswap/swap.ts')
+        await datumBuilder.loadDefinition('/minswap/order.ts')
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });

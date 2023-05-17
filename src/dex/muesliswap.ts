@@ -162,7 +162,7 @@ export class MuesliSwap extends BaseDex {
         }
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        await datumBuilder.loadDefinition('/muesliswap/swap.ts')
+        await datumBuilder.loadDefinition('/muesliswap/order.ts')
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });

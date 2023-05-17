@@ -42,6 +42,8 @@ export enum DatumParameterKey {
     LpFeeDenominator = 'LpFeeDenominator',
     PoolAssetAPolicyId = 'PoolAssetAPolicyId',
     PoolAssetAAssetName = 'PoolAssetAAssetName',
+    PoolAssetABarFee = 'PoolAssetABarFee',
+    PoolAssetBBarFee = 'PoolAssetBBarFee',
     PoolAssetBPolicyId = 'PoolAssetBPolicyId',
     PoolAssetBAssetName = 'PoolAssetBAssetName',
     RootKLast = 'RootKLast',
