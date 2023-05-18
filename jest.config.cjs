@@ -2,7 +2,7 @@ module.exports = {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
   modulePathIgnorePatterns: [
-    '<rootDir>/dist/',
+    '<rootDir>/build/',
     '<rootDir>/node_modules/',
   ],
   transform: {

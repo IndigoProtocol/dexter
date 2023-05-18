@@ -1,5 +1,5 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { DataProvider } from '../providers/data/data-provider';
+import { BaseDataProvider } from '../providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import {
@@ -13,6 +13,10 @@ import {
 import { DefinitionBuilder } from '../definition-builder';
 import { correspondingReserves, tokensMatch } from '../utils';
 import { AddressType, DatumParameterKey } from '../constants';
+import pool from './definitions/sundaeswap/pool';
+import order from './definitions/sundaeswap/order';
+import { BaseApi } from './api/base-api';
+import { SundaeSwapApi } from './api/sundaeswap-api';
 
 /**
  * SundaeSwap constants.
@@ -25,10 +29,14 @@ export class SundaeSwap extends BaseDex {
 
     public readonly name: string = 'SundaeSwap';
 
-    async liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+    public api(): BaseApi {
+        return new SundaeSwapApi();
+    }
+
+    async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const utxos: UTxO[] = await provider.utxos(POOL_ADDRESS, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
-            .loadDefinition('/sundaeswap/pool.js');
+            .loadDefinition(pool);
 
         const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO) => {
             const liquidityPool: LiquidityPool | undefined = this.liquidityPoolFromUtxo(utxo, assetA, assetB);
@@ -158,7 +166,7 @@ export class SundaeSwap extends BaseDex {
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        await datumBuilder.loadDefinition('/sundaeswap/order.ts')
+        await datumBuilder.loadDefinition(order)
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });

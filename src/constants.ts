@@ -1,5 +1,3 @@
-export const DEFINITION_ROOT: string = './dex/definitions';
-
 export enum DatumParameterKey {
     /**
      * Generics.

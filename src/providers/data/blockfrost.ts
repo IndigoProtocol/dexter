@@ -1,9 +1,9 @@
-import { DataProvider } from './data-provider';
+import { BaseDataProvider } from './base-data-provider';
 import axios, { RawAxiosRequestConfig, AxiosInstance } from 'axios';
 import { Asset } from '../../dex/models/asset';
 import { AssetAddress, AssetBalance, BlockfrostConfig, DefinitionField, Transaction, UTxO } from '../../types';
 
-export class Blockfrost extends DataProvider {
+export class Blockfrost extends BaseDataProvider {
 
     private api: AxiosInstance;
 
@@ -16,7 +16,7 @@ export class Blockfrost extends DataProvider {
         this.api = axios.create({
             baseURL: config.url,
             headers: {
-                'project_id': config.projectId,
+                project_id: config.projectId,
             },
         } as RawAxiosRequestConfig);
     }
@@ -27,7 +27,7 @@ export class Blockfrost extends DataProvider {
      */
     public async utxos(address: string, asset?: Asset): Promise<UTxO[]> {
         try {
-            return this.fromPaginatedRequest(`/addresses/${address}/utxos/${asset ? asset.id() : ''}`)
+            return this.sendPaginatedRequest(`/addresses/${address}/utxos/${asset ? asset.id() : ''}`)
                 .then((results: any) => {
                     return results.map((utxo: any) => {
                         return {
@@ -79,7 +79,7 @@ export class Blockfrost extends DataProvider {
      */
     public async assetTransactions(asset: Asset): Promise<Transaction[]> {
         try {
-            return this.fromPaginatedRequest(`/assets/${asset.id()}/transactions`)
+            return this.sendPaginatedRequest(`/assets/${asset.id()}/transactions`)
                 .then((results: any) => {
                     return results.map((tx: any) => {
                         return {
@@ -98,7 +98,7 @@ export class Blockfrost extends DataProvider {
      */
     public async assetAddresses(asset: Asset): Promise<AssetAddress[]> {
         try {
-            return this.fromPaginatedRequest(`/assets/${asset.id()}/addresses`)
+            return this.sendPaginatedRequest(`/assets/${asset.id()}/addresses`)
                 .then((results: any) => {
                     return results.map((result: any) => {
                         return {
@@ -125,20 +125,23 @@ export class Blockfrost extends DataProvider {
     /**
      * https://docs.blockfrost.io/#section/Concepts
      */
-    private fromPaginatedRequest(url: string, page: number = 1, results: any = []): Promise<any> {
+    private sendPaginatedRequest(url: string, page: number = 1, results: any = []): Promise<any> {
         return this.api.get(url, {
             params: {
                 page,
             },
         }).then((response: any) => {
-            if (response.data.length === 0) {
-                return results;
-            }
-
             results = results.concat(response.data);
             page++;
 
-            return this.fromPaginatedRequest(url, page, results);
+            // Possibly more data to grab
+            if (response.data.length === 100) {
+                return this.sendPaginatedRequest(url, page, results);
+            }
+
+            return results;
+        }).catch((e) => {
+            return Promise.resolve([]);
         });
     }
 

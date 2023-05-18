@@ -1,24 +1,16 @@
 import { DatumParameters, DefinitionConstr, DefinitionField } from './types';
 import { datumJsonToCbor } from 'lucid-cardano';
-import { DatumParameterKey, DEFINITION_ROOT } from './constants';
+import { DatumParameterKey } from './constants';
 
 export class DefinitionBuilder {
 
-    private _filePath: string;
     private _definition: DefinitionConstr;
 
     /**
      * Load a DEX definition file as a template for this builder.
      */
-    public async loadDefinition(definitionFilePath: string): Promise<DefinitionBuilder> {
-        this._filePath = definitionFilePath;
-
-        await import(DEFINITION_ROOT + definitionFilePath)
-            .then((definition) => {
-                this._definition = definition.default as DefinitionConstr;
-            }).catch(() => {
-                throw new Error(`Unable to load definition file '${definitionFilePath}'`);
-            });
+    public async loadDefinition(definition: DefinitionConstr): Promise<DefinitionBuilder> {
+        this._definition = definition;
 
         return this;
     }

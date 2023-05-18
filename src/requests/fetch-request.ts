@@ -3,12 +3,10 @@ import { Asset, Token } from '../dex/models/asset';
 import { LiquidityPool } from '../dex/models/liquidity-pool';
 import { Dexter } from '../dexter';
 import { LiquidityPoolGroups, Transaction, UTxO } from '../types';
-import { DataProvider } from '../providers/data/data-provider';
 
 export class FetchRequest {
 
     private _dexter: Dexter;
-    private _dataProvider: DataProvider;
     private _onDexs: BaseDex[] = [];
 
     constructor(dexter: Dexter) {
@@ -47,7 +45,14 @@ export class FetchRequest {
      */
     public getLiquidityPools(assetA: Token = 'lovelace', assetB?: Token, groupByDex: boolean = false): Promise<LiquidityPoolGroups | LiquidityPool[]> {
         return Promise.all(
-            this._onDexs.map((dex: BaseDex) => dex.liquidityPools(this._dexter.dataProvider, assetA, assetB)),
+            this._onDexs.map((dex: BaseDex) => {
+                return dex.liquidityPools(this._dexter.dataProvider, assetA, assetB)
+                    .catch(() => {
+                        return this._dexter.config.shouldFallbackToApi
+                            ? dex.api().liquidityPools(assetA, assetB)
+                            : [];
+                    });
+            }),
         ).then(async (mappedLiquidityPools: Awaited<LiquidityPool[]>[]) => {
             const liquidityPools: LiquidityPool[] = mappedLiquidityPools.flat();
 

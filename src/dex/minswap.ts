@@ -1,5 +1,5 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { DataProvider } from '../providers/data/data-provider';
+import { BaseDataProvider } from '../providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import {
@@ -14,6 +14,10 @@ import {
 import { DefinitionBuilder } from '../definition-builder';
 import { correspondingReserves } from '../utils';
 import { AddressType, DatumParameterKey } from '../constants';
+import pool from './definitions/minswap/pool';
+import order from './definitions/minswap/order';
+import { BaseApi } from './api/base-api';
+import { MinswapApi } from './api/minswap-api';
 
 /**
  * Minswap constants.
@@ -29,10 +33,14 @@ export class Minswap extends BaseDex {
 
     public readonly name: string = 'Minswap';
 
-    public async liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+    public api(): BaseApi {
+        return new MinswapApi();
+    }
+
+    public async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const utxos: UTxO[] = await provider.utxos(POOL_ADDRESS, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
-            .loadDefinition('/minswap/pool.js');
+            .loadDefinition(pool);
 
         const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO) => {
             const liquidityPool: LiquidityPool | undefined = this.liquidityPoolFromUtxo(utxo, assetA, assetB);
@@ -165,7 +173,7 @@ export class Minswap extends BaseDex {
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        await datumBuilder.loadDefinition('/minswap/order.ts')
+        await datumBuilder.loadDefinition(order)
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });

@@ -1,7 +1,7 @@
 import { Cip30Api, PayToAddress, WalletOptions } from '../../types';
 import { DexTransaction } from '../../dex/models/dex-transaction';
 
-export abstract class WalletProvider {
+export abstract class BaseWalletProvider {
 
     abstract address(): string;
 
@@ -9,9 +9,9 @@ export abstract class WalletProvider {
 
     abstract stakingKeyHash(): string;
 
-    abstract loadWallet(walletApi: Cip30Api): Promise<WalletProvider>;
+    abstract loadWallet(walletApi: Cip30Api): Promise<BaseWalletProvider>;
 
-    abstract loadWalletFromSeedPhrase(seed: string[], options: WalletOptions): Promise<WalletProvider>;
+    abstract loadWalletFromSeedPhrase(seed: string[], options: WalletOptions): Promise<BaseWalletProvider>;
 
     abstract createTransaction(): DexTransaction;
 

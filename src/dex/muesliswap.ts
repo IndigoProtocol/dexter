@@ -9,10 +9,14 @@ import {
 } from '../types';
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
-import { DataProvider } from '../providers/data/data-provider';
+import { BaseDataProvider } from '../providers/data/base-data-provider';
 import { DefinitionBuilder } from '../definition-builder';
 import { correspondingReserves } from '../utils';
 import { AddressType, DatumParameterKey } from '../constants';
+import pool from './definitions/muesliswap/pool';
+import order from './definitions/muesliswap/order';
+import { BaseApi } from './api/base-api';
+import { MuesliSwapApi } from './api/muesliswap-api';
 
 /**
  * MuesliSwap constants.
@@ -27,10 +31,14 @@ export class MuesliSwap extends BaseDex {
 
     public readonly name: string = 'MuesliSwap';
 
-    async liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+    public api(): BaseApi {
+        return new MuesliSwapApi();
+    }
+
+    async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const utxos: UTxO[] = await provider.utxos(POOL_ADDRESS, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
-            .loadDefinition('/muesliswap/pool.js');
+            .loadDefinition(pool);
 
         const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO) => {
             const liquidityPool: LiquidityPool | undefined = this.liquidityPoolFromUtxo(utxo, assetA, assetB);
@@ -162,7 +170,7 @@ export class MuesliSwap extends BaseDex {
         }
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        await datumBuilder.loadDefinition('/muesliswap/order.ts')
+        await datumBuilder.loadDefinition(order)
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });
@@ -185,8 +193,23 @@ export class MuesliSwap extends BaseDex {
         ];
     }
 
-    public buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
-        return Promise.resolve([]);
+    public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
+        const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
+            return utxo.address === ORDER_ADDRESS;
+        });
+
+        if (! relevantUtxo) {
+            return Promise.reject('Unable to find relevant UTxO for cancelling the swap order.');
+        }
+
+        return [
+            {
+                address: returnAddress,
+                addressType: AddressType.Base,
+                assetBalances: relevantUtxo.assetBalances,
+                spendUtxos: [relevantUtxo],
+            }
+        ];
     }
 
     public swapOrderFees(): SwapFee[] {

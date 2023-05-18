@@ -1,4 +1,4 @@
-import { DataProvider } from './providers/data/data-provider';
+import { BaseDataProvider } from './providers/data/base-data-provider';
 import { TokenRegistry } from './services/token-registry';
 import { FetchRequest } from './requests/fetch-request';
 import { AvailableDexs, DexterConfig } from './types';
@@ -7,22 +7,22 @@ import { SundaeSwap } from './dex/sundaeswap';
 import { MuesliSwap } from './dex/muesliswap';
 import { WingRiders } from './dex/wingriders';
 import { SwapRequest } from './requests/swap-request';
-import { WalletProvider } from './providers/wallet/wallet-provider';
+import { BaseWalletProvider } from './providers/wallet/base-wallet-provider';
 import { BaseDex } from './dex/base-dex';
 import { CancelRequest } from './requests/cancel-request';
 
 export class Dexter {
 
-    public dataProvider: DataProvider;
-    public walletProvider?: WalletProvider;
+    public dataProvider: BaseDataProvider;
+    public walletProvider?: BaseWalletProvider;
     public config: DexterConfig;
 
     public availableDexs: AvailableDexs;
     public tokenRegistry: TokenRegistry;
 
-    constructor(dataProvider: DataProvider, config: DexterConfig = {}, walletProvider?: WalletProvider) {
-        this.dataProvider = dataProvider;
+    constructor(config: DexterConfig = {}, dataProvider: BaseDataProvider, walletProvider?: BaseWalletProvider) {
         this.config = config;
+        this.dataProvider = dataProvider;
         this.walletProvider = walletProvider;
 
         this.tokenRegistry = new TokenRegistry();
@@ -41,7 +41,7 @@ export class Dexter {
     /**
      * Switch to a new data provider.
      */
-    public switchDataProvider(dataProvider: DataProvider): Dexter {
+    public switchDataProvider(dataProvider: BaseDataProvider): Dexter {
         this.dataProvider = dataProvider;
 
         return this;
@@ -50,7 +50,7 @@ export class Dexter {
     /**
      * Switch to a new wallet provider.
      */
-    public switchWalletProvider(walletProvider: WalletProvider): Dexter {
+    public switchWalletProvider(walletProvider: BaseWalletProvider): Dexter {
         this.walletProvider = walletProvider;
 
         return this;

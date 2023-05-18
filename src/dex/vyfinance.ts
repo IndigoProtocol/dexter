@@ -1,5 +1,5 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { DataProvider } from '../providers/data/data-provider';
+import { BaseDataProvider } from '../providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import {
@@ -14,6 +14,9 @@ import {
 import { DefinitionBuilder } from '../definition-builder';
 import { correspondingReserves } from '../utils';
 import { AddressType, DatumParameterKey } from '../constants';
+import order from './definitions/vyfinance/order';
+import { BaseApi } from './api/base-api';
+import { VyfinanceApi } from './api/vyfinance-api';
 
 /**
  * VyFinance constants.
@@ -26,8 +29,12 @@ export class VyFinance extends BaseDex {
 
     public readonly name: string = 'VyFinance';
 
-    public async liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        return Promise.resolve([]);
+    public api(): BaseApi {
+        return new VyfinanceApi();
+    }
+
+    public async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+        return this.api().liquidityPools(assetA, assetB);
     }
 
     public liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB?: Token): LiquidityPool | undefined {
@@ -44,7 +51,7 @@ export class VyFinance extends BaseDex {
 
     public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        await datumBuilder.loadDefinition('/vyfinance/order.ts')
+        await datumBuilder.loadDefinition(order)
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });
@@ -68,7 +75,22 @@ export class VyFinance extends BaseDex {
     }
 
     public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
-        return Promise.resolve([]);
+        const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
+            return utxo.address !== returnAddress;
+        });
+
+        if (! relevantUtxo) {
+            return Promise.reject('Unable to find relevant UTxO for cancelling the swap order.');
+        }
+
+        return [
+            {
+                address: returnAddress,
+                addressType: AddressType.Base,
+                assetBalances: relevantUtxo.assetBalances,
+                spendUtxos: [relevantUtxo],
+            }
+        ];
     }
 
     public swapOrderFees(): SwapFee[] {

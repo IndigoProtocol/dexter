@@ -8,10 +8,13 @@ import {
 } from '../types';
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
-import { DataProvider } from '../providers/data/data-provider';
+import { BaseDataProvider } from '../providers/data/base-data-provider';
 import { correspondingReserves } from '../utils';
 import { AddressType, DatumParameterKey } from '../constants';
 import { DefinitionBuilder } from '../definition-builder';
+import order from './definitions/wingriders/order';
+import { BaseApi } from './api/base-api';
+import { WingRidersApi } from './api/wingriders-api';
 
 /**
  * WingRiders constants.
@@ -25,9 +28,17 @@ export class WingRiders extends BaseDex {
 
     public readonly name: string = 'WingRiders';
 
-    async liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+    private _assetAddresses: AssetAddress[] = [];
+
+    public api(): BaseApi {
+        return new WingRidersApi();
+    }
+
+    async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const validityAsset: Asset = Asset.fromId(POOL_VALIDITY_ASSET);
-        const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
+        const assetAddresses: AssetAddress[] = this._assetAddresses
+            ? this._assetAddresses
+            : await provider.assetAddresses(validityAsset);
 
         const addressPromises: Promise<LiquidityPool[]>[] = assetAddresses.map(async (assetAddress: AssetAddress) => {
             const utxos: UTxO[] = await provider.utxos(assetAddress.address, validityAsset);
@@ -173,7 +184,7 @@ export class WingRiders extends BaseDex {
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
-        await datumBuilder.loadDefinition('/wingriders/order.ts')
+        await datumBuilder.loadDefinition(order)
             .then((builder: DefinitionBuilder) => {
                 builder.pushParameters(swapParameters);
             });
@@ -196,8 +207,23 @@ export class WingRiders extends BaseDex {
         ];
     }
 
-    public buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
-        return Promise.resolve([]);
+    public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
+        const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
+            return utxo.address === ORDER_ADDRESS;
+        });
+
+        if (! relevantUtxo) {
+            return Promise.reject('Unable to find relevant UTxO for cancelling the swap order.');
+        }
+
+        return [
+            {
+                address: returnAddress,
+                addressType: AddressType.Base,
+                assetBalances: relevantUtxo.assetBalances,
+                spendUtxos: [relevantUtxo],
+            }
+        ];
     }
 
     public swapOrderFees(): SwapFee[] {

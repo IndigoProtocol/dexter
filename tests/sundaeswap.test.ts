@@ -15,7 +15,7 @@ import {
 describe('SundaeSwap', () => {
 
     const walletProvider: MockWalletProvider = new MockWalletProvider();
-    const dexter: Dexter = new Dexter(new MockDataProvider(), {}, walletProvider);
+    const dexter: Dexter = new Dexter({}, new MockDataProvider(), walletProvider);
     const swapRequest: SwapRequest = dexter.newSwapRequest();
     const asset: Asset = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344', 6);
     const liquidityPool: LiquidityPool = new LiquidityPool(
@@ -59,7 +59,7 @@ describe('SundaeSwap', () => {
         return sundaeswap.buildSwapOrder(defaultSwapParameters)
             .then((payments: PayToAddress[]) => {
                 expect(payments[0].addressType).toBe(AddressType.Contract);
-                expect(payments[0].assetBalances[0].quantity).toBe(10004500000n);
+                expect(payments[0].assetBalances[0].quantity).toEqual(10004500000n);
                 expect(payments[0].datum).toBe('d8799f421234d8799fd8799fd8799fd8799f42ed56ffd8799fd8799fd8799f42bac6ffffffffd87a80ffd87a80ff1a002625a0d8799fd879801b00000002540be400d8799f1b000000309173774fffffff');
             });
     });

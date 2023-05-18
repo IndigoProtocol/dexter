@@ -1,7 +1,7 @@
 import { AssetAddress, DefinitionField, Transaction, UTxO } from '../../types';
 import { Asset } from '../../dex/models/asset';
 
-export abstract class DataProvider {
+export abstract class BaseDataProvider {
 
     /**
      * Fetch all UTxOs for an address. Will filter on UTxOs containing

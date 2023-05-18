@@ -15,7 +15,7 @@ import {
 describe('Minswap', () => {
 
     const walletProvider: MockWalletProvider = new MockWalletProvider();
-    const dexter: Dexter = new Dexter(new MockDataProvider(), {}, walletProvider);
+    const dexter: Dexter = new Dexter({}, new MockDataProvider(), walletProvider);
     const swapRequest: SwapRequest = dexter.newSwapRequest();
     const asset: Asset = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344', 6);
     const liquidityPool: LiquidityPool = new LiquidityPool(
@@ -58,7 +58,7 @@ describe('Minswap', () => {
         return minswap.buildSwapOrder(defaultSwapParameters)
             .then((payments: PayToAddress[]) => {
                 expect(payments[0].addressType).toBe(AddressType.Contract);
-                expect(payments[0].assetBalances[0].quantity).toBe(10000004000000n);
+                expect(payments[0].assetBalances[0].quantity).toEqual(10000004000000n);
                 expect(payments[0].datum).toBe('d8799fd8799fd8799f42ed56ffd8799fd8799fd8799f42bac6ffffffffd8799fd8799f42ed56ffd8799fd8799fd8799f42bac6ffffffffd87a80d8799fd8799f581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b698804469555344ff1b00004d616c553b2dff1a001e84801a001e8480ff');
             });
     });

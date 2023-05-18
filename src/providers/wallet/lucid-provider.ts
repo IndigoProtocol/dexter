@@ -1,6 +1,6 @@
 import { AssetBalance, BlockfrostConfig, Cip30Api, PayToAddress, UTxO, WalletOptions } from '../../types';
 import { DexTransaction } from '../../dex/models/dex-transaction';
-import { WalletProvider } from './wallet-provider';
+import { BaseWalletProvider } from './base-wallet-provider';
 import {
     Address,
     AddressDetails,
@@ -15,7 +15,7 @@ import {
 } from 'lucid-cardano';
 import { AddressType } from '../../constants';
 
-export class LucidProvider extends WalletProvider {
+export class LucidProvider extends BaseWalletProvider {
 
     private _api: Lucid;
     private _usableAddress: string;
@@ -47,13 +47,13 @@ export class LucidProvider extends WalletProvider {
         return this._stakingCredential ?? '';
     }
 
-    public loadWallet(walletApi: Cip30Api): Promise<WalletProvider> {
+    public loadWallet(walletApi: Cip30Api): Promise<BaseWalletProvider> {
         this._api.selectWallet(walletApi);
 
         return this.loadWalletInformation();
     }
 
-    public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions): Promise<WalletProvider> {
+    public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions): Promise<BaseWalletProvider> {
         const addressType: 'Base' | 'Enterprise' = options.addressType === AddressType.Enterprise
             ? 'Enterprise'
             : 'Base';
@@ -148,7 +148,7 @@ export class LucidProvider extends WalletProvider {
             }, {} as Assets);
     }
 
-    private loadWalletInformation(): Promise<WalletProvider> {
+    private loadWalletInformation(): Promise<BaseWalletProvider> {
         return this._api.wallet.address()
             .then((address: Address) => {
                 const details: AddressDetails = this._api.utils.getAddressDetails(
@@ -159,7 +159,7 @@ export class LucidProvider extends WalletProvider {
                 this._paymentCredential = details.paymentCredential?.hash ?? '';
                 this._stakingCredential = details.stakeCredential?.hash ?? '';
 
-                return this as WalletProvider;
+                return this as BaseWalletProvider;
             });
     }
 

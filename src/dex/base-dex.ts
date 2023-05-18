@@ -1,9 +1,10 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { DataProvider } from '../providers/data/data-provider';
+import { BaseDataProvider } from '../providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
 import { AssetBalance, DatumParameters, PayToAddress, SwapFee, UTxO } from '../types';
 import { DatumParameterKey } from '../constants';
 import { tokensMatch } from '../utils';
+import { BaseApi } from './api/base-api';
 
 export abstract class BaseDex {
 
@@ -13,9 +14,14 @@ export abstract class BaseDex {
     public abstract readonly name: string;
 
     /**
+     * API implementation for the DEX.
+     */
+    abstract api(): BaseApi;
+
+    /**
      * Fetch all liquidity pools matching assetA & assetB.
      */
-    abstract liquidityPools(provider: DataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]>;
+    abstract liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]>;
 
     /**
      * Craft liquidity pool state from a valid UTxO given the matching assetA & assetB.

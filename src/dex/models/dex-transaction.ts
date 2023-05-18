@@ -1,5 +1,5 @@
 import { TransactionStatus } from '../../constants';
-import { WalletProvider } from '../../providers/wallet/wallet-provider';
+import { BaseWalletProvider } from '../../providers/wallet/base-wallet-provider';
 import { DexTransactionError, PayToAddress } from '../../types';
 
 interface TransactionCallback {
@@ -12,12 +12,12 @@ export class DexTransaction {
     public error: DexTransactionError | undefined = undefined;
 
     private _hash: string;
-    private _walletProvider: WalletProvider;
+    private _walletProvider: BaseWalletProvider;
     private _isSigned: boolean = false;
     private _currentStatus: TransactionStatus = TransactionStatus.Building;
     private _listeners: TransactionCallback[] = [];
 
-    constructor(walletProvider: WalletProvider) {
+    constructor(walletProvider: BaseWalletProvider) {
         this._walletProvider = walletProvider;
     }
 

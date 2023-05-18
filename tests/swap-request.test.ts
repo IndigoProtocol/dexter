@@ -2,7 +2,7 @@ import { Asset, Dexter, LiquidityPool, MockDataProvider, MockWalletProvider, Swa
 
 describe('SwapRequest', () => {
 
-    const dexter: Dexter = new Dexter(new MockDataProvider(), {}, new MockWalletProvider());
+    const dexter: Dexter = new Dexter({}, new MockDataProvider(), new MockWalletProvider());
     const swapRequest: SwapRequest = dexter.newSwapRequest();
     const asset: Asset = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344', 6);
     const liquidityPool: LiquidityPool = new LiquidityPool(

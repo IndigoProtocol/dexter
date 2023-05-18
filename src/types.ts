@@ -5,6 +5,7 @@ import { LiquidityPool } from './dex/models/liquidity-pool';
 
 export interface DexterConfig {
     shouldFetchMetadata?: false,
+    shouldFallbackToApi?: true,
 }
 
 export interface BlockfrostConfig {
