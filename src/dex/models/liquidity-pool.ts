@@ -39,8 +39,8 @@ export class LiquidityPool {
         const assetADecimals: number = this.assetA === 'lovelace' ? 6 : this.assetA.decimals;
         const assetBDecimals: number = this.assetB === 'lovelace' ? 6 : this.assetB.decimals;
 
-        const adjustedReserveA = Number(this.reserveA) / (10**assetADecimals)
-        const adjustedReserveB = Number(this.reserveB) / (10**assetBDecimals)
+        const adjustedReserveA: number = Number(this.reserveA) / (10**assetADecimals);
+        const adjustedReserveB: number = Number(this.reserveB) / (10**assetBDecimals);
 
         return adjustedReserveA / adjustedReserveB;
     }

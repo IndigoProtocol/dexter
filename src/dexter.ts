@@ -10,17 +10,18 @@ import { SwapRequest } from './requests/swap-request';
 import { BaseWalletProvider } from './providers/wallet/base-wallet-provider';
 import { BaseDex } from './dex/base-dex';
 import { CancelRequest } from './requests/cancel-request';
+import { ApiProvider } from './providers/data/api-provider';
 
 export class Dexter {
 
-    public dataProvider: BaseDataProvider;
+    public dataProvider: BaseDataProvider | ApiProvider;
     public walletProvider?: BaseWalletProvider;
     public config: DexterConfig;
 
     public availableDexs: AvailableDexs;
     public tokenRegistry: TokenRegistry;
 
-    constructor(config: DexterConfig = {}, dataProvider: BaseDataProvider, walletProvider?: BaseWalletProvider) {
+    constructor(config: DexterConfig = {}, dataProvider: BaseDataProvider | ApiProvider, walletProvider?: BaseWalletProvider) {
         this.config = config;
         this.dataProvider = dataProvider;
         this.walletProvider = walletProvider;
@@ -66,14 +67,25 @@ export class Dexter {
     /**
      * New request for a swap order.
      */
-    public newSwapRequest() {
+    public newSwapRequest(): SwapRequest {
+        if (! this.walletProvider) {
+            throw new Error('Please set a wallet provider before requesting a swap order.');
+        }
+
         return new SwapRequest(this);
     }
 
     /**
      * New request for cancelling a swap order.
      */
-    public newCancelRequest() {
+    public newCancelRequest(): CancelRequest {
+        if (! this.walletProvider) {
+            throw new Error('Please set a wallet provider before requesting a cancel order.');
+        }
+        if (this.dataProvider instanceof ApiProvider) {
+            throw new Error('Unable to cancel order. Please use data provider with available on-chain data.');
+        }
+
         return new CancelRequest(this);
     }
 

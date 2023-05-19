@@ -3,7 +3,7 @@ import { LiquidityPool } from '../models/liquidity-pool';
 
 export abstract class BaseApi {
 
-    abstract readonly apiUrl: string;
+    protected abstract readonly apiUrl: string;
 
     /**
      * Fetch all liquidity pools matching assetA & assetB.

@@ -13,6 +13,10 @@ export interface BlockfrostConfig {
     projectId: string,
 }
 
+export interface ApiProviderConfig {
+    timeout: 3000,
+}
+
 export type LiquidityPoolGroups = {
     [dex: string]: LiquidityPool[],
 }

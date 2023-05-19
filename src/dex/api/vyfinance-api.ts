@@ -5,7 +5,7 @@ import axios from 'axios';
 
 export class VyfinanceApi extends BaseApi {
 
-    private readonly apiUrl: string;
+    protected readonly apiUrl: string;
 
     constructor() {
         super();
@@ -14,10 +14,10 @@ export class VyfinanceApi extends BaseApi {
     }
 
     liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const assetAName: string = assetA === 'lovelace'
+        let assetAName: string = assetA === 'lovelace'
             ? 'ADA'
             : assetA.assetName;
-        const assetBName: string = assetB === 'lovelace'
+        let assetBName: string = assetB === 'lovelace'
             ? 'ADA'
             : (assetB?.assetName ?? '');
 

@@ -2,6 +2,7 @@ import { Dexter } from '../dexter';
 import { DexTransaction } from '../dex/models/dex-transaction';
 import { PayToAddress, UTxO } from '../types';
 import { TransactionStatus } from '../constants';
+import { BaseDataProvider } from '../providers/data/base-data-provider';
 
 export class CancelRequest {
 
@@ -39,7 +40,7 @@ export class CancelRequest {
         const cancelTransaction: DexTransaction = this._dexter.walletProvider.createTransaction();
         const returnAddress: string = this._dexter.walletProvider.address();
 
-        this._dexter.dataProvider.transactionUtxos(this._txHash)
+        (this._dexter.dataProvider as BaseDataProvider).transactionUtxos(this._txHash)
             .then((utxos: UTxO[]) => {
                 this._dexter.availableDexs[this._dexName].buildCancelSwapOrder(utxos, returnAddress)
                     .then((payToAddresses: PayToAddress[]) => {
