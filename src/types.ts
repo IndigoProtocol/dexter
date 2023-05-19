@@ -13,12 +13,13 @@ export interface BlockfrostConfig {
     projectId: string,
 }
 
-export interface ApiProviderConfig {
-    timeout: 3000,
+export interface KupmiosConfig {
+    kupoUrl: string,
+    ogmiosUrl: string,
 }
 
-export type LiquidityPoolGroups = {
-    [dex: string]: LiquidityPool[],
+export interface ApiProviderConfig {
+    timeout: 3000,
 }
 
 export type AvailableDexs = {

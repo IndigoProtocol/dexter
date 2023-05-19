@@ -1,4 +1,4 @@
-import axios, { RawAxiosRequestConfig, AxiosInstance } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
 export class TokenRegistry {
 
@@ -10,7 +10,7 @@ export class TokenRegistry {
     constructor() {
         this.api = axios.create({
             baseURL: 'https://tokens.cardano.org/',
-        } as RawAxiosRequestConfig);
+        });
     }
 
     /**

@@ -2,7 +2,7 @@ import { LiquidityPool } from '../dex/models/liquidity-pool';
 import { Token } from '../dex/models/asset';
 import { Dexter } from '../dexter';
 import { tokensMatch } from '../utils';
-import { DatumParameters, PayToAddress } from '../types';
+import { DatumParameters, PayToAddress, SwapFee } from '../types';
 import { DatumParameterKey, TransactionStatus } from '../constants';
 import { DexTransaction } from '../dex/models/dex-transaction';
 
@@ -95,23 +95,25 @@ export class SwapRequest {
         return this;
     }
 
-    public getEstimatedReceive(): bigint {
-        if (! this._liquidityPool) {
+    public getEstimatedReceive(liquidityPool?: LiquidityPool): bigint {
+        const poolToCheck: LiquidityPool | undefined = liquidityPool ?? this._liquidityPool;
+
+        if (! poolToCheck) {
             throw new Error('Liquidity pool must be set before providing calculating the estimated receive.');
         } else if (! this._swapInToken) {
             throw new Error('Swap in token must be set before providing calculating the estimated receive.');
         }
 
         return this._dexter.availableDexs[this._liquidityPool.dex].estimatedReceive(
-            this._liquidityPool,
+            poolToCheck,
             this._swapInToken,
             this._swapInAmount,
         );
     }
 
-    public getMinimumReceive(): bigint {
+    public getMinimumReceive(liquidityPool?: LiquidityPool): bigint {
         return BigInt(
-            Math.floor(Number(this.getEstimatedReceive()) / (1 + (this._slippagePercent / 100)))
+            Math.floor(Number(this.getEstimatedReceive(liquidityPool)) / (1 + (this._slippagePercent / 100)))
         );
     }
 
@@ -127,6 +129,10 @@ export class SwapRequest {
             this._swapInToken,
             this._swapInAmount,
         );
+    }
+
+    public getSwapFees(): SwapFee[] {
+        return this._dexter.availableDexs[this._liquidityPool.dex].swapOrderFees();
     }
 
     public submit(): DexTransaction {

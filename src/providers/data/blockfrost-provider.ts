@@ -1,11 +1,11 @@
 import { BaseDataProvider } from './base-data-provider';
-import axios, { RawAxiosRequestConfig, AxiosInstance } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { Asset } from '../../dex/models/asset';
 import { AssetAddress, AssetBalance, BlockfrostConfig, DefinitionField, Transaction, UTxO } from '../../types';
 
-export class Blockfrost extends BaseDataProvider {
+export class BlockfrostProvider extends BaseDataProvider {
 
-    private api: AxiosInstance;
+    private _api: AxiosInstance;
 
     /**
      * https://docs.blockfrost.io/
@@ -13,12 +13,12 @@ export class Blockfrost extends BaseDataProvider {
     constructor(config: BlockfrostConfig) {
         super();
 
-        this.api = axios.create({
+        this._api = axios.create({
             baseURL: config.url,
             headers: {
                 project_id: config.projectId,
             },
-        } as RawAxiosRequestConfig);
+        });
     }
 
     /**
@@ -54,7 +54,7 @@ export class Blockfrost extends BaseDataProvider {
      * https://docs.blockfrost.io/#tag/Cardano-Transactions/paths/~1txs~1%7Bhash%7D~1utxos/get
      */
     public async transactionUtxos(txHash: string): Promise<UTxO[]> {
-        return this.api.get(`/txs/${txHash}/utxos`)
+        return this._api.get(`/txs/${txHash}/utxos`)
             .then((response: any) => {
                 return response.data.outputs.map((utxo: any) => {
                     return {
@@ -116,7 +116,7 @@ export class Blockfrost extends BaseDataProvider {
      * https://docs.blockfrost.io/#tag/Cardano-Scripts/paths/~1scripts~1datum~1%7Bdatum_hash%7D/get
      */
     public async datumValue(datumHash: string): Promise<DefinitionField> {
-        return this.api.get(`/scripts/datum/${datumHash}`)
+        return this._api.get(`/scripts/datum/${datumHash}`)
             .then((response: any) => {
                 return response.data.json_value as DefinitionField;
             });
@@ -126,7 +126,7 @@ export class Blockfrost extends BaseDataProvider {
      * https://docs.blockfrost.io/#section/Concepts
      */
     private sendPaginatedRequest(url: string, page: number = 1, results: any = []): Promise<any> {
-        return this.api.get(url, {
+        return this._api.get(url, {
             params: {
                 page,
             },

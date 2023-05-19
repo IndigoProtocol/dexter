@@ -2,7 +2,7 @@ import { BaseDex } from '../dex/base-dex';
 import { Asset, Token } from '../dex/models/asset';
 import { LiquidityPool } from '../dex/models/liquidity-pool';
 import { Dexter } from '../dexter';
-import { LiquidityPoolGroups, Transaction, UTxO } from '../types';
+import { Transaction, UTxO } from '../types';
 import { ApiProvider } from '../providers/data/api-provider';
 import { BaseDataProvider } from '../providers/data/base-data-provider';
 
@@ -45,7 +45,7 @@ export class FetchRequest {
      * Fetch all liquidity pools matching assetA & assetB.
      * All liquidity pools will be returned if assetA & assetB are not provided.
      */
-    public getLiquidityPools(assetA: Token = 'lovelace', assetB?: Token, groupByDex: boolean = false): Promise<LiquidityPoolGroups | LiquidityPool[]> {
+    public getLiquidityPools(assetA: Token = 'lovelace', assetB?: Token): Promise<LiquidityPool[]> {
         const liquidityPoolPromises: Promise<LiquidityPool[]>[] =
             this._dexter.dataProvider instanceof ApiProvider
                 ? [this._dexter.dataProvider.getLiquidityPools(assetA, assetB)]
@@ -65,16 +65,6 @@ export class FetchRequest {
 
             if (this._dexter.config.shouldFetchMetadata) {
                 // await this.fetchAssetMetadata(liquidityPools);
-            }
-
-            if (groupByDex) {
-                return liquidityPools.reduce((result: LiquidityPoolGroups, liquidityPool?: LiquidityPool) => {
-                    if (liquidityPool) {
-                        (result[liquidityPool.dex] = result[liquidityPool.dex] || []).push(liquidityPool);
-                    }
-
-                    return result;
-                }, {} as LiquidityPoolGroups);
             }
 
             return liquidityPools;

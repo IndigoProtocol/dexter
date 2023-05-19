@@ -1,10 +1,12 @@
 export * from './constants';
 export * from './types';
+export * from './utils';
 export * from './dexter';
 export * from './definition-builder';
 
 export * from './providers/data/base-data-provider';
-export * from './providers/data/blockfrost';
+export * from './providers/data/blockfrost-provider';
+export * from './providers/data/kupmios-provider';
 export * from './providers/data/mock-data-provider';
 export * from './providers/wallet/base-wallet-provider';
 export * from './providers/wallet/mock-wallet-provider';

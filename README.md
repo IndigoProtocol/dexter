@@ -5,7 +5,7 @@
 #### Liquidity Pools
 ```js
 const dexter: Dexter = new Dexter(
-    new Blockfrost('https://cardano-mainnet.blockfrost.io/api/v0', '{project-id}')
+    new BlockfrostProvider('https://cardano-mainnet.blockfrost.io/api/v0', '{project-id}')
 );
 
 // For a specific DEX

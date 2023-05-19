@@ -4,6 +4,7 @@
     "noImplicitAny": true,
     "module": "es2020",
     "target": "es2020",
+    "lib": ["es2020", "DOM"],
     "allowJs": true,
     "moduleResolution": "node",
     "declaration": true,
@@ -24,6 +25,11 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "tests"]
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "tests", "build"],
 }

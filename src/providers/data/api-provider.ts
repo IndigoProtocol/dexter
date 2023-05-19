@@ -1,4 +1,4 @@
-import { ApiProviderConfig, AvailableDexs, LiquidityPoolGroups } from '../../types';
+import { ApiProviderConfig } from '../../types';
 import { LiquidityPool } from '../../dex/models/liquidity-pool';
 import { Token } from '../../dex/models/asset';
 import { BaseApi } from '../../dex/api/base-api';
