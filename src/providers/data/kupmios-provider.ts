@@ -1,6 +1,14 @@
 import { BaseDataProvider } from './base-data-provider';
 import { Asset } from '../../dex/models/asset';
-import { AssetAddress, AssetBalance, DefinitionField, KupmiosConfig, Transaction, UTxO } from '../../types';
+import {
+    AssetAddress,
+    AssetBalance, DefinitionBytes,
+    DefinitionConstr,
+    DefinitionField, DefinitionInt,
+    KupmiosConfig,
+    Transaction,
+    UTxO
+} from '../../types';
 import axios, { AxiosInstance } from 'axios';
 import { Data } from 'lucid-cardano';
 
@@ -43,7 +51,7 @@ export class KupmiosProvider extends BaseDataProvider {
     public async datumValue(datumHash: string): Promise<DefinitionField> {
         return this._kupoApi.get(`${this._config.kupoUrl}/datums/${datumHash}`)
             .then((result: any) => {
-                return Data.from(result.data.datum) as DefinitionField;
+                return this.toDefinitionDatum(Data.from(result.data.datum));
             });
     }
 
@@ -62,7 +70,7 @@ export class KupmiosProvider extends BaseDataProvider {
     }
 
     public async assetAddresses(asset: Asset): Promise<AssetAddress[]> {
-        return this._kupoApi.get(`${this._config.kupoUrl}/matches/*?policy_id=${asset.policyId}&asset_name=${asset.assetNameHex}`)
+        return this._kupoApi.get(`${this._config.kupoUrl}/matches/${asset.id('.')}?unspent`)
             .then((results: any) => {
                 return results.data.map((result: any) => {
                     return {
@@ -99,6 +107,29 @@ export class KupmiosProvider extends BaseDataProvider {
                 })(),
             } as UTxO;
         }) as UTxO[];
+    }
+
+    private toDefinitionDatum(unconstructedField: any): DefinitionField {
+        if (unconstructedField?.fields) {
+            return {
+                constructor: unconstructedField.index,
+                fields: unconstructedField.fields.map((field: any) => this.toDefinitionDatum(field)),
+            } as DefinitionConstr;
+        }
+
+        if (typeof unconstructedField === 'bigint') {
+            return {
+              int: Number(unconstructedField)
+            } as DefinitionInt;
+        }
+
+        if (typeof unconstructedField === 'string') {
+            return {
+                bytes: unconstructedField
+            } as DefinitionBytes;
+        }
+
+        return unconstructedField;
     }
 
 }

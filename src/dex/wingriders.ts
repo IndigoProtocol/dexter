@@ -36,7 +36,7 @@ export class WingRiders extends BaseDex {
 
     async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const validityAsset: Asset = Asset.fromId(POOL_VALIDITY_ASSET);
-        const assetAddresses: AssetAddress[] = this._assetAddresses
+        const assetAddresses: AssetAddress[] = this._assetAddresses.length > 0
             ? this._assetAddresses
             : await provider.assetAddresses(validityAsset);
 

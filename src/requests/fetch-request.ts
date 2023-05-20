@@ -51,7 +51,12 @@ export class FetchRequest {
                 ? [this._dexter.dataProvider.getLiquidityPools(assetA, assetB)]
                 : this._onDexs.map((dex: BaseDex) => {
                     return dex.liquidityPools(this._dexter.dataProvider as BaseDataProvider, assetA, assetB)
-                        .catch(() => {
+                        .then((pools: LiquidityPool[]) => {
+                            console.log(pools)
+                            return pools;
+                        })
+                        .catch((e) => {
+                            console.log(e)
                             return this._dexter.config.shouldFallbackToApi
                                 ? dex.api().liquidityPools(assetA, assetB)
                                 : [];
