@@ -56,7 +56,7 @@ export class KupmiosProvider extends BaseDataProvider {
     }
 
     public async assetTransactions(asset: Asset): Promise<Transaction[]> {
-        return this._kupoApi.get(`${this._config.kupoUrl}/matches/*?policy_id=${asset.policyId}&asset_name=${asset.assetNameHex}`)
+        return this._kupoApi.get(`${this._config.kupoUrl}/matches/${asset.id('.')}`)
             .then((results: any) => {
                 return results.data.map((result: any) => {
                     return {

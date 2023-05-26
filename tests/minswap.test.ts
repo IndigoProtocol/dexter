@@ -26,7 +26,7 @@ describe('Minswap', () => {
         30817255371488n,
         349805856622734n,
     );
-    liquidityPool.poolFee = 0.3;
+    liquidityPool.poolFeePercent = 0.3;
 
     swapRequest
         .forLiquidityPool(liquidityPool)

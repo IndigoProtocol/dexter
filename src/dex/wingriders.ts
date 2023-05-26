@@ -129,7 +129,7 @@ export class WingRiders extends BaseDex {
             liquidityPool.lpToken = lpTokenBalance.asset as Asset;
             liquidityPool.totalLpTokens = MAX_INT - lpTokenBalance.quantity;
         }
-        liquidityPool.poolFee = 0.35;
+        liquidityPool.poolFeePercent = 0.35;
 
         return liquidityPool;
     }
@@ -137,7 +137,7 @@ export class WingRiders extends BaseDex {
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
-        const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFee * 100)) + BigInt(10000) - 1n) / 10000n;
+        const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
 
         return reserveOut - (reserveIn * reserveOut - 1n) / (reserveIn + swapInAmount - swapFee) - 1n;
     }

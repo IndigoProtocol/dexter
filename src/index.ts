@@ -23,3 +23,4 @@ export * from './dex/minswap';
 export * from './dex/sundaeswap';
 export * from './dex/muesliswap';
 export * from './dex/wingriders';
+export * from './dex/vyfinance';

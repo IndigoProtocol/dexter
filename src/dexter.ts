@@ -11,6 +11,7 @@ import { BaseWalletProvider } from './providers/wallet/base-wallet-provider';
 import { BaseDex } from './dex/base-dex';
 import { CancelRequest } from './requests/cancel-request';
 import { ApiProvider } from './providers/data/api-provider';
+import { VyFinance } from './dex/vyfinance';
 
 export class Dexter {
 
@@ -32,6 +33,7 @@ export class Dexter {
             [SundaeSwap.name]: new SundaeSwap(),
             [MuesliSwap.name]: new MuesliSwap(),
             [WingRiders.name]: new WingRiders(),
+            [VyFinance.name]: new VyFinance(),
         };
     }
 

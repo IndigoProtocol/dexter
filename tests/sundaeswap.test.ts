@@ -26,7 +26,7 @@ describe('SundaeSwap', () => {
         3699642000000n,
         78391015000000n,
     );
-    liquidityPool.poolFee = 0.3;
+    liquidityPool.poolFeePercent = 0.3;
 
     swapRequest
         .forLiquidityPool(liquidityPool)

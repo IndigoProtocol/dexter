@@ -51,7 +51,7 @@ export class VyfinanceApi extends BaseApi {
                     liquidityPool.lpToken = new Asset(lpTokenDetails[0], lpTokenDetails[1]);
                     liquidityPool.totalLpTokens = BigInt(pool['lpQuantity']);
 
-                    liquidityPool.poolFee = poolDetails['feeSettings']['barFee'] + poolDetails['feeSettings']['liqFee'];
+                    liquidityPool.poolFeePercent = (poolDetails['feeSettings']['barFee'] + poolDetails['feeSettings']['liqFee']) / 100;
 
                     return liquidityPool;
                 }) as LiquidityPool[];

@@ -51,7 +51,7 @@ export class SundaeSwap extends BaseDex {
                 liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
                     ? BigInt(parameters.TotalLpTokens)
                     : 0n;
-                liquidityPool.poolFee = typeof parameters.LpFeeNumerator === 'number' && typeof parameters.LpFeeDenominator === 'number'
+                liquidityPool.poolFeePercent = typeof parameters.LpFeeNumerator === 'number' && typeof parameters.LpFeeDenominator === 'number'
                     ? parameters.LpFeeNumerator / parameters.LpFeeDenominator
                     : 0;
             }
@@ -131,7 +131,7 @@ export class SundaeSwap extends BaseDex {
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
-        const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFee * 100)) + BigInt(10000) - 1n) / 10000n;
+        const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
         const adjustedSwapInAmount: bigint = swapInAmount - swapFee;
 
         return reserveOut - (reserveIn * reserveOut) / (reserveIn + adjustedSwapInAmount);

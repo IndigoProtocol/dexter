@@ -26,7 +26,7 @@ describe('WingRiders', () => {
         50491527399n,
         12677234723n,
     );
-    liquidityPool.poolFee = 0.35;
+    liquidityPool.poolFeePercent = 0.35;
 
     swapRequest
         .forLiquidityPool(liquidityPool)

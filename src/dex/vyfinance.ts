@@ -42,14 +42,31 @@ export class VyFinance extends BaseDex {
     }
 
     public estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
-        return 0n;
+        const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
+
+        const constFactor: bigint = reserveIn * reserveOut;
+        const swapFee: bigint = BigInt((Number(swapInAmount) * liquidityPool.poolFeePercent / 100));
+
+        return reserveOut - constFactor / (reserveIn + swapInAmount - swapFee);
     }
 
     public priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
-        return 0;
+        const [reserveIn, reserveOut]: number[] = correspondingReserves(liquidityPool, swapInToken).map((x: bigint) => Number(x));
+
+        const estimatedReceive: number = Number(this.estimatedReceive(liquidityPool, swapInToken, swapInAmount));
+        const swapFee: number = Number(swapInAmount) * liquidityPool.poolFeePercent / 100;
+
+        return (1 - estimatedReceive / ((Number(swapInAmount) - swapFee) * (reserveOut / reserveIn))) * 100;
     }
 
     public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
+        const swapDirection: number = (swapParameters.SwapInTokenPolicyId as string) === '' ? 3 : 4
+
+        swapParameters = {
+            ...swapParameters,
+            [DatumParameterKey.Action]: swapDirection,
+        };
+
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
         await datumBuilder.loadDefinition(order)
             .then((builder: DefinitionBuilder) => {
