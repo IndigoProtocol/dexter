@@ -21,16 +21,14 @@ import { VyfinanceApi } from './api/vyfinance-api';
 /**
  * VyFinance constants.
  */
-const POOL_ADDRESS: string = '';
 const ORDER_ADDRESS: string = '';
-const POOL_VALIDITY_ASSET: string = '';
 
 export class VyFinance extends BaseDex {
 
     public readonly name: string = 'VyFinance';
 
     public api(): BaseApi {
-        return new VyfinanceApi();
+        return new VyfinanceApi(this);
     }
 
     public async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
@@ -60,7 +58,10 @@ export class VyFinance extends BaseDex {
     }
 
     public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
-        const swapDirection: number = (swapParameters.SwapInTokenPolicyId as string) === '' ? 3 : 4
+        const isDoubleSidedSwap: boolean = (swapParameters.SwapInTokenPolicyId as string) !== '' && (swapParameters.SwapOutTokenPolicyId as string) !== '';
+        const swapDirection: number = (swapParameters.SwapInTokenPolicyId as string) === '' || isDoubleSidedSwap
+            ? 3
+            : 4
 
         swapParameters = {
             ...swapParameters,

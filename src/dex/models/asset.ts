@@ -10,10 +10,13 @@ export class Asset {
         this.decimals = decimals;
     }
 
-    static fromId(id: string): Asset {
+    static fromId(id: string, decimals: number = 0): Asset {
+        id = id.replace('.', '');
+
         return new Asset(
             id.slice(0, 56),
-            id.slice(56)
+            id.slice(56),
+            decimals,
         );
     }
 

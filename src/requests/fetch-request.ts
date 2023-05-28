@@ -3,7 +3,6 @@ import { Asset, Token } from '../dex/models/asset';
 import { LiquidityPool } from '../dex/models/liquidity-pool';
 import { Dexter } from '../dexter';
 import { Transaction, UTxO } from '../types';
-import { ApiProvider } from '../providers/data/api-provider';
 import { BaseDataProvider } from '../providers/data/base-data-provider';
 
 export class FetchRequest {
@@ -47,21 +46,20 @@ export class FetchRequest {
      */
     public getLiquidityPools(assetA: Token = 'lovelace', assetB?: Token): Promise<LiquidityPool[]> {
         const liquidityPoolPromises: Promise<LiquidityPool[]>[] =
-            this._dexter.dataProvider instanceof ApiProvider
-                ? [this._dexter.dataProvider.getLiquidityPools(assetA, assetB)]
-                : this._onDexs.map((dex: BaseDex) => {
-                    return dex.liquidityPools(this._dexter.dataProvider as BaseDataProvider, assetA, assetB)
-                        .then((pools: LiquidityPool[]) => {
-                            console.log(pools)
-                            return pools;
-                        })
-                        .catch((e) => {
-                            console.log(e)
-                            return this._dexter.config.shouldFallbackToApi
-                                ? dex.api().liquidityPools(assetA, assetB)
-                                : [];
-                        });
-                });
+            this._onDexs.map((dex: BaseDex) => {
+                if (! this._dexter.dataProvider) {
+                    return dex.api().liquidityPools(assetA, assetB);
+                }
+
+                return dex.liquidityPools(this._dexter.dataProvider as BaseDataProvider, assetA, assetB)
+                    .then((pools: LiquidityPool[]) => pools)
+                    .catch(() => {
+                        // Attempt fallback to API
+                        return this._dexter.config.shouldFallbackToApi
+                            ? dex.api().liquidityPools(assetA, assetB)
+                            : [];
+                    });
+            });
 
         return Promise.all(
             liquidityPoolPromises,
@@ -80,8 +78,8 @@ export class FetchRequest {
      * Fetch historic states for a liquidity pool.
      */
     public async getLiquidityPoolHistory(liquidityPool: LiquidityPool): Promise<LiquidityPool[]> {
-        if (this._dexter.dataProvider instanceof ApiProvider) {
-            return this._dexter.dataProvider.getLiquidityPoolHistory(liquidityPool);
+        if (! this._dexter.dataProvider) {
+            return []; // todo
         }
 
         const transactions: Transaction[] = await this._dexter.dataProvider.assetTransactions(liquidityPool.lpToken);

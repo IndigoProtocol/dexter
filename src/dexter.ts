@@ -10,19 +10,18 @@ import { SwapRequest } from './requests/swap-request';
 import { BaseWalletProvider } from './providers/wallet/base-wallet-provider';
 import { BaseDex } from './dex/base-dex';
 import { CancelRequest } from './requests/cancel-request';
-import { ApiProvider } from './providers/data/api-provider';
 import { VyFinance } from './dex/vyfinance';
 
 export class Dexter {
 
-    public dataProvider: BaseDataProvider | ApiProvider;
+    public dataProvider?: BaseDataProvider;
     public walletProvider?: BaseWalletProvider;
     public config: DexterConfig;
 
     public availableDexs: AvailableDexs;
     public tokenRegistry: TokenRegistry;
 
-    constructor(config: DexterConfig = {}, dataProvider: BaseDataProvider | ApiProvider, walletProvider?: BaseWalletProvider) {
+    constructor(config: DexterConfig = {}, dataProvider: BaseDataProvider | undefined, walletProvider?: BaseWalletProvider) {
         this.config = config;
         this.dataProvider = dataProvider;
         this.walletProvider = walletProvider;
@@ -83,9 +82,6 @@ export class Dexter {
     public newCancelRequest(): CancelRequest {
         if (! this.walletProvider) {
             throw new Error('Please set a wallet provider before requesting a cancel order.');
-        }
-        if (this.dataProvider instanceof ApiProvider) {
-            throw new Error('Unable to cancel order. Please use data provider with available on-chain data.');
         }
 
         return new CancelRequest(this);

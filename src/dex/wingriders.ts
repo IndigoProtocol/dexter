@@ -31,7 +31,7 @@ export class WingRiders extends BaseDex {
     private _assetAddresses: AssetAddress[] = [];
 
     public api(): BaseApi {
-        return new WingRidersApi();
+        return new WingRidersApi(this);
     }
 
     async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {

@@ -32,7 +32,7 @@ export class MuesliSwap extends BaseDex {
     public readonly name: string = 'MuesliSwap';
 
     public api(): BaseApi {
-        return new MuesliSwapApi();
+        return new MuesliSwapApi(this);
     }
 
     async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {

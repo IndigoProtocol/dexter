@@ -34,7 +34,7 @@ export class Minswap extends BaseDex {
     public readonly name: string = 'Minswap';
 
     public api(): BaseApi {
-        return new MinswapApi();
+        return new MinswapApi(this);
     }
 
     public async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {

@@ -19,7 +19,7 @@ export interface KupmiosConfig {
 }
 
 export interface ApiProviderConfig {
-    timeout: 3000,
+    timeout?: 3000,
 }
 
 export type AvailableDexs = {

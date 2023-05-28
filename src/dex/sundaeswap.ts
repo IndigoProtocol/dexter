@@ -18,23 +18,20 @@ import order from './definitions/sundaeswap/order';
 import { BaseApi } from './api/base-api';
 import { SundaeSwapApi } from './api/sundaeswap-api';
 
-/**
- * SundaeSwap constants.
- */
-const ORDER_ADDRESS: string = 'addr1wxaptpmxcxawvr3pzlhgnpmzz3ql43n2tc8mn3av5kx0yzs09tqh8';
-const POOL_ADDRESS: string = 'addr1w9qzpelu9hn45pefc0xr4ac4kdxeswq7pndul2vuj59u8tqaxdznu';
-const LP_TOKEN_POLICY_ID: string = '0029cb7c88c7567b63d1a512c0ed626aa169688ec980730c0473b913';
-
 export class SundaeSwap extends BaseDex {
 
     public readonly name: string = 'SundaeSwap';
 
+    public readonly orderAddress: string = 'addr1wxaptpmxcxawvr3pzlhgnpmzz3ql43n2tc8mn3av5kx0yzs09tqh8';
+    public readonly poolAddress: string = 'addr1w9qzpelu9hn45pefc0xr4ac4kdxeswq7pndul2vuj59u8tqaxdznu';
+    public readonly lpTokenPolicyId: string = '0029cb7c88c7567b63d1a512c0ed626aa169688ec980730c0473b913';
+
     public api(): BaseApi {
-        return new SundaeSwapApi();
+        return new SundaeSwapApi(this);
     }
 
     async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const utxos: UTxO[] = await provider.utxos(POOL_ADDRESS, (assetA === 'lovelace' ? undefined : assetA));
+        const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
             .loadDefinition(pool);
 
@@ -78,7 +75,7 @@ export class SundaeSwap extends BaseDex {
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
             const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
 
-            return ! assetBalanceId.startsWith(LP_TOKEN_POLICY_ID);
+            return ! assetBalanceId.startsWith(this.lpTokenPolicyId);
         });
 
         // Irrelevant UTxO
@@ -117,7 +114,7 @@ export class SundaeSwap extends BaseDex {
         );
 
         const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
-            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === LP_TOKEN_POLICY_ID;
+            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
         })?.asset as Asset;
 
         if (lpToken) {
@@ -175,7 +172,7 @@ export class SundaeSwap extends BaseDex {
             this.buildSwapOrderPayment(
                 swapParameters,
                 {
-                    address: ORDER_ADDRESS,
+                    address: this.orderAddress,
                     addressType: AddressType.Contract,
                     assetBalances: [
                         {
@@ -191,7 +188,7 @@ export class SundaeSwap extends BaseDex {
 
     public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
         const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
-            return utxo.address === ORDER_ADDRESS;
+            return utxo.address === this.orderAddress;
         });
 
         if (! relevantUtxo) {
