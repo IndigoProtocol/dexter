@@ -1,10 +1,11 @@
 import { Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import { BaseDex } from '../base-dex';
+import { AxiosInstance } from 'axios';
 
 export abstract class BaseApi {
 
-    protected abstract readonly apiUrl: string;
+    protected abstract readonly api: AxiosInstance;
     protected abstract readonly dex: BaseDex;
 
     /**

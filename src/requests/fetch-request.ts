@@ -48,7 +48,7 @@ export class FetchRequest {
         const liquidityPoolPromises: Promise<LiquidityPool[]>[] =
             this._onDexs.map((dex: BaseDex) => {
                 if (! this._dexter.dataProvider) {
-                    return dex.api().liquidityPools(assetA, assetB);
+                    return dex.api.liquidityPools(assetA, assetB);
                 }
 
                 return dex.liquidityPools(this._dexter.dataProvider as BaseDataProvider, assetA, assetB)
@@ -56,7 +56,7 @@ export class FetchRequest {
                     .catch(() => {
                         // Attempt fallback to API
                         return this._dexter.config.shouldFallbackToApi
-                            ? dex.api().liquidityPools(assetA, assetB)
+                            ? dex.api.liquidityPools(assetA, assetB)
                             : [];
                     });
             });
@@ -67,7 +67,7 @@ export class FetchRequest {
             const liquidityPools: LiquidityPool[] = mappedLiquidityPools.flat();
 
             if (this._dexter.config.shouldFetchMetadata) {
-                // await this.fetchAssetMetadata(liquidityPools);
+                await this.fetchAssetMetadata(liquidityPools);
             }
 
             return liquidityPools;
@@ -138,6 +138,9 @@ export class FetchRequest {
                         asset.decimals = responseAsset.decimals.value;
                     });
                 });
+            })
+            .catch(() => {
+                return liquidityPools;
             });
     }
 

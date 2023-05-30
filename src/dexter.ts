@@ -1,7 +1,7 @@
 import { BaseDataProvider } from './providers/data/base-data-provider';
 import { TokenRegistry } from './services/token-registry';
 import { FetchRequest } from './requests/fetch-request';
-import { AvailableDexs, DexterConfig } from './types';
+import { AvailableDexs, DexterConfig, RequestConfig } from './types';
 import { Minswap } from './dex/minswap';
 import { SundaeSwap } from './dex/sundaeswap';
 import { MuesliSwap } from './dex/muesliswap';
@@ -17,22 +17,35 @@ export class Dexter {
     public dataProvider?: BaseDataProvider;
     public walletProvider?: BaseWalletProvider;
     public config: DexterConfig;
+    public requestConfig: RequestConfig;
 
     public availableDexs: AvailableDexs;
     public tokenRegistry: TokenRegistry;
 
-    constructor(config: DexterConfig = {}, dataProvider: BaseDataProvider | undefined, walletProvider?: BaseWalletProvider) {
-        this.config = config;
-        this.dataProvider = dataProvider;
-        this.walletProvider = walletProvider;
+    constructor(config: DexterConfig = {}, requestConfig: RequestConfig = {}) {
+        this.config = Object.assign(
+            {},
+            {
+                shouldFetchMetadata: true,
+                shouldFallbackToApi: true,
+            } as DexterConfig,
+            config,
+        );
+        this.requestConfig = Object.assign(
+            {},
+            {
+                shouldUseRequestProxy: true,
+            } as RequestConfig,
+            requestConfig,
+        );
 
-        this.tokenRegistry = new TokenRegistry();
+        this.tokenRegistry = new TokenRegistry(this.requestConfig);
         this.availableDexs = {
-            [Minswap.name]: new Minswap(),
-            [SundaeSwap.name]: new SundaeSwap(),
-            [MuesliSwap.name]: new MuesliSwap(),
-            [WingRiders.name]: new WingRiders(),
-            [VyFinance.name]: new VyFinance(),
+            [Minswap.name]: new Minswap(this.requestConfig),
+            [SundaeSwap.name]: new SundaeSwap(this.requestConfig),
+            [MuesliSwap.name]: new MuesliSwap(this.requestConfig),
+            [WingRiders.name]: new WingRiders(this.requestConfig),
+            [VyFinance.name]: new VyFinance(this.requestConfig),
         };
     }
 
@@ -43,7 +56,7 @@ export class Dexter {
     /**
      * Switch to a new data provider.
      */
-    public switchDataProvider(dataProvider: BaseDataProvider): Dexter {
+    public withDataProvider(dataProvider: BaseDataProvider): Dexter {
         this.dataProvider = dataProvider;
 
         return this;
@@ -52,7 +65,7 @@ export class Dexter {
     /**
      * Switch to a new wallet provider.
      */
-    public switchWalletProvider(walletProvider: BaseWalletProvider): Dexter {
+    public withWalletProvider(walletProvider: BaseWalletProvider): Dexter {
         this.walletProvider = walletProvider;
 
         return this;

@@ -1,15 +1,21 @@
 import axios, { AxiosInstance } from 'axios';
+import { RequestConfig } from '../types';
 
 export class TokenRegistry {
 
-    private api: AxiosInstance;
+    private _api: AxiosInstance;
+    private _requestConfig: RequestConfig;
 
     /**
      * https://input-output-hk.github.io/offchain-metadata-tools/api/latest/
      */
-    constructor() {
-        this.api = axios.create({
-            baseURL: 'https://tokens.cardano.org/',
+    constructor(requestConfig: RequestConfig) {
+        this._requestConfig = requestConfig;
+
+        this._api = axios.create({
+            baseURL: this._requestConfig.shouldUseRequestProxy
+                ? 'https://cors-anywhere.herokuapp.com/https://tokens.cardano.org/'
+                : 'https://tokens.cardano.org/',
         });
     }
 
@@ -17,7 +23,7 @@ export class TokenRegistry {
      * https://input-output-hk.github.io/offchain-metadata-tools/api/latest/#tag/query/paths/~1metadata~1query/post
      */
     metadataBatch(assetIds: string[]): Promise<any> {
-        return this.api.post('/metadata/query', {
+        return this._api.post('/metadata/query', {
             subjects: assetIds,
         }).then((response) => response.data.subjects);
     }

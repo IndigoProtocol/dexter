@@ -7,7 +7,7 @@ import {
     DatumParameters,
     DefinitionConstr,
     DefinitionField,
-    PayToAddress,
+    PayToAddress, RequestConfig,
     SwapFee,
     UTxO
 } from '../types';
@@ -26,13 +26,16 @@ const ORDER_ADDRESS: string = '';
 export class VyFinance extends BaseDex {
 
     public readonly name: string = 'VyFinance';
+    public readonly api: BaseApi;
 
-    public api(): BaseApi {
-        return new VyfinanceApi(this);
+    constructor(requestConfig: RequestConfig = {}) {
+        super();
+
+        this.api = new VyfinanceApi(this, requestConfig);
     }
 
     public async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        return this.api().liquidityPools(assetA, assetB);
+        return this.api.liquidityPools(assetA, assetB);
     }
 
     public liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB?: Token): LiquidityPool | undefined {

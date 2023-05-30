@@ -1,26 +1,33 @@
 import { BaseApi } from './base-api';
 import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { Minswap } from '../minswap';
+import { RequestConfig } from '../../types';
 
 export class MinswapApi extends BaseApi {
 
-    protected readonly apiUrl: string;
+    protected readonly api: AxiosInstance;
     protected readonly dex: Minswap;
 
-    constructor(dex: Minswap) {
+    constructor(dex: Minswap, requestConfig: RequestConfig) {
         super();
 
-        this.apiUrl = 'https://monorepo-mainnet-prod.minswap.org/graphql';
         this.dex = dex;
+
+        this.api = axios.create({
+            baseURL: requestConfig.shouldUseRequestProxy
+                ? 'https://cors-anywhere.herokuapp.com/https://monorepo-mainnet-prod.minswap.org/graphql'
+                : 'https://monorepo-mainnet-prod.minswap.org/graphql',
+        });
     }
 
     liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const maxPerPage: number = 20;
 
         const getPaginatedResponse = (page: number): Promise<LiquidityPool[]> => {
-            return axios.post(`${this.apiUrl}?PoolsByAsset`, {
+            return this.api.post(``, {
+                operationName: 'PoolsByAsset',
                 query: `
                     query PoolsByAsset($asset: InputAsset!, $limit: Int, $offset: Int) {
                         poolsByAsset(

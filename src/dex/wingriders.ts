@@ -3,7 +3,7 @@ import {
     AssetAddress,
     AssetBalance,
     DatumParameters,
-    PayToAddress, SwapFee,
+    PayToAddress, RequestConfig, SwapFee,
     UTxO
 } from '../types';
 import { Asset, Token } from './models/asset';
@@ -21,21 +21,25 @@ import { WingRidersApi } from './api/wingriders-api';
  */
 const MIN_POOL_ADA: bigint = 3_000_000n;
 const MAX_INT: bigint = 9_223_372_036_854_775_807n;
-const ORDER_ADDRESS: string = 'addr1wxr2a8htmzuhj39y2gq7ftkpxv98y2g67tg8zezthgq4jkg0a4ul4';
-const POOL_VALIDITY_ASSET: string = '026a18d04a0c642759bb3d83b12e3344894e5c1c7b2aeb1a2113a5704c';
 
 export class WingRiders extends BaseDex {
 
     public readonly name: string = 'WingRiders';
+    public readonly api: BaseApi;
+
+    public readonly orderAddress: string = 'addr1wxr2a8htmzuhj39y2gq7ftkpxv98y2g67tg8zezthgq4jkg0a4ul4';
+    public readonly poolValidityAsset: string = '026a18d04a0c642759bb3d83b12e3344894e5c1c7b2aeb1a2113a5704c';
 
     private _assetAddresses: AssetAddress[] = [];
 
-    public api(): BaseApi {
-        return new WingRidersApi(this);
+    constructor(requestConfig: RequestConfig = {}) {
+        super();
+
+        this.api = new WingRidersApi(this, requestConfig);
     }
 
     async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const validityAsset: Asset = Asset.fromId(POOL_VALIDITY_ASSET);
+        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
         const assetAddresses: AssetAddress[] = this._assetAddresses.length > 0
             ? this._assetAddresses
             : await provider.assetAddresses(validityAsset);
@@ -64,7 +68,7 @@ export class WingRiders extends BaseDex {
             return undefined;
         }
 
-        const validityAsset: Asset = Asset.fromId(POOL_VALIDITY_ASSET);
+        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
         const assetAId: string = assetA === 'lovelace' ? 'lovelace' : assetA.id();
         const assetBId: string = assetB ? (assetB === 'lovelace' ? 'lovelace' : assetB.id()) : '';
 
@@ -193,7 +197,7 @@ export class WingRiders extends BaseDex {
             this.buildSwapOrderPayment(
                 swapParameters,
                 {
-                    address: ORDER_ADDRESS,
+                    address: this.orderAddress,
                     addressType: AddressType.Contract,
                     assetBalances: [
                         {
@@ -209,7 +213,7 @@ export class WingRiders extends BaseDex {
 
     public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
         const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
-            return utxo.address === ORDER_ADDRESS;
+            return utxo.address === this.orderAddress;
         });
 
         if (! relevantUtxo) {

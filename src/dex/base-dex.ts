@@ -14,9 +14,9 @@ export abstract class BaseDex {
     public abstract readonly name: string;
 
     /**
-     * API implementation for the DEX.
+     * Unique name for this DEX.
      */
-    abstract api(): BaseApi;
+    public abstract readonly api: BaseApi;
 
     /**
      * Fetch all liquidity pools matching assetA & assetB.

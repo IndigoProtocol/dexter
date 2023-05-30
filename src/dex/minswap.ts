@@ -7,7 +7,7 @@ import {
     DatumParameters,
     DefinitionConstr,
     DefinitionField,
-    PayToAddress,
+    PayToAddress, RequestConfig,
     SwapFee,
     UTxO
 } from '../types';
@@ -22,6 +22,7 @@ import { MinswapApi } from './api/minswap-api';
 export class Minswap extends BaseDex {
 
     public readonly name: string = 'Minswap';
+    public readonly api: BaseApi;
 
     public readonly marketOrderAddress: string = 'addr1wxn9efv2f6w82hagxqtn62ju4m293tqvw0uhmdl64ch8uwc0h43gt';
     public readonly limitOrderAddress: string = 'addr1zxn9efv2f6w82hagxqtn62ju4m293tqvw0uhmdl64ch8uw6j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq6s3z70';
@@ -30,8 +31,10 @@ export class Minswap extends BaseDex {
     public readonly poolNftPolicyId: string = '0be55d262b29f564998ff81efe21bdc0022621c12f15af08d0f2ddb1';
     public readonly poolValidityAsset: string = '13aa2accf2e1561723aa26871e071fdf32c867cff7e7d50ad470d62f4d494e53574150';
 
-    public api(): BaseApi {
-        return new MinswapApi(this);
+    constructor(requestConfig: RequestConfig = {}) {
+        super();
+
+        this.api = new MinswapApi(this, requestConfig);
     }
 
     public async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {

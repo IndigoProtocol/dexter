@@ -1,26 +1,38 @@
 import { BaseApi } from './base-api';
 import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { SundaeSwap } from '../sundaeswap';
+import { RequestConfig } from '../../types';
 
 export class SundaeSwapApi extends BaseApi {
 
-    protected readonly apiUrl: string;
+    protected readonly api: AxiosInstance;
     protected readonly dex: SundaeSwap;
 
-    constructor(dex: SundaeSwap) {
+    constructor(dex: SundaeSwap, requestConfig: RequestConfig) {
         super();
 
-        this.apiUrl = 'https://stats.sundaeswap.finance/graphql';
         this.dex = dex;
+        this.api = axios.create({
+            baseURL: requestConfig.shouldUseRequestProxy
+                ? 'https://cors-anywhere.herokuapp.com/https://stats.sundaeswap.finance/graphql'
+                : 'https://stats.sundaeswap.finance/graphql',
+        });
     }
 
     liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const maxPerPage: number = 100;
 
+        const assetAId: string = (assetA === 'lovelace')
+            ? ''
+            : assetA.id('.');
+        const assetBId: string = (assetB && assetB !== 'lovelace')
+            ? assetB.id('.')
+            : '';
+
         const getPaginatedResponse = (page: number): Promise<LiquidityPool[]> => {
-            return axios.post(this.apiUrl, {
+            return this.api.post('', {
                 operationName: 'getPoolsByAssetIds',
                 query: `
                     query getPoolsByAssetIds($assetIds: [String!]!, $pageSize: Int, $page: Int) {
@@ -54,14 +66,9 @@ export class SundaeSwapApi extends BaseApi {
                 variables: {
                     page: page,
                     pageSize: maxPerPage,
-                    assetIds: [
-                        (assetA === 'lovelace')
-                            ? ''
-                            : assetA.id('.'),
-                        (assetB && assetB !== 'lovelace')
-                            ? assetB.id('.')
-                            : ''
-                    ],
+                    assetIds: assetBId !== ''
+                        ? [assetAId, assetBId]
+                        : [assetAId],
                 },
             }).then((response: any) => {
                 const pools = response.data.data.pools;

@@ -1,31 +1,36 @@
 import { BaseApi } from './base-api';
 import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { MuesliSwap } from '../muesliswap';
+import { RequestConfig } from '../../types';
 
 export class MuesliSwapApi extends BaseApi {
 
-    protected readonly apiUrl: string;
+    protected readonly api: AxiosInstance;
     protected readonly dex: MuesliSwap;
 
-    constructor(dex: MuesliSwap) {
+    constructor(dex: MuesliSwap, requestConfig: RequestConfig) {
         super();
 
-        this.apiUrl = 'https://api.muesliswap.com/';
         this.dex = dex;
+        this.api = axios.create({
+            baseURL: requestConfig.shouldUseRequestProxy
+                ? 'https://cors-anywhere.herokuapp.com/https://api.muesliswap.com/'
+                : 'https://api.muesliswap.com/',
+        });
     }
 
     liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const providers: string[] = ['muesliswap', 'muesliswap_v2', 'muesliswap_clp'];
         const tokenA: string = (assetA === 'lovelace')
             ? '.'
-            : assetA.id('.')
+            : assetA.id('.');
         const tokenB: string = (assetB && assetB !== 'lovelace')
             ? assetB.id('.')
-            : ''
+            : '';
 
-        return axios.get(`${this.apiUrl}/liquidity/pools?providers=${providers.join(',')}&token-a=${tokenA}&token-b=${tokenB}`)
+        return this.api.get(`/liquidity/pools?providers=${providers.join(',')}&token-a=${tokenA}&token-b=${tokenB}`)
             .then((response: any) => {
                 return response.data.map((pool: any) => {
                     let liquidityPool: LiquidityPool = new LiquidityPool(
@@ -47,7 +52,7 @@ export class MuesliSwapApi extends BaseApi {
                     liquidityPool.poolFeePercent = Number(pool.poolFee);
 
                     return liquidityPool;
-                })
+                });
             });
     }
 

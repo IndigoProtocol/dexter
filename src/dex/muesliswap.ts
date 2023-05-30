@@ -4,7 +4,7 @@ import {
     DatumParameters,
     DefinitionConstr,
     DefinitionField,
-    PayToAddress, SwapFee,
+    PayToAddress, RequestConfig, SwapFee,
     UTxO
 } from '../types';
 import { Asset, Token } from './models/asset';
@@ -21,6 +21,7 @@ import { MuesliSwapApi } from './api/muesliswap-api';
 export class MuesliSwap extends BaseDex {
 
     public readonly name: string = 'MuesliSwap';
+    public readonly api: BaseApi;
 
     public readonly orderAddress: string = 'addr1zyq0kyrml023kwjk8zr86d5gaxrt5w8lxnah8r6m6s4jp4g3r6dxnzml343sx8jweqn4vn3fz2kj8kgu9czghx0jrsyqqktyhv';
     public readonly poolAddress: string = 'addr1z9cy2gmar6cpn8yymll93lnd7lw96f27kn2p3eq5d4tjr7xnh3gfhnqcwez2pzmr4tryugrr0uahuk49xqw7dc645chscql0d7';
@@ -28,8 +29,10 @@ export class MuesliSwap extends BaseDex {
     public readonly poolNftPolicyId: string = '909133088303c49f3a30f1cc8ed553a73857a29779f6c6561cd8093f';
     public readonly factoryTokenPolicyId: string = 'de9b756719341e79785aa13c164e7fe68c189ed04d61c9876b2fe53f';
 
-    public api(): BaseApi {
-        return new MuesliSwapApi(this);
+    constructor(requestConfig: RequestConfig = {}) {
+        super();
+
+        this.api = new MuesliSwapApi(this, requestConfig);
     }
 
     async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {

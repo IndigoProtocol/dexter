@@ -1,11 +1,14 @@
 import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
 import { Token } from './dex/models/asset';
 import { BaseDex } from './dex/base-dex';
-import { LiquidityPool } from './dex/models/liquidity-pool';
 
 export interface DexterConfig {
-    shouldFetchMetadata?: false,
-    shouldFallbackToApi?: true,
+    shouldFetchMetadata?: boolean,
+    shouldFallbackToApi?: boolean,
+}
+
+export interface RequestConfig {
+    shouldUseRequestProxy?: boolean,
 }
 
 export interface BlockfrostConfig {
@@ -16,10 +19,6 @@ export interface BlockfrostConfig {
 export interface KupmiosConfig {
     kupoUrl: string,
     ogmiosUrl: string,
-}
-
-export interface ApiProviderConfig {
-    timeout?: 3000,
 }
 
 export type AvailableDexs = {

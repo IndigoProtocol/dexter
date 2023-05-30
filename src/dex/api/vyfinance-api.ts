@@ -1,19 +1,24 @@
 import { BaseApi } from './base-api';
 import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { VyFinance } from '../vyfinance';
+import { RequestConfig } from '../../types';
 
 export class VyfinanceApi extends BaseApi {
 
-    protected readonly apiUrl: string;
+    protected readonly api: AxiosInstance;
     protected readonly dex: VyFinance;
 
-    constructor(dex: VyFinance) {
+    constructor(dex: VyFinance, requestConfig: RequestConfig) {
         super();
 
-        this.apiUrl = 'https://api.vyfi.io';
         this.dex = dex;
+        this.api = axios.create({
+            baseURL: requestConfig.shouldUseRequestProxy
+                ? 'https://cors-anywhere.herokuapp.com/https://api.vyfi.io'
+                : 'https://api.vyfi.io',
+        });
     }
 
     liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
@@ -29,10 +34,10 @@ export class VyfinanceApi extends BaseApi {
         }
 
         const url: string = assetBName
-            ? `${this.apiUrl}/lp?networkId=1&tokenA=${assetAName}&tokenB=${assetBName}`
-            : `${this.apiUrl}/lp?networkId=1&tokenA=${assetAName}`;
+            ? `/lp?networkId=1&tokenA=${assetAName}&tokenB=${assetBName}`
+            : `/lp?networkId=1&tokenA=${assetAName}`;
 
-        return axios.get(url)
+        return this.api.get(url)
             .then((poolResponse: any) => {
                 return poolResponse.data.map((pool: any) => {
                     const poolDetails: any = JSON.parse(pool.json);
