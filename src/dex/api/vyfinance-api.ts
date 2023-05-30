@@ -2,14 +2,14 @@ import { BaseApi } from './base-api';
 import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import axios from 'axios';
-import { BaseDex } from '../base-dex';
+import { VyFinance } from '../vyfinance';
 
 export class VyfinanceApi extends BaseApi {
 
     protected readonly apiUrl: string;
-    protected readonly dex: BaseDex;
+    protected readonly dex: VyFinance;
 
-    constructor(dex: BaseDex) {
+    constructor(dex: VyFinance) {
         super();
 
         this.apiUrl = 'https://api.vyfi.io';

@@ -8,8 +8,8 @@ export function tokensMatch(tokenA: Token, tokenB: Token): boolean {
     return tokenAId === tokenBId;
 }
 
-export function correspondingReserves(liquidityPool: LiquidityPool, swapInToken: Token): bigint[] {
-    return tokensMatch(swapInToken, liquidityPool.assetA)
+export function correspondingReserves(liquidityPool: LiquidityPool, tokenA: Token): bigint[] {
+    return tokensMatch(tokenA, liquidityPool.assetA)
         ? [liquidityPool.reserveA, liquidityPool.reserveB]
         : [liquidityPool.reserveB, liquidityPool.reserveA]
 }

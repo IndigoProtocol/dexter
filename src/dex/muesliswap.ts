@@ -18,25 +18,22 @@ import order from './definitions/muesliswap/order';
 import { BaseApi } from './api/base-api';
 import { MuesliSwapApi } from './api/muesliswap-api';
 
-/**
- * MuesliSwap constants.
- */
-const ORDER_ADDRESS: string = 'addr1zyq0kyrml023kwjk8zr86d5gaxrt5w8lxnah8r6m6s4jp4g3r6dxnzml343sx8jweqn4vn3fz2kj8kgu9czghx0jrsyqqktyhv';
-const POOL_ADDRESS: string = 'addr1z9cy2gmar6cpn8yymll93lnd7lw96f27kn2p3eq5d4tjr7xnh3gfhnqcwez2pzmr4tryugrr0uahuk49xqw7dc645chscql0d7';
-const FACTORY_TOKEN_POLICY_ID: string = 'de9b756719341e79785aa13c164e7fe68c189ed04d61c9876b2fe53f';
-const POOL_NFT_POLICY_ID: string = '909133088303c49f3a30f1cc8ed553a73857a29779f6c6561cd8093f';
-const LP_TOKEN_POLICY_ID: string = 'af3d70acf4bd5b3abb319a7d75c89fb3e56eafcdd46b2e9b57a2557f';
-
 export class MuesliSwap extends BaseDex {
 
     public readonly name: string = 'MuesliSwap';
+
+    public readonly orderAddress: string = 'addr1zyq0kyrml023kwjk8zr86d5gaxrt5w8lxnah8r6m6s4jp4g3r6dxnzml343sx8jweqn4vn3fz2kj8kgu9czghx0jrsyqqktyhv';
+    public readonly poolAddress: string = 'addr1z9cy2gmar6cpn8yymll93lnd7lw96f27kn2p3eq5d4tjr7xnh3gfhnqcwez2pzmr4tryugrr0uahuk49xqw7dc645chscql0d7';
+    public readonly lpTokenPolicyId: string = 'af3d70acf4bd5b3abb319a7d75c89fb3e56eafcdd46b2e9b57a2557f';
+    public readonly poolNftPolicyId: string = '909133088303c49f3a30f1cc8ed553a73857a29779f6c6561cd8093f';
+    public readonly factoryTokenPolicyId: string = 'de9b756719341e79785aa13c164e7fe68c189ed04d61c9876b2fe53f';
 
     public api(): BaseApi {
         return new MuesliSwapApi(this);
     }
 
     async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const utxos: UTxO[] = await provider.utxos(POOL_ADDRESS, (assetA === 'lovelace' ? undefined : assetA));
+        const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
             .loadDefinition(pool);
 
@@ -77,8 +74,8 @@ export class MuesliSwap extends BaseDex {
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
             const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
 
-            return ! assetBalanceId.startsWith(FACTORY_TOKEN_POLICY_ID)
-                && ! assetBalanceId.startsWith(POOL_NFT_POLICY_ID);
+            return ! assetBalanceId.startsWith(this.factoryTokenPolicyId)
+                && ! assetBalanceId.startsWith(this.poolNftPolicyId);
         });
 
         // Irrelevant UTxO
@@ -117,11 +114,11 @@ export class MuesliSwap extends BaseDex {
         );
 
         const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
-            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === POOL_NFT_POLICY_ID;
+            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.poolNftPolicyId;
         })?.asset as Asset;
 
         if (lpToken) {
-            lpToken.policyId = LP_TOKEN_POLICY_ID;
+            lpToken.policyId = this.lpTokenPolicyId;
             liquidityPool.lpToken = lpToken;
         }
 
@@ -179,7 +176,7 @@ export class MuesliSwap extends BaseDex {
             this.buildSwapOrderPayment(
                 swapParameters,
                 {
-                    address: ORDER_ADDRESS,
+                    address: this.orderAddress,
                     addressType: AddressType.Contract,
                     assetBalances: [
                         {
@@ -195,7 +192,7 @@ export class MuesliSwap extends BaseDex {
 
     public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
         const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
-            return utxo.address === ORDER_ADDRESS;
+            return utxo.address === this.orderAddress;
         });
 
         if (! relevantUtxo) {

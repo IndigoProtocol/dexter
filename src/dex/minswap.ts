@@ -19,26 +19,23 @@ import order from './definitions/minswap/order';
 import { BaseApi } from './api/base-api';
 import { MinswapApi } from './api/minswap-api';
 
-/**
- * Minswap constants.
- */
-const POOL_ADDRESS: string = 'addr1z8snz7c4974vzdpxu65ruphl3zjdvtxw8strf2c2tmqnxz2j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq0xmsha';
-const MARKET_ORDER_ADDRESS: string = 'addr1wxn9efv2f6w82hagxqtn62ju4m293tqvw0uhmdl64ch8uwc0h43gt';
-const LIMIT_ORDER_ADDRESS: string = 'addr1zxn9efv2f6w82hagxqtn62ju4m293tqvw0uhmdl64ch8uw6j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq6s3z70';
-const POOL_VALIDITY_ASSET: string = '13aa2accf2e1561723aa26871e071fdf32c867cff7e7d50ad470d62f4d494e53574150';
-const LP_TOKEN_POLICY_ID: string = 'e4214b7cce62ac6fbba385d164df48e157eae5863521b4b67ca71d86';
-const POOL_NFT_POLICY_ID: string = '0be55d262b29f564998ff81efe21bdc0022621c12f15af08d0f2ddb1';
-
 export class Minswap extends BaseDex {
 
     public readonly name: string = 'Minswap';
+
+    public readonly marketOrderAddress: string = 'addr1wxn9efv2f6w82hagxqtn62ju4m293tqvw0uhmdl64ch8uwc0h43gt';
+    public readonly limitOrderAddress: string = 'addr1zxn9efv2f6w82hagxqtn62ju4m293tqvw0uhmdl64ch8uw6j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq6s3z70';
+    public readonly poolAddress: string = 'addr1z8snz7c4974vzdpxu65ruphl3zjdvtxw8strf2c2tmqnxz2j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq0xmsha';
+    public readonly lpTokenPolicyId: string = 'e4214b7cce62ac6fbba385d164df48e157eae5863521b4b67ca71d86';
+    public readonly poolNftPolicyId: string = '0be55d262b29f564998ff81efe21bdc0022621c12f15af08d0f2ddb1';
+    public readonly poolValidityAsset: string = '13aa2accf2e1561723aa26871e071fdf32c867cff7e7d50ad470d62f4d494e53574150';
 
     public api(): BaseApi {
         return new MinswapApi(this);
     }
 
     public async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const utxos: UTxO[] = await provider.utxos(POOL_ADDRESS, (assetA === 'lovelace' ? undefined : assetA));
+        const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? undefined : assetA));
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
             .loadDefinition(pool);
 
@@ -76,9 +73,9 @@ export class Minswap extends BaseDex {
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
             const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
 
-            return assetBalanceId !== POOL_VALIDITY_ASSET
-                && ! assetBalanceId.startsWith(LP_TOKEN_POLICY_ID)
-                && ! assetBalanceId.startsWith(POOL_NFT_POLICY_ID);
+            return assetBalanceId !== this.poolValidityAsset
+                && ! assetBalanceId.startsWith(this.lpTokenPolicyId)
+                && ! assetBalanceId.startsWith(this.poolNftPolicyId);
         });
 
         // Irrelevant UTxO
@@ -117,7 +114,7 @@ export class Minswap extends BaseDex {
         );
 
         const lpToken: Asset | undefined = utxo.assetBalances.find((assetBalance) => {
-            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === LP_TOKEN_POLICY_ID;
+            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
         })?.asset as Asset;
 
         if (lpToken) {
@@ -182,7 +179,7 @@ export class Minswap extends BaseDex {
             this.buildSwapOrderPayment(
                 swapParameters,
                 {
-                    address: MARKET_ORDER_ADDRESS,
+                    address: this.marketOrderAddress,
                     addressType: AddressType.Contract,
                     assetBalances: [
                         {
@@ -198,7 +195,7 @@ export class Minswap extends BaseDex {
 
     public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
         const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
-            return [MARKET_ORDER_ADDRESS, LIMIT_ORDER_ADDRESS].includes(utxo.address);
+            return [this.marketOrderAddress, this.limitOrderAddress].includes(utxo.address);
         });
 
         if (! relevantUtxo) {

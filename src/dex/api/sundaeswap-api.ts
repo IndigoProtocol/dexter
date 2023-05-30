@@ -18,25 +18,50 @@ export class SundaeSwapApi extends BaseApi {
 
     liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const maxPerPage: number = 100;
-        const assetAId: string = assetA === 'lovelace'
-            ? ''
-            : assetA.id('.');
 
         const getPaginatedResponse = (page: number): Promise<LiquidityPool[]> => {
             return axios.post(this.apiUrl, {
                 operationName: 'getPoolsByAssetIds',
-                query: "query getPoolsByAssetIds($assetIds: [String!]!, $pageSize: Int, $page: Int) {\n  pools(assetIds: $assetIds, pageSize: $pageSize, page: $page) {\n    ...PoolFragment\n  }\n}\n\nfragment PoolFragment on Pool {\n  apr\n  rewards {\n    apr\n    asset {\n      ...AssetFragment\n    }\n  }\n  assetA {\n    ...AssetFragment\n  }\n  assetB {\n    ...AssetFragment\n  }\n  assetLP {\n    ...AssetFragment\n  }\n  name\n  fee\n  fees24H\n  quantityA\n  quantityB\n  quantityLP\n  ident\n  assetID\n}\n\nfragment AssetFragment on Asset {\n  assetId\n  policyId\n  assetName\n  decimals\n  logo\n  ticker\n  dateListed\n  marketCap\n  sources\n  priceToday\n  priceYesterday\n  priceDiff24H\n  poolId\n  slotAdded\n  totalSupply\n  tvl\n  tvlDiff24H\n  tvlToday\n  tvlYesterday\n  volume24H\n}",
+                query: `
+                    query getPoolsByAssetIds($assetIds: [String!]!, $pageSize: Int, $page: Int) {
+                        pools(assetIds: $assetIds, pageSize: $pageSize, page: $page) {
+                            ...PoolFragment
+                        }
+                    }
+                    fragment PoolFragment on Pool {
+                        assetA {
+                            ...AssetFragment
+                        }
+                        assetB {
+                            ...AssetFragment
+                        }
+                        assetLP {
+                            ...AssetFragment
+                        }
+                        name
+                        fee
+                        quantityA
+                        quantityB
+                        quantityLP
+                        ident
+                        assetID
+                    }
+                    fragment AssetFragment on Asset {
+                        assetId
+                        decimals
+                    }
+                `,
                 variables: {
                     page: page,
                     pageSize: maxPerPage,
-                    assetIds: assetB
-                        ? [
-                            assetAId,
-                            assetB === 'lovelace'
-                                ? ''
-                                : assetB.id('.')
-                        ]
-                        : [assetAId],
+                    assetIds: [
+                        (assetA === 'lovelace')
+                            ? ''
+                            : assetA.id('.'),
+                        (assetB && assetB !== 'lovelace')
+                            ? assetB.id('.')
+                            : ''
+                    ],
                 },
             }).then((response: any) => {
                 const pools = response.data.data.pools;
@@ -66,7 +91,7 @@ export class SundaeSwapApi extends BaseApi {
                     return liquidityPools;
                 }
 
-                return getPaginatedResponse(page + 1).then(nextPagePools => {
+                return getPaginatedResponse(page + 1).then((nextPagePools: LiquidityPool[]) => {
                     return liquidityPools.concat(nextPagePools);
                 });
             });
