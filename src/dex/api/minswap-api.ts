@@ -16,6 +16,7 @@ export class MinswapApi extends BaseApi {
         this.dex = dex;
 
         this.api = axios.create({
+            timeout: requestConfig.timeout,
             baseURL: requestConfig.shouldUseRequestProxy
                 ? 'https://cors-anywhere.herokuapp.com/https://monorepo-mainnet-prod.minswap.org/graphql'
                 : 'https://monorepo-mainnet-prod.minswap.org/graphql',

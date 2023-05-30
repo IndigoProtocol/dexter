@@ -16,6 +16,7 @@ export class WingRidersApi extends BaseApi {
 
         this.dex = dex;
         this.api = axios.create({
+            timeout: requestConfig.timeout,
             baseURL: requestConfig.shouldUseRequestProxy
                 ? 'https://cors-anywhere.herokuapp.com/https://api.mainnet.wingriders.com/graphql'
                 : 'https://api.mainnet.wingriders.com/graphql',

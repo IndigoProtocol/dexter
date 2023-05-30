@@ -23,6 +23,9 @@ export class SundaeSwap extends BaseDex {
     public readonly name: string = 'SundaeSwap';
     public readonly api: BaseApi;
 
+    /**
+     * On-Chain constants.
+     */
     public readonly orderAddress: string = 'addr1wxaptpmxcxawvr3pzlhgnpmzz3ql43n2tc8mn3av5kx0yzs09tqh8';
     public readonly poolAddress: string = 'addr1w9qzpelu9hn45pefc0xr4ac4kdxeswq7pndul2vuj59u8tqaxdznu';
     public readonly lpTokenPolicyId: string = '0029cb7c88c7567b63d1a512c0ed626aa169688ec980730c0473b913';

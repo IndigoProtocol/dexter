@@ -4,6 +4,7 @@ import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { VyFinance } from '../vyfinance';
 import { RequestConfig } from '../../types';
+import { tokensMatch } from '../../utils';
 
 export class VyfinanceApi extends BaseApi {
 
@@ -15,6 +16,7 @@ export class VyfinanceApi extends BaseApi {
 
         this.dex = dex;
         this.api = axios.create({
+            timeout: requestConfig.timeout,
             baseURL: requestConfig.shouldUseRequestProxy
                 ? 'https://cors-anywhere.herokuapp.com/https://api.vyfi.io'
                 : 'https://api.vyfi.io',
@@ -22,46 +24,43 @@ export class VyfinanceApi extends BaseApi {
     }
 
     liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        let assetAName: string = assetA === 'lovelace'
-            ? 'ADA'
-            : assetA.assetName;
-        let assetBName: string = assetB === 'lovelace'
-            ? 'ADA'
-            : (assetB?.assetName ?? '');
-
-        if (assetBName === 'lovelace') {
-            [assetAName, assetBName] = [assetBName, assetAName];
-        }
-
-        const url: string = assetBName
-            ? `/lp?networkId=1&tokenA=${assetAName}&tokenB=${assetBName}`
-            : `/lp?networkId=1&tokenA=${assetAName}`;
-
-        return this.api.get(url)
+        return this.api.get('/lp?networkId=1&v2=true')
             .then((poolResponse: any) => {
                 return poolResponse.data.map((pool: any) => {
                     const poolDetails: any = JSON.parse(pool.json);
 
+                    const tokenA: Token = poolDetails['aAsset']['tokenName']
+                        ? new Asset(poolDetails['aAsset']['currencySymbol'], Buffer.from(poolDetails['aAsset']['tokenName']).toString('hex'))
+                        : 'lovelace';
+                    const tokenB: Token = poolDetails['bAsset']['tokenName']
+                        ? new Asset(poolDetails['bAsset']['currencySymbol'], Buffer.from(poolDetails['bAsset']['tokenName']).toString('hex'))
+                        : 'lovelace';
+
+                    // Filtering for supplied assets
+                    const isWanted: boolean = tokensMatch(tokenA, assetA)
+                        || tokensMatch(tokenB, assetA)
+                        || (assetB ? tokensMatch(tokenA, assetB) : false)
+                        || (assetB ? tokensMatch(tokenB, assetB) : false)
+
+                    if (! isWanted) {
+                        return undefined;
+                    }
+
                     let liquidityPool: LiquidityPool = new LiquidityPool(
                         this.dex.name,
                         pool['poolValidatorUtxoAddress'],
-                        poolDetails['aAsset']['tokenName']
-                            ? new Asset(poolDetails['aAsset']['currencySymbol'], poolDetails['aAsset']['tokenName'])
-                            : 'lovelace',
-                        poolDetails['bAsset']['tokenName']
-                            ? new Asset(poolDetails['bAsset']['currencySymbol'], poolDetails['bAsset']['tokenName'])
-                            : 'lovelace',
+                        tokenA,
+                        tokenB,
                         pool['tokenAQuantity'],
                         pool['tokenBQuantity'],
                     );
 
                     const lpTokenDetails: string[] = pool['lpPolicyId-assetId'].split('-');
                     liquidityPool.lpToken = new Asset(lpTokenDetails[0], lpTokenDetails[1]);
-                    liquidityPool.totalLpTokens = BigInt(pool['lpQuantity']);
-                    liquidityPool.poolFeePercent = (poolDetails['feeSettings']['barFee'] + poolDetails['feeSettings']['liqFee']) / 100;
+                    liquidityPool.poolFeePercent = (poolDetails['feesSettings']['barFee'] + poolDetails['feesSettings']['liqFee']) / 100;
 
                     return liquidityPool;
-                }) as LiquidityPool[];
+                }).filter((pool: LiquidityPool | undefined) => pool !== undefined) as LiquidityPool[];
             }).catch(() => {
                 return [];
             });

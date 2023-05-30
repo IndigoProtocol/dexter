@@ -15,6 +15,7 @@ export class SundaeSwapApi extends BaseApi {
 
         this.dex = dex;
         this.api = axios.create({
+            timeout: requestConfig.timeout,
             baseURL: requestConfig.shouldUseRequestProxy
                 ? 'https://cors-anywhere.herokuapp.com/https://stats.sundaeswap.finance/graphql'
                 : 'https://stats.sundaeswap.finance/graphql',

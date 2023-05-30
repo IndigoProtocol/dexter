@@ -166,10 +166,12 @@ export class SwapRequest {
 
         const swapTransaction: DexTransaction = this._dexter.walletProvider.createTransaction();
 
-        this._dexter.availableDexs[this._liquidityPool.dex].buildSwapOrder(defaultSwapParameters)
-            .then((payToAddresses: PayToAddress[]) => {
-                this.sendSwapOrder(swapTransaction, payToAddresses);
-            });
+        if (this._dexter.config.shouldSubmitOrders) {
+            this._dexter.availableDexs[this._liquidityPool.dex].buildSwapOrder(defaultSwapParameters)
+                .then((payToAddresses: PayToAddress[]) => {
+                    this.sendSwapOrder(swapTransaction, payToAddresses);
+                });
+        }
 
         return swapTransaction;
     }

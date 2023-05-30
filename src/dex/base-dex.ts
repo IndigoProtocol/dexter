@@ -9,12 +9,12 @@ import { BaseApi } from './api/base-api';
 export abstract class BaseDex {
 
     /**
-     * Unique name for this DEX.
+     * Unique name for the DEX.
      */
     public abstract readonly name: string;
 
     /**
-     * Unique name for this DEX.
+     * API connection for the DEX.
      */
     public abstract readonly api: BaseApi;
 

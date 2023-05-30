@@ -27,6 +27,9 @@ export class WingRiders extends BaseDex {
     public readonly name: string = 'WingRiders';
     public readonly api: BaseApi;
 
+    /**
+     * On-Chain constants.
+     */
     public readonly orderAddress: string = 'addr1wxr2a8htmzuhj39y2gq7ftkpxv98y2g67tg8zezthgq4jkg0a4ul4';
     public readonly poolValidityAsset: string = '026a18d04a0c642759bb3d83b12e3344894e5c1c7b2aeb1a2113a5704c';
 

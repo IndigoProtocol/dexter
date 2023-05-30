@@ -112,18 +112,18 @@ export class FetchRequest {
     }
 
     private async fetchAssetMetadata(liquidityPools: LiquidityPool[]) {
-        const assetIds: string[] = liquidityPools.reduce((results: string[], liquidityPool: LiquidityPool) => {
-            if (liquidityPool.assetA !== 'lovelace' && ! results.includes(liquidityPool.assetA.id())) {
-                results.push(liquidityPool.assetA.id());
+        const assets: Asset[] = liquidityPools.reduce((results: Asset[], liquidityPool: LiquidityPool) => {
+            if (liquidityPool.assetA !== 'lovelace' && ! results.some((asset: Asset) => asset.id() === (liquidityPool.assetA as Asset).id())) {
+                results.push(liquidityPool.assetA);
             }
-            if (liquidityPool.assetB !== 'lovelace' && ! results.includes(liquidityPool.assetB.id())) {
-                results.push(liquidityPool.assetB.id());
+            if (liquidityPool.assetB !== 'lovelace' && ! results.some((asset: Asset) => asset.id() === (liquidityPool.assetB as Asset).id())) {
+                results.push(liquidityPool.assetB);
             }
 
             return results;
-        }, [] as string[]);
+        }, [] as Asset[]);
 
-        await this._dexter.tokenRegistry.metadataBatch(assetIds)
+        await this._dexter.metadataProvider.fetch(assets)
             .then((response: any) => {
                 liquidityPools.forEach((liquidityPool: LiquidityPool) => {
                     [liquidityPool.assetA, liquidityPool.assetB].forEach((asset: Token) => {

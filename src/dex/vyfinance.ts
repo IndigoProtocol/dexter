@@ -1,12 +1,9 @@
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseDataProvider } from '../providers/data/base-data-provider';
-import { Asset, Token } from './models/asset';
+import { Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import {
-    AssetBalance,
     DatumParameters,
-    DefinitionConstr,
-    DefinitionField,
     PayToAddress, RequestConfig,
     SwapFee,
     UTxO
@@ -21,7 +18,8 @@ import { VyfinanceApi } from './api/vyfinance-api';
 /**
  * VyFinance constants.
  */
-const ORDER_ADDRESS: string = '';
+const SWAP_ACTION_EXPECT_ASSET: number = 3;
+const SWAP_ACTION_EXPECT_ADA: number = 4;
 
 export class VyFinance extends BaseDex {
 
@@ -63,8 +61,8 @@ export class VyFinance extends BaseDex {
     public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
         const isDoubleSidedSwap: boolean = (swapParameters.SwapInTokenPolicyId as string) !== '' && (swapParameters.SwapOutTokenPolicyId as string) !== '';
         const swapDirection: number = (swapParameters.SwapInTokenPolicyId as string) === '' || isDoubleSidedSwap
-            ? 3
-            : 4
+            ? SWAP_ACTION_EXPECT_ASSET
+            : SWAP_ACTION_EXPECT_ADA;
 
         swapParameters = {
             ...swapParameters,
@@ -81,7 +79,7 @@ export class VyFinance extends BaseDex {
             this.buildSwapOrderPayment(
                 swapParameters,
                 {
-                    address: ORDER_ADDRESS,
+                    address: '', //todo need liquidity pool
                     addressType: AddressType.Contract,
                     assetBalances: [
                         {

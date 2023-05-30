@@ -1,5 +1,4 @@
 import { BaseDataProvider } from './providers/data/base-data-provider';
-import { TokenRegistry } from './services/token-registry';
 import { FetchRequest } from './requests/fetch-request';
 import { AvailableDexs, DexterConfig, RequestConfig } from './types';
 import { Minswap } from './dex/minswap';
@@ -11,16 +10,19 @@ import { BaseWalletProvider } from './providers/wallet/base-wallet-provider';
 import { BaseDex } from './dex/base-dex';
 import { CancelRequest } from './requests/cancel-request';
 import { VyFinance } from './dex/vyfinance';
+import { BaseMetadataProvider } from './providers/asset-metadata/base-metadata-provider';
+import { TokenRegistryProvider } from './providers/asset-metadata/token-registry-provider';
 
 export class Dexter {
 
-    public dataProvider?: BaseDataProvider;
-    public walletProvider?: BaseWalletProvider;
     public config: DexterConfig;
     public requestConfig: RequestConfig;
 
+    public dataProvider?: BaseDataProvider;
+    public walletProvider?: BaseWalletProvider;
+    public metadataProvider: BaseMetadataProvider;
+
     public availableDexs: AvailableDexs;
-    public tokenRegistry: TokenRegistry;
 
     constructor(config: DexterConfig = {}, requestConfig: RequestConfig = {}) {
         this.config = Object.assign(
@@ -28,18 +30,20 @@ export class Dexter {
             {
                 shouldFetchMetadata: true,
                 shouldFallbackToApi: true,
+                shouldSubmitOrders: true,
             } as DexterConfig,
             config,
         );
         this.requestConfig = Object.assign(
             {},
             {
+                timeout: 5000,
                 shouldUseRequestProxy: true,
             } as RequestConfig,
             requestConfig,
         );
 
-        this.tokenRegistry = new TokenRegistry(this.requestConfig);
+        this.metadataProvider = new TokenRegistryProvider(this.requestConfig);
         this.availableDexs = {
             [Minswap.name]: new Minswap(this.requestConfig),
             [SundaeSwap.name]: new SundaeSwap(this.requestConfig),
@@ -49,6 +53,9 @@ export class Dexter {
         };
     }
 
+    /**
+     * Retrieve DEX instance from unique name.
+     */
     public dexByName(name: string): BaseDex | undefined {
         return this.availableDexs[name];
     }
@@ -67,6 +74,15 @@ export class Dexter {
      */
     public withWalletProvider(walletProvider: BaseWalletProvider): Dexter {
         this.walletProvider = walletProvider;
+
+        return this;
+    }
+
+    /**
+     * Switch to a new asset metadata provider.
+     */
+    public withMetadataProvider(metadataProvider: BaseMetadataProvider): Dexter {
+        this.metadataProvider = metadataProvider;
 
         return this;
     }

@@ -5,9 +5,11 @@ import { BaseDex } from './dex/base-dex';
 export interface DexterConfig {
     shouldFetchMetadata?: boolean,
     shouldFallbackToApi?: boolean,
+    shouldSubmitOrders?: boolean,
 }
 
 export interface RequestConfig {
+    timeout?: number,
     shouldUseRequestProxy?: boolean,
 }
 
@@ -92,6 +94,10 @@ export type DexTransactionError = {
     step: TransactionStatus,
     reason: string,
     reasonRaw: string,
+};
+
+export type AssetMetadata = {
+    decimals: number,
 };
 
 export type Cip30Api = {
