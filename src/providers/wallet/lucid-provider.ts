@@ -1,4 +1,4 @@
-import { AssetBalance, BlockfrostConfig, Cip30Api, PayToAddress, UTxO, WalletOptions } from '@/types';
+import { AssetBalance, BlockfrostConfig, Cip30Api, PayToAddress, UTxO, WalletOptions } from '@app/types';
 import { DexTransaction } from '@dex/models/dex-transaction';
 import { BaseWalletProvider } from './base-wallet-provider';
 import {
@@ -13,7 +13,7 @@ import {
     TxSigned,
     Unit
 } from 'lucid-cardano';
-import { AddressType } from '@/constants';
+import { AddressType } from '@app/constants';
 
 export class LucidProvider extends BaseWalletProvider {
 

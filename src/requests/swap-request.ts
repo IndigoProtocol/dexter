@@ -1,9 +1,9 @@
 import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Token } from '@dex/models/asset';
-import { Dexter } from '@/dexter';
-import { tokensMatch } from '@/utils';
-import { DatumParameters, PayToAddress, SwapFee } from '@/types';
-import { DatumParameterKey, TransactionStatus } from '@/constants';
+import { Dexter } from '@app/dexter';
+import { tokensMatch } from '@app/utils';
+import { DatumParameters, PayToAddress, SwapFee } from '@app/types';
+import { DatumParameterKey, TransactionStatus } from '@app/constants';
 import { DexTransaction } from '@dex/models/dex-transaction';
 
 export class SwapRequest {

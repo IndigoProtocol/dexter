@@ -3,8 +3,8 @@ import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import { BaseDex } from '../base-dex';
 import axios, { AxiosInstance } from 'axios';
-import { tokensMatch } from '@/utils';
-import { RequestConfig } from '@/types';
+import { tokensMatch } from '@app/utils';
+import { RequestConfig } from '@app/types';
 
 export class WingRidersApi extends BaseApi {
 
@@ -17,9 +17,7 @@ export class WingRidersApi extends BaseApi {
         this.dex = dex;
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: requestConfig.shouldUseRequestProxy
-                ? 'https://cors-anywhere.herokuapp.com/https://api.mainnet.wingriders.com/graphql'
-                : 'https://api.mainnet.wingriders.com/graphql',
+            baseURL: `${requestConfig.proxyUrl}https://api.mainnet.wingriders.com/graphql`
         });
     }
 

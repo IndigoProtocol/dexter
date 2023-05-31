@@ -3,7 +3,7 @@ import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { Minswap } from '../minswap';
-import { RequestConfig } from '@/types';
+import { RequestConfig } from '@app/types';
 
 export class MinswapApi extends BaseApi {
 
@@ -17,9 +17,7 @@ export class MinswapApi extends BaseApi {
 
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: requestConfig.shouldUseRequestProxy
-                ? 'https://cors-anywhere.herokuapp.com/https://monorepo-mainnet-prod.minswap.org/graphql'
-                : 'https://monorepo-mainnet-prod.minswap.org/graphql',
+            baseURL: `${requestConfig.proxyUrl}https://monorepo-mainnet-prod.minswap.org/graphql`
         });
     }
 

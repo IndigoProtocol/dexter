@@ -1,6 +1,6 @@
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { FetchRequest } from '@requests/fetch-request';
-import { AvailableDexs, DexterConfig, RequestConfig } from '@/types';
+import { AvailableDexs, DexterConfig, RequestConfig } from '@app/types';
 import { Minswap } from '@dex/minswap';
 import { SundaeSwap } from '@dex/sundaeswap';
 import { MuesliSwap } from '@dex/muesliswap';
@@ -38,7 +38,7 @@ export class Dexter {
             {},
             {
                 timeout: 5000,
-                shouldUseRequestProxy: true,
+                proxyUrl: '',
             } as RequestConfig,
             requestConfig,
         );

@@ -1,4 +1,4 @@
-import { Cip30Api, PayToAddress, WalletOptions } from '@/types';
+import { Cip30Api, PayToAddress, WalletOptions } from '@app/types';
 import { DexTransaction } from '@dex/models/dex-transaction';
 
 export abstract class BaseWalletProvider {

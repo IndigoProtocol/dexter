@@ -1,7 +1,7 @@
-import { Dexter } from '@/dexter';
+import { Dexter } from '@app/dexter';
 import { DexTransaction } from '@dex/models/dex-transaction';
-import { PayToAddress, UTxO } from '@/types';
-import { TransactionStatus } from '@/constants';
+import { PayToAddress, UTxO } from '@app/types';
+import { TransactionStatus } from '@app/constants';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 
 export class CancelSwapRequest {

@@ -11,10 +11,10 @@ import {
     RequestConfig,
     SwapFee,
     UTxO
-} from '@/types';
-import { DefinitionBuilder } from '@/definition-builder';
-import { correspondingReserves, tokensMatch } from '@/utils';
-import { AddressType, DatumParameterKey } from '@/constants';
+} from '@app/types';
+import { DefinitionBuilder } from '@app/definition-builder';
+import { correspondingReserves, tokensMatch } from '@app/utils';
+import { AddressType, DatumParameterKey } from '@app/constants';
 import pool from '@dex/definitions/sundaeswap/pool';
 import order from '@dex/definitions/sundaeswap/order';
 import { BaseApi } from '@dex/api/base-api';

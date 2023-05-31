@@ -11,10 +11,10 @@ import {
     RequestConfig,
     SwapFee,
     UTxO
-} from '@/types';
-import { DefinitionBuilder } from '@/definition-builder';
-import { correspondingReserves } from '@/utils';
-import { AddressType, DatumParameterKey } from '@/constants';
+} from '@app/types';
+import { DefinitionBuilder } from '@app/definition-builder';
+import { correspondingReserves } from '@app/utils';
+import { AddressType, DatumParameterKey } from '@app/constants';
 import pool from '@dex/definitions/minswap/pool';
 import order from '@dex/definitions/minswap/order';
 import { BaseApi } from '@dex/api/base-api';

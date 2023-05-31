@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { AssetMetadata, RequestConfig } from '@/types';
+import { AssetMetadata, RequestConfig } from '@app/types';
 import { Asset } from '@dex/models/asset';
 import { BaseMetadataProvider } from './base-metadata-provider';
 
@@ -18,9 +18,7 @@ export class TokenRegistryProvider extends BaseMetadataProvider {
 
         this._api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: this._requestConfig.shouldUseRequestProxy
-                ? 'https://cors-anywhere.herokuapp.com/https://tokens.cardano.org/'
-                : 'https://tokens.cardano.org/',
+            baseURL: `${requestConfig.proxyUrl}https://tokens.cardano.org/`
         });
     }
 

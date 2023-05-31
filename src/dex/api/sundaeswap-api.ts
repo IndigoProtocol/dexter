@@ -3,7 +3,7 @@ import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { SundaeSwap } from '../sundaeswap';
-import { RequestConfig } from '@/types';
+import { RequestConfig } from '@app/types';
 
 export class SundaeSwapApi extends BaseApi {
 
@@ -16,9 +16,7 @@ export class SundaeSwapApi extends BaseApi {
         this.dex = dex;
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: requestConfig.shouldUseRequestProxy
-                ? 'https://cors-anywhere.herokuapp.com/https://stats.sundaeswap.finance/graphql'
-                : 'https://stats.sundaeswap.finance/graphql',
+            baseURL: `${requestConfig.proxyUrl}https://stats.sundaeswap.finance/graphql`
         });
     }
 

@@ -10,7 +10,7 @@ export interface DexterConfig {
 
 export interface RequestConfig {
     timeout?: number,
-    shouldUseRequestProxy?: boolean,
+    proxyUrl?: string,
 }
 
 export interface BlockfrostConfig {

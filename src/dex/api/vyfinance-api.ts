@@ -3,8 +3,8 @@ import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { VyFinance } from '../vyfinance';
-import { RequestConfig } from '@/types';
-import { tokensMatch } from '@/utils';
+import { RequestConfig } from '@app/types';
+import { tokensMatch } from '@app/utils';
 
 export class VyfinanceApi extends BaseApi {
 
@@ -17,9 +17,7 @@ export class VyfinanceApi extends BaseApi {
         this.dex = dex;
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: requestConfig.shouldUseRequestProxy
-                ? 'https://cors-anywhere.herokuapp.com/https://api.vyfi.io'
-                : 'https://api.vyfi.io',
+            baseURL: `${requestConfig.proxyUrl}https://api.vyfi.io`
         });
     }
 

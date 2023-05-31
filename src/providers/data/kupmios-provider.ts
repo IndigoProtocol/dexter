@@ -10,7 +10,7 @@ import {
     KupmiosConfig,
     Transaction,
     UTxO
-} from '@/types';
+} from '@app/types';
 import axios, { AxiosInstance } from 'axios';
 import { Data } from 'lucid-cardano';
 

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./build",
-    "baseUrl": "src",
+    "baseUrl": ".",
     "module": "es2020",
     "target": "es2020",
     "lib": ["es2020", "DOM"],
@@ -26,10 +26,10 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "@/*": ["*"],
-      "@dex/*": ["dex/*"],
-      "@providers/*": ["providers/*"],
-      "@requests/*": ["requests/*"],
+      "@app/*": ["src/*"],
+      "@dex/*": ["src/dex/*"],
+      "@providers/*": ["src/providers/*"],
+      "@requests/*": ["src/requests/*"],
     }
   },
   "ts-node": {
