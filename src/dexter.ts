@@ -1,17 +1,17 @@
-import { BaseDataProvider } from './providers/data/base-data-provider';
-import { FetchRequest } from './requests/fetch-request';
-import { AvailableDexs, DexterConfig, RequestConfig } from './types';
-import { Minswap } from './dex/minswap';
-import { SundaeSwap } from './dex/sundaeswap';
-import { MuesliSwap } from './dex/muesliswap';
-import { WingRiders } from './dex/wingriders';
-import { SwapRequest } from './requests/swap-request';
-import { BaseWalletProvider } from './providers/wallet/base-wallet-provider';
-import { BaseDex } from './dex/base-dex';
-import { CancelRequest } from './requests/cancel-request';
-import { VyFinance } from './dex/vyfinance';
-import { BaseMetadataProvider } from './providers/asset-metadata/base-metadata-provider';
-import { TokenRegistryProvider } from './providers/asset-metadata/token-registry-provider';
+import { BaseDataProvider } from '@providers/data/base-data-provider';
+import { FetchRequest } from '@requests/fetch-request';
+import { AvailableDexs, DexterConfig, RequestConfig } from '@/types';
+import { Minswap } from '@dex/minswap';
+import { SundaeSwap } from '@dex/sundaeswap';
+import { MuesliSwap } from '@dex/muesliswap';
+import { WingRiders } from '@dex/wingriders';
+import { SwapRequest } from '@requests/swap-request';
+import { BaseWalletProvider } from '@providers/wallet/base-wallet-provider';
+import { BaseDex } from '@dex/base-dex';
+import { VyFinance } from '@dex/vyfinance';
+import { BaseMetadataProvider } from '@providers/asset-metadata/base-metadata-provider';
+import { TokenRegistryProvider } from '@providers/asset-metadata/token-registry-provider';
+import { CancelSwapRequest } from '@requests/cancel-swap-request';
 
 export class Dexter {
 
@@ -30,7 +30,7 @@ export class Dexter {
             {
                 shouldFetchMetadata: true,
                 shouldFallbackToApi: true,
-                shouldSubmitOrders: true,
+                shouldSubmitOrders: false,
             } as DexterConfig,
             config,
         );
@@ -101,6 +101,9 @@ export class Dexter {
         if (! this.walletProvider) {
             throw new Error('Please set a wallet provider before requesting a swap order.');
         }
+        if (! this.walletProvider.isWalletLoaded) {
+            throw new Error('Please load your wallet before requesting a swap order.');
+        }
 
         return new SwapRequest(this);
     }
@@ -108,12 +111,15 @@ export class Dexter {
     /**
      * New request for cancelling a swap order.
      */
-    public newCancelRequest(): CancelRequest {
+    public newCancelSwapRequest(): CancelSwapRequest {
         if (! this.walletProvider) {
             throw new Error('Please set a wallet provider before requesting a cancel order.');
         }
+        if (! this.walletProvider.isWalletLoaded) {
+            throw new Error('Please load your wallet before requesting a cancel order.');
+        }
 
-        return new CancelRequest(this);
+        return new CancelSwapRequest(this);
     }
 
 }

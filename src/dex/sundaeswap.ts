@@ -1,5 +1,5 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { BaseDataProvider } from '../providers/data/base-data-provider';
+import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import {
@@ -7,16 +7,18 @@ import {
     DatumParameters,
     DefinitionConstr,
     DefinitionField,
-    PayToAddress, RequestConfig, SwapFee,
+    PayToAddress,
+    RequestConfig,
+    SwapFee,
     UTxO
-} from '../types';
-import { DefinitionBuilder } from '../definition-builder';
-import { correspondingReserves, tokensMatch } from '../utils';
-import { AddressType, DatumParameterKey } from '../constants';
-import pool from './definitions/sundaeswap/pool';
-import order from './definitions/sundaeswap/order';
-import { BaseApi } from './api/base-api';
-import { SundaeSwapApi } from './api/sundaeswap-api';
+} from '@/types';
+import { DefinitionBuilder } from '@/definition-builder';
+import { correspondingReserves, tokensMatch } from '@/utils';
+import { AddressType, DatumParameterKey } from '@/constants';
+import pool from '@dex/definitions/sundaeswap/pool';
+import order from '@dex/definitions/sundaeswap/order';
+import { BaseApi } from '@dex/api/base-api';
+import { SundaeSwapApi } from '@dex/api/sundaeswap-api';
 
 export class SundaeSwap extends BaseDex {
 

@@ -1,5 +1,5 @@
-import { AssetMetadata } from '../../types';
-import { Asset } from '../../dex/models/asset';
+import { AssetMetadata } from '@/types';
+import { Asset } from '@dex/models/asset';
 
 export abstract class BaseMetadataProvider {
 

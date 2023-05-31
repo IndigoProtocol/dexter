@@ -1,5 +1,5 @@
-import { AssetBalance, BlockfrostConfig, Cip30Api, PayToAddress, UTxO, WalletOptions } from '../../types';
-import { DexTransaction } from '../../dex/models/dex-transaction';
+import { AssetBalance, BlockfrostConfig, Cip30Api, PayToAddress, UTxO, WalletOptions } from '@/types';
+import { DexTransaction } from '@dex/models/dex-transaction';
 import { BaseWalletProvider } from './base-wallet-provider';
 import {
     Address,
@@ -13,9 +13,11 @@ import {
     TxSigned,
     Unit
 } from 'lucid-cardano';
-import { AddressType } from '../../constants';
+import { AddressType } from '@/constants';
 
 export class LucidProvider extends BaseWalletProvider {
+
+    public isWalletLoaded: boolean = false;
 
     private _api: Lucid;
     private _usableAddress: string;
@@ -53,7 +55,7 @@ export class LucidProvider extends BaseWalletProvider {
         return this.loadWalletInformation();
     }
 
-    public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions): Promise<BaseWalletProvider> {
+    public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions = {}): Promise<BaseWalletProvider> {
         const addressType: 'Base' | 'Enterprise' = options.addressType === AddressType.Enterprise
             ? 'Enterprise'
             : 'Base';
@@ -124,6 +126,10 @@ export class LucidProvider extends BaseWalletProvider {
     }
 
     public signTransaction(transaction: DexTransaction): Promise<DexTransaction> {
+        if (! this.isWalletLoaded) {
+            throw new Error('Must load wallet before signing transaction.');
+        }
+
         return transaction.providerData.tx.sign().complete()
             .then((signedTx: TxSigned) => {
                 transaction.providerData.tx = signedTx;
@@ -158,6 +164,8 @@ export class LucidProvider extends BaseWalletProvider {
                 this._usableAddress = address;
                 this._paymentCredential = details.paymentCredential?.hash ?? '';
                 this._stakingCredential = details.stakeCredential?.hash ?? '';
+
+                this.isWalletLoaded = true;
 
                 return this as BaseWalletProvider;
             });

@@ -3,7 +3,7 @@ import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { SundaeSwap } from '../sundaeswap';
-import { RequestConfig } from '../../types';
+import { RequestConfig } from '@/types';
 
 export class SundaeSwapApi extends BaseApi {
 

@@ -1,6 +1,6 @@
-import { TransactionStatus } from '../../constants';
-import { BaseWalletProvider } from '../../providers/wallet/base-wallet-provider';
-import { DexTransactionError, PayToAddress } from '../../types';
+import { TransactionStatus } from '@/constants';
+import { BaseWalletProvider } from '@providers/wallet/base-wallet-provider';
+import { DexTransactionError, PayToAddress } from '@/types';
 
 interface TransactionCallback {
     (transaction: DexTransaction): void;

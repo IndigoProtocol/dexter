@@ -1,7 +1,9 @@
-import { Cip30Api, PayToAddress, WalletOptions } from '../../types';
-import { DexTransaction } from '../../dex/models/dex-transaction';
+import { Cip30Api, PayToAddress, WalletOptions } from '@/types';
+import { DexTransaction } from '@dex/models/dex-transaction';
 
 export abstract class BaseWalletProvider {
+
+    public abstract isWalletLoaded: boolean;
 
     abstract address(): string;
 

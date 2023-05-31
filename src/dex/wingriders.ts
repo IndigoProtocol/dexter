@@ -1,20 +1,14 @@
 import { BaseDex } from './base-dex';
-import {
-    AssetAddress,
-    AssetBalance,
-    DatumParameters,
-    PayToAddress, RequestConfig, SwapFee,
-    UTxO
-} from '../types';
+import { AssetAddress, AssetBalance, DatumParameters, PayToAddress, RequestConfig, SwapFee, UTxO } from '@/types';
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
-import { BaseDataProvider } from '../providers/data/base-data-provider';
-import { correspondingReserves } from '../utils';
-import { AddressType, DatumParameterKey } from '../constants';
-import { DefinitionBuilder } from '../definition-builder';
-import order from './definitions/wingriders/order';
-import { BaseApi } from './api/base-api';
-import { WingRidersApi } from './api/wingriders-api';
+import { BaseDataProvider } from '@providers/data/base-data-provider';
+import { correspondingReserves } from '@/utils';
+import { AddressType, DatumParameterKey } from '@/constants';
+import { DefinitionBuilder } from '@/definition-builder';
+import order from '@dex/definitions/wingriders/order';
+import { BaseApi } from '@dex/api/base-api';
+import { WingRidersApi } from '@dex/api/wingriders-api';
 
 /**
  * WingRiders constants.

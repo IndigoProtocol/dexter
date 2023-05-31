@@ -1,6 +1,6 @@
 import { BaseDataProvider } from './base-data-provider';
-import { AssetAddress, DefinitionField, Transaction, UTxO } from '../../types';
-import { Asset } from '../../dex/models/asset';
+import { AssetAddress, DefinitionField, Transaction, UTxO } from '@/types';
+import { Asset } from '@dex/models/asset';
 
 export class MockDataProvider extends BaseDataProvider {
 

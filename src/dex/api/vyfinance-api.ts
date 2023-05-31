@@ -3,8 +3,8 @@ import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { VyFinance } from '../vyfinance';
-import { RequestConfig } from '../../types';
-import { tokensMatch } from '../../utils';
+import { RequestConfig } from '@/types';
+import { tokensMatch } from '@/utils';
 
 export class VyfinanceApi extends BaseApi {
 

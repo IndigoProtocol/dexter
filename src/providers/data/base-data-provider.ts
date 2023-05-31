@@ -1,5 +1,5 @@
-import { AssetAddress, DefinitionField, Transaction, UTxO } from '../../types';
-import { Asset } from '../../dex/models/asset';
+import { AssetAddress, DefinitionField, Transaction, UTxO } from '@/types';
+import { Asset } from '@dex/models/asset';
 
 export abstract class BaseDataProvider {
 

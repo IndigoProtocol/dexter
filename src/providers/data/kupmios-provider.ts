@@ -1,14 +1,16 @@
 import { BaseDataProvider } from './base-data-provider';
-import { Asset } from '../../dex/models/asset';
+import { Asset } from '@dex/models/asset';
 import {
     AssetAddress,
-    AssetBalance, DefinitionBytes,
+    AssetBalance,
+    DefinitionBytes,
     DefinitionConstr,
-    DefinitionField, DefinitionInt,
+    DefinitionField,
+    DefinitionInt,
     KupmiosConfig,
     Transaction,
     UTxO
-} from '../../types';
+} from '@/types';
 import axios, { AxiosInstance } from 'axios';
 import { Data } from 'lucid-cardano';
 

@@ -1,10 +1,10 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { BaseDataProvider } from '../providers/data/base-data-provider';
+import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
-import { AssetBalance, DatumParameters, PayToAddress, SwapFee, UTxO } from '../types';
-import { DatumParameterKey } from '../constants';
-import { tokensMatch } from '../utils';
-import { BaseApi } from './api/base-api';
+import { AssetBalance, DatumParameters, PayToAddress, SwapFee, UTxO } from '@/types';
+import { DatumParameterKey } from '@/constants';
+import { tokensMatch } from '@/utils';
+import { BaseApi } from '@dex/api/base-api';
 
 export abstract class BaseDex {
 

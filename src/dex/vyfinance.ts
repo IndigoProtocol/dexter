@@ -1,19 +1,14 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { BaseDataProvider } from '../providers/data/base-data-provider';
+import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { Token } from './models/asset';
 import { BaseDex } from './base-dex';
-import {
-    DatumParameters,
-    PayToAddress, RequestConfig,
-    SwapFee,
-    UTxO
-} from '../types';
-import { DefinitionBuilder } from '../definition-builder';
-import { correspondingReserves } from '../utils';
-import { AddressType, DatumParameterKey } from '../constants';
-import order from './definitions/vyfinance/order';
-import { BaseApi } from './api/base-api';
-import { VyfinanceApi } from './api/vyfinance-api';
+import { DatumParameters, PayToAddress, RequestConfig, SwapFee, UTxO } from '@/types';
+import { DefinitionBuilder } from '@/definition-builder';
+import { correspondingReserves } from '@/utils';
+import { AddressType, DatumParameterKey } from '@/constants';
+import order from '@dex/definitions/vyfinance/order';
+import { BaseApi } from '@dex/api/base-api';
+import { VyfinanceApi } from '@dex/api/vyfinance-api';
 
 /**
  * VyFinance constants.

@@ -1,4 +1,4 @@
-import { DatumParameterKey } from '../../../constants';
+import { DatumParameterKey } from '@/constants';
 
 /**
  * https://github.com/WingRiders/dex-serializer/blob/main/src/RequestDatum.ts

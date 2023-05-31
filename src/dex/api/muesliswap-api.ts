@@ -3,7 +3,7 @@ import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { MuesliSwap } from '../muesliswap';
-import { RequestConfig } from '../../types';
+import { RequestConfig } from '@/types';
 
 export class MuesliSwapApi extends BaseApi {
 

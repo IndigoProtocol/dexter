@@ -1,10 +1,10 @@
-import { LiquidityPool } from '../dex/models/liquidity-pool';
-import { Token } from '../dex/models/asset';
-import { Dexter } from '../dexter';
-import { tokensMatch } from '../utils';
-import { DatumParameters, PayToAddress, SwapFee } from '../types';
-import { DatumParameterKey, TransactionStatus } from '../constants';
-import { DexTransaction } from '../dex/models/dex-transaction';
+import { LiquidityPool } from '@dex/models/liquidity-pool';
+import { Token } from '@dex/models/asset';
+import { Dexter } from '@/dexter';
+import { tokensMatch } from '@/utils';
+import { DatumParameters, PayToAddress, SwapFee } from '@/types';
+import { DatumParameterKey, TransactionStatus } from '@/constants';
+import { DexTransaction } from '@dex/models/dex-transaction';
 
 export class SwapRequest {
 
@@ -49,6 +49,14 @@ export class SwapRequest {
         return this;
     }
 
+    public flip(): SwapRequest {
+        if (this._swapInToken) {
+            [this._swapInToken, this._swapOutToken] = [this._swapOutToken, this._swapInToken];
+        }
+
+        return this;
+    }
+
     public withSwapInToken(swapInToken: Token): SwapRequest {
         if (! this._liquidityPool) {
             throw new Error('Liquidity pool must be set before providing an input token.');
@@ -63,14 +71,6 @@ export class SwapRequest {
         }
 
         this._swapInToken = swapInToken;
-
-        return this;
-    }
-
-    public flip(): SwapRequest {
-        if (this._swapInToken) {
-            [this._swapInToken, this._swapOutToken] = [this._swapOutToken, this._swapInToken];
-        }
 
         return this;
     }
@@ -100,7 +100,8 @@ export class SwapRequest {
 
         if (! poolToCheck) {
             throw new Error('Liquidity pool must be set before providing calculating the estimated receive.');
-        } else if (! this._swapInToken) {
+        }
+        if (! this._swapInToken) {
             throw new Error('Swap in token must be set before providing calculating the estimated receive.');
         }
 
@@ -120,7 +121,8 @@ export class SwapRequest {
     public getPriceImpactPercent(): number {
         if (! this._liquidityPool) {
             throw new Error('Liquidity pool must be set before providing calculating the price impact.');
-        } else if (! this._swapInToken) {
+        }
+        if (! this._swapInToken) {
             throw new Error('Swap in token must be set before providing calculating the price impact.');
         }
 
@@ -138,6 +140,9 @@ export class SwapRequest {
     public submit(): DexTransaction {
         if (! this._dexter.walletProvider) {
             throw new Error('Please set a wallet provider before submitting a swap order.');
+        }
+        if (! this._dexter.walletProvider.isWalletLoaded) {
+            throw new Error('Please load your wallet before submitting a swap order.');
         }
         if (! this._liquidityPool) {
             throw new Error('Please set a liquidity pool before submitting a swap order.');
@@ -193,8 +198,32 @@ export class SwapRequest {
                         swapTransaction.submit()
                             .then(() => {
                                 swapTransaction.status = TransactionStatus.Submitted;
+                            })
+                            .catch((error) => {
+                                swapTransaction.status = TransactionStatus.Errored;
+                                swapTransaction.error = {
+                                    step: TransactionStatus.Submitting,
+                                    reason: 'Failed submitting transaction.',
+                                    reasonRaw: error,
+                                };
                             });
+                    })
+                    .catch((error) => {
+                        swapTransaction.status = TransactionStatus.Errored;
+                        swapTransaction.error = {
+                            step: TransactionStatus.Signing,
+                            reason: 'Failed to sign transaction.',
+                            reasonRaw: error,
+                        };
                     });
+            })
+            .catch((error) => {
+                swapTransaction.status = TransactionStatus.Errored;
+                swapTransaction.error = {
+                    step: TransactionStatus.Building,
+                    reason: 'Failed to build transaction.',
+                    reasonRaw: error,
+                };
             });
     }
 

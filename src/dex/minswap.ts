@@ -1,5 +1,5 @@
 import { LiquidityPool } from './models/liquidity-pool';
-import { BaseDataProvider } from '../providers/data/base-data-provider';
+import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import {
@@ -7,17 +7,18 @@ import {
     DatumParameters,
     DefinitionConstr,
     DefinitionField,
-    PayToAddress, RequestConfig,
+    PayToAddress,
+    RequestConfig,
     SwapFee,
     UTxO
-} from '../types';
-import { DefinitionBuilder } from '../definition-builder';
-import { correspondingReserves } from '../utils';
-import { AddressType, DatumParameterKey } from '../constants';
-import pool from './definitions/minswap/pool';
-import order from './definitions/minswap/order';
-import { BaseApi } from './api/base-api';
-import { MinswapApi } from './api/minswap-api';
+} from '@/types';
+import { DefinitionBuilder } from '@/definition-builder';
+import { correspondingReserves } from '@/utils';
+import { AddressType, DatumParameterKey } from '@/constants';
+import pool from '@dex/definitions/minswap/pool';
+import order from '@dex/definitions/minswap/order';
+import { BaseApi } from '@dex/api/base-api';
+import { MinswapApi } from '@dex/api/minswap-api';
 
 export class Minswap extends BaseDex {
 

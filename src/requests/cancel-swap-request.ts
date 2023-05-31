@@ -1,10 +1,10 @@
-import { Dexter } from '../dexter';
-import { DexTransaction } from '../dex/models/dex-transaction';
-import { PayToAddress, UTxO } from '../types';
-import { TransactionStatus } from '../constants';
-import { BaseDataProvider } from '../providers/data/base-data-provider';
+import { Dexter } from '@/dexter';
+import { DexTransaction } from '@dex/models/dex-transaction';
+import { PayToAddress, UTxO } from '@/types';
+import { TransactionStatus } from '@/constants';
+import { BaseDataProvider } from '@providers/data/base-data-provider';
 
-export class CancelRequest {
+export class CancelSwapRequest {
 
     private _dexter: Dexter;
     private _txHash: string;
@@ -14,13 +14,13 @@ export class CancelRequest {
         this._dexter = dexter;
     }
 
-    public forTransaction(txHash: string): CancelRequest {
+    public forTransaction(txHash: string): CancelSwapRequest {
         this._txHash = txHash;
 
         return this;
     }
 
-    public forDex(name: string): CancelRequest {
+    public forDex(name: string): CancelSwapRequest {
         this._dexName = name;
 
         return this;

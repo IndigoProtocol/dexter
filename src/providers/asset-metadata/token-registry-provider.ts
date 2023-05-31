@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
-import { AssetMetadata, RequestConfig } from '../../types';
-import { Asset } from '../../dex/models/asset';
+import { AssetMetadata, RequestConfig } from '@/types';
+import { Asset } from '@dex/models/asset';
 import { BaseMetadataProvider } from './base-metadata-provider';
 
 export class TokenRegistryProvider extends BaseMetadataProvider {

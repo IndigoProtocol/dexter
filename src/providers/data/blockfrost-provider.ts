@@ -1,7 +1,7 @@
 import { BaseDataProvider } from './base-data-provider';
 import axios, { AxiosInstance } from 'axios';
-import { Asset } from '../../dex/models/asset';
-import { AssetAddress, AssetBalance, BlockfrostConfig, DefinitionField, Transaction, UTxO } from '../../types';
+import { Asset } from '@dex/models/asset';
+import { AssetAddress, AssetBalance, BlockfrostConfig, DefinitionField, Transaction, UTxO } from '@/types';
 
 export class BlockfrostProvider extends BaseDataProvider {
 

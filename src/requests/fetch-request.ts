@@ -1,9 +1,9 @@
-import { BaseDex } from '../dex/base-dex';
-import { Asset, Token } from '../dex/models/asset';
-import { LiquidityPool } from '../dex/models/liquidity-pool';
-import { Dexter } from '../dexter';
-import { Transaction, UTxO } from '../types';
-import { BaseDataProvider } from '../providers/data/base-data-provider';
+import { BaseDex } from '@dex/base-dex';
+import { Asset, Token } from '@dex/models/asset';
+import { LiquidityPool } from '@dex/models/liquidity-pool';
+import { Dexter } from '@/dexter';
+import { Transaction, UTxO } from '@/types';
+import { BaseDataProvider } from '@providers/data/base-data-provider';
 
 export class FetchRequest {
 

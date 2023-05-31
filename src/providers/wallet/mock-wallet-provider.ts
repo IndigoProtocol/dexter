@@ -1,8 +1,10 @@
-import { Cip30Api, PayToAddress, WalletOptions } from '../../types';
-import { DexTransaction } from '../../dex/models/dex-transaction';
+import { Cip30Api, PayToAddress, WalletOptions } from '@/types';
+import { DexTransaction } from '@dex/models/dex-transaction';
 import { BaseWalletProvider } from './base-wallet-provider';
 
 export class MockWalletProvider extends BaseWalletProvider {
+
+    public isWalletLoaded: boolean = false;
 
     private _usableAddress: string;
     private _paymentCredential: string;
@@ -29,10 +31,14 @@ export class MockWalletProvider extends BaseWalletProvider {
     }
 
     public loadWallet(walletApi: Cip30Api): Promise<BaseWalletProvider> {
+        this.isWalletLoaded = true;
+
         return Promise.resolve(this as BaseWalletProvider);
     }
 
     public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions): Promise<BaseWalletProvider> {
+        this.isWalletLoaded = true;
+
         return Promise.resolve(this as BaseWalletProvider);
     }
 

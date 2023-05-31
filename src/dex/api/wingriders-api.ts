@@ -3,8 +3,8 @@ import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import { BaseDex } from '../base-dex';
 import axios, { AxiosInstance } from 'axios';
-import { tokensMatch } from '../../utils';
-import { RequestConfig } from '../../types';
+import { tokensMatch } from '@/utils';
+import { RequestConfig } from '@/types';
 
 export class WingRidersApi extends BaseApi {
 

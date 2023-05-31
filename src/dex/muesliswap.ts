@@ -4,19 +4,21 @@ import {
     DatumParameters,
     DefinitionConstr,
     DefinitionField,
-    PayToAddress, RequestConfig, SwapFee,
+    PayToAddress,
+    RequestConfig,
+    SwapFee,
     UTxO
-} from '../types';
+} from '@/types';
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
-import { BaseDataProvider } from '../providers/data/base-data-provider';
-import { DefinitionBuilder } from '../definition-builder';
-import { correspondingReserves } from '../utils';
-import { AddressType, DatumParameterKey } from '../constants';
-import pool from './definitions/muesliswap/pool';
-import order from './definitions/muesliswap/order';
-import { BaseApi } from './api/base-api';
-import { MuesliSwapApi } from './api/muesliswap-api';
+import { BaseDataProvider } from '@providers/data/base-data-provider';
+import { DefinitionBuilder } from '@/definition-builder';
+import { correspondingReserves } from '@/utils';
+import { AddressType, DatumParameterKey } from '@/constants';
+import pool from '@dex/definitions/muesliswap/pool';
+import order from '@dex/definitions/muesliswap/order';
+import { BaseApi } from '@dex/api/base-api';
+import { MuesliSwapApi } from '@dex/api/muesliswap-api';
 
 export class MuesliSwap extends BaseDex {
 

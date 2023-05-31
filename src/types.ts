@@ -1,6 +1,6 @@
 import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
-import { Token } from './dex/models/asset';
-import { BaseDex } from './dex/base-dex';
+import { Token } from '@dex/models/asset';
+import { BaseDex } from '@dex/base-dex';
 
 export interface DexterConfig {
     shouldFetchMetadata?: boolean,
