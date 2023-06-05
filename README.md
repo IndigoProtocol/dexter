@@ -59,7 +59,7 @@ dexter.dexByName(Minswap.name)
 
 <details>
 <summary><code>withDataProvider(BaseDataProvider): Dexter</code> Set where Dexter should grab liquidity pool data.</summary>
-<br>
+
 By default, Dexter will use the DEX APIs to grab information. However, you can use [Blockfrost](./docs/providers/blockfrost.md) or [Kupo](./docs/providers/kupo.md) to supply your own data.
 
 ##### Using
@@ -79,7 +79,7 @@ dexter.withDataProvider(provider)
 
 <details>
 <summary><code>withWalletProvider(BaseWalletProvider): Dexter</code> Set who Dexter sends wallet requests to.</summary>
-<br>
+
 At this time, Dexter only supplies a Mock wallet provider & a [Lucid provider](./docs/providers/lucid.md). Behind the scenes,
 the lucid provider leverages [Lucid JS](https://github.com/spacebudz/lucid) to manage your wallet & create transactions.
 
@@ -105,7 +105,7 @@ provider.loadWalletFromSeedPhrase(seedphrase, blockfrostConfig)
 
 <details>
 <summary><code>withMetadataProvider(BaseMetadataProvider): Dexter</code> Set where Dexter grabs necessary asset metadata.</summary>
-<br>
+
 By default, Dexter will use the [Cardano Token Registry](https://github.com/cardano-foundation/cardano-token-registry) for grabbing
 asset metadata. You can extend the `BaseMetadataProvider` interface to provide your own metadata.
 
@@ -123,7 +123,7 @@ dexter.withMetadataProvider(provider)
 
 <details>
 <summary><code>newFetchRequest(): FetchRequest</code> Create new request for liquidity pool data.</summary>
-<br>
+
 For available methods on the `FetchRequest` instance, please see those specific [docs](./docs/requests/fetch-request.md).
 
 ##### Using
@@ -138,7 +138,7 @@ dexter.newFetchRequest()
 
 <details>
 <summary><code>newSwapRequest(): SwapRequest</code> Create new request for a swap order.</summary>
-<br>
+
 For available methods on the `SwapRequest` instance, please see those specific [docs](./docs/requests/swap-request.md).
 
 ##### Using
@@ -153,7 +153,7 @@ dexter.newSwapRequest()
 
 <details>
 <summary><code>newCancelSwapRequest(): CancelSwapRequest</code> Create new request for cancelling a swap order.</summary>
-<br>
+
 For available methods on the `CancelSwapRequest` instance, please see those specific [docs](./docs/requests/cancel-swap-request.md).
 
 ##### Using

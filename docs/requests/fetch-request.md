@@ -47,7 +47,7 @@ dexter.newFetchRequest()
 
 <details>
 <summary><code>getLiquidityPools(Token, Token?): Promise&lt;LiquidityPool[]&gt;</code> Fetch liquidity pools from your set DEXs</summary>
-<br>
+
 Providing the first or first & second parameters will filter the returned pools by the assets you provide.
 
 ##### Using

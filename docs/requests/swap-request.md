@@ -57,7 +57,7 @@ dexter.newSwapRequest()
 
 <details>
 <summary><code>flip(): SwapRequest</code> Flip your swap in and swap out token.</summary>
-<br>
+
 Flipping will only affect the swap in & swap out token if the swap in token was set beforehand.
 
 ##### Using
@@ -87,7 +87,7 @@ dexter.newSwapRequest()
 
 <details>
 <summary><code>getEstimatedReceive(LiquidityPool?): bigint</code> Get the <i>estimated</i> receive for your swap.</summary>
-<br>
+
 Supplying a liquidity pool will run against the provided pool. This is useful when getting the estimated receive for pools with the 
 same tokens, but on different DEXs.
 
@@ -103,7 +103,7 @@ dexter.newSwapRequest()
 
 <details>
 <summary><code>getMinimumReceive(LiquidityPool?): bigint</code> Get the <i>minimum</i> receive for your swap.</summary>
-<br>
+
 Supplying a liquidity pool will run against the provided pool. This is useful when getting the minimum receive for pools with the 
 same tokens, but on different DEXs.
 
@@ -119,7 +119,7 @@ dexter.newSwapRequest()
 
 <details>
 <summary><code>getPriceImpactPercent(): number</code> Get the price impact percentage for your swap.</summary>
-<br>
+
 Supplying a liquidity pool will run against the provided pool. This is useful when getting the minimum receive for pools with the 
 same tokens, but on different DEXs.
 
