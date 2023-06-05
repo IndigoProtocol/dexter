@@ -19,6 +19,10 @@ export interface BlockfrostConfig {
     projectId: string,
 }
 
+export interface KupoConfig {
+    url: string,
+}
+
 export interface KupmiosConfig {
     kupoUrl: string,
     ogmiosUrl: string,

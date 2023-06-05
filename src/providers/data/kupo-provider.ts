@@ -7,7 +7,7 @@ import {
     DefinitionConstr,
     DefinitionField,
     DefinitionInt,
-    KupmiosConfig,
+    KupoConfig,
     Transaction,
     UTxO
 } from '@app/types';
@@ -16,22 +16,22 @@ import { Data } from 'lucid-cardano';
 
 export class KupoProvider extends BaseDataProvider {
 
-    private _config: KupmiosConfig;
+    private _config: KupoConfig;
     private _kupoApi: AxiosInstance;
 
-    constructor(config: KupmiosConfig) {
+    constructor(config: KupoConfig) {
         super();
 
         this._config = config;
         this._kupoApi = axios.create({
-            baseURL: config.kupoUrl,
+            baseURL: config.url,
         });
     }
 
     public async utxos(address: string, asset?: Asset): Promise<UTxO[]> {
         const url: string = asset
-            ? `${this._config.kupoUrl}/matches/${address}?policy_id=${asset.policyId}&asset_name=${asset.assetNameHex}&unspent`
-            : `${this._config.kupoUrl}/matches/${address}`;
+            ? `/matches/${address}?policy_id=${asset.policyId}&asset_name=${asset.assetNameHex}&unspent`
+            : `/matches/${address}`;
 
         return this._kupoApi.get(url)
             .then((results: any) => {
@@ -42,7 +42,7 @@ export class KupoProvider extends BaseDataProvider {
     }
 
     public async transactionUtxos(txHash: string): Promise<UTxO[]> {
-        return this._kupoApi.get(`${this._config.kupoUrl}/matches/${txHash}`)
+        return this._kupoApi.get(`/matches/${txHash}`)
             .then((results: any) => {
                 return this.toUtxos(results.data);
             }).catch(() => {
@@ -51,14 +51,14 @@ export class KupoProvider extends BaseDataProvider {
     }
 
     public async datumValue(datumHash: string): Promise<DefinitionField> {
-        return this._kupoApi.get(`${this._config.kupoUrl}/datums/${datumHash}`)
+        return this._kupoApi.get(`/datums/${datumHash}`)
             .then((result: any) => {
                 return this.toDefinitionDatum(Data.from(result.data.datum));
             });
     }
 
     public async assetTransactions(asset: Asset): Promise<Transaction[]> {
-        return this._kupoApi.get(`${this._config.kupoUrl}/matches/${asset.id('.')}`)
+        return this._kupoApi.get(`/matches/${asset.id('.')}`)
             .then((results: any) => {
                 return results.data.map((result: any) => {
                     return {
@@ -72,7 +72,7 @@ export class KupoProvider extends BaseDataProvider {
     }
 
     public async assetAddresses(asset: Asset): Promise<AssetAddress[]> {
-        return this._kupoApi.get(`${this._config.kupoUrl}/matches/${asset.id('.')}?unspent`)
+        return this._kupoApi.get(`/matches/${asset.id('.')}?unspent`)
             .then((results: any) => {
                 return results.data.map((result: any) => {
                     return {

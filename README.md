@@ -1,8 +1,20 @@
-<p align="center">
-  <h1 align="center">Dexter</h1>
-</p>
+<div align="center">
+    <h1 align="center">Dexter</h1>
+    <p align="center">Typescript SDK for interacting with Cardano DEXs.</p>
+    <img src="./src/dex/logo/sundaeswap.png" width="30" style="border-radius: 50%; margin-right: 5px" />
+    <img src="./src/dex/logo/minswap.png" width="30" style="border-radius: 50%; margin-right: 5px" /> 
+    <img src="./src/dex/logo/muesliswap.png" width="30" style="border-radius: 50%; margin-right: 5px" />
+    <img src="./src/dex/logo/wingriders.png" width="30" style="border-radius: 50%; margin-right: 5px" />
+    <img src="./src/dex/logo/vyfinance.png" width="30" style="border-radius: 50%" />
+</div>
 
-[All Available Docs](./docs/)
+### Abilities
+[View Docs](./docs/)
+- Pull Liquidity Pools from DEX APIs or On-chain using [Blockfrost](https://blockfrost.io/) / [Kupo](https://github.com/CardanoSolutions/kupo)
+- Submit and cancel swap orders
+- Build swap datums given specific parameters using Dexters _Definition Builder_
+- Build your own data, wallet, or asset metadata providers to plug into Dexter
+- Load wallets using a seedphrase or CIP-30 interface using [Lucid](https://github.com/spacebudz/lucid)
 
 ### Install
 
@@ -26,17 +38,32 @@ const dexterConfig: DexterConfig = {
     shouldSubmitOrders: false,  // Allow Dexter to submit orders from swap requests. Useful during development
 };
 const requestConfig: RequestConfig = {
-    timeout: 5000, // How long outside network requests have to reply
-    proxyUrl: '',  // URL to prepend to all outside URLs. Useful when dealing with CORs
+    timeout: 5000,  // How long outside network requests have to reply
+    proxyUrl: '',   // URL to prepend to all outside URLs. Useful when dealing with CORs
 };
 
 const dexter: Dexter = new Dexter(dexterConfig, requestConfig);
 
+// Basic fetch example
 dexter.newFetchRequest()
     .forAllDexs()
     .getLiquidityPools()
     .then((pools: LiquidityPool[]) => {
         console.log(pools);
+    });
+
+// Example loading wallet to be used in a swap
+const lucidProvider: BaseWalletProvider = new LucidProvider();
+
+lucidProvider
+    .loadWallet(cip30Interface, {
+        url: 'https://cardano-mainnet.blockfrost.io/api/v0',
+        projectId: '<blockfrost-project-id>'
+    })
+    .then((walletProvider: BaseWalletProvider) => {
+        dexter.withWalletProvider(walletProvider)
+            .newFetchRequest()
+            ...
     });
 ```
 
@@ -60,15 +87,17 @@ dexter.dexByName(Minswap.name)
 <details>
 <summary><code>withDataProvider(BaseDataProvider): Dexter</code> Set where Dexter should grab liquidity pool data.</summary>
 
-By default, Dexter will use the DEX APIs to grab information. However, you can use [Blockfrost](./docs/providers/blockfrost.md) or [Kupo](./docs/providers/kupo.md) to supply your own data.
+By default, Dexter will use the DEX APIs to grab information. However, you can use [Blockfrost](./docs/providers/data.md) or [Kupo](./docs/providers/data.md) to supply your own data.
 
 ##### Using
 
 ```js
-const provider: BaseDataProvider = new BlockfrostProvider({
-    url: 'https://cardano-mainnet.blockfrost.io/api/v0',
-    projectId: '<blockfrost-project-id>', 
-});
+const provider: BaseDataProvider = new BlockfrostProvider(
+    {
+        url: 'https://cardano-mainnet.blockfrost.io/api/v0',
+        projectId: '<blockfrost-project-id>',
+    }
+);
 
 dexter.withDataProvider(provider)
     ...
@@ -80,8 +109,8 @@ dexter.withDataProvider(provider)
 <details>
 <summary><code>withWalletProvider(BaseWalletProvider): Dexter</code> Set who Dexter sends wallet requests to.</summary>
 
-At this time, Dexter only supplies a Mock wallet provider & a [Lucid provider](./docs/providers/lucid.md). Behind the scenes,
-the lucid provider leverages [Lucid JS](https://github.com/spacebudz/lucid) to manage your wallet & create transactions.
+At this time, Dexter only supplies a Mock wallet provider & a [Lucid provider](./docs/providers/wallet.md). Behind the scenes,
+the lucid provider leverages [Lucid](https://github.com/spacebudz/lucid) to manage your wallet & create transactions.
 
 ##### Using
 
