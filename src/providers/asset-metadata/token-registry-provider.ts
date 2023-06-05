@@ -11,14 +11,14 @@ export class TokenRegistryProvider extends BaseMetadataProvider {
     /**
      * https://input-output-hk.github.io/offchain-metadata-tools/api/latest/
      */
-    constructor(requestConfig: RequestConfig) {
+    constructor(requestConfig: RequestConfig = {}) {
         super();
 
         this._requestConfig = requestConfig;
 
         this._api = axios.create({
-            timeout: requestConfig.timeout,
-            baseURL: `${requestConfig.proxyUrl}https://tokens.cardano.org/`
+            timeout: requestConfig.timeout ?? 5000,
+            baseURL: `${requestConfig.proxyUrl ?? ''}https://tokens.cardano.org/`
         });
     }
 
