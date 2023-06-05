@@ -36,7 +36,7 @@ export class MockWalletProvider extends BaseWalletProvider {
         return Promise.resolve(this as BaseWalletProvider);
     }
 
-    public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions): Promise<BaseWalletProvider> {
+    public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions = {}): Promise<BaseWalletProvider> {
         this.isWalletLoaded = true;
 
         return Promise.resolve(this as BaseWalletProvider);

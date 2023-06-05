@@ -15,6 +15,7 @@ import {
 describe('WingRiders', () => {
 
     const walletProvider: MockWalletProvider = new MockWalletProvider();
+    walletProvider.loadWalletFromSeedPhrase(['']);
     const dexter: Dexter = (new Dexter())
         .withDataProvider(new MockDataProvider())
         .withWalletProvider(walletProvider);
@@ -57,7 +58,7 @@ describe('WingRiders', () => {
             [DatumParameterKey.SwapOutTokenAssetName]: asset.assetNameHex,
         };
 
-        return wingriders.buildSwapOrder(defaultSwapParameters)
+        return wingriders.buildSwapOrder(liquidityPool, defaultSwapParameters)
             .then((payments: PayToAddress[]) => {
                 expect(payments[0].addressType).toBe(AddressType.Contract);
                 expect(payments[0].assetBalances[0].quantity).toEqual(14000000n);

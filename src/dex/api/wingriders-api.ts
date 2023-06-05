@@ -1,17 +1,17 @@
 import { BaseApi } from './base-api';
 import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
-import { BaseDex } from '../base-dex';
 import axios, { AxiosInstance } from 'axios';
 import { tokensMatch } from '@app/utils';
 import { RequestConfig } from '@app/types';
+import { WingRiders } from '@dex/wingriders';
 
 export class WingRidersApi extends BaseApi {
 
     protected readonly api: AxiosInstance;
-    protected readonly dex: BaseDex;
+    protected readonly dex: WingRiders;
 
-    constructor(dex: BaseDex, requestConfig: RequestConfig) {
+    constructor(dex: WingRiders, requestConfig: RequestConfig) {
         super();
 
         this.dex = dex;
@@ -76,11 +76,13 @@ export class WingRidersApi extends BaseApi {
 
                 let liquidityPool: LiquidityPool = new LiquidityPool(
                     this.dex.name,
-                    '', // todo unavailable
                     tokenA,
                     tokenB,
                     BigInt(pool.treasuryA),
                     BigInt(pool.treasuryB),
+                    '', // todo unavailable
+                    this.dex.orderAddress,
+                    this.dex.orderAddress,
                 );
 
                 liquidityPool.lpToken = new Asset(pool.issuedShareToken.policyId, pool.issuedShareToken.assetName);

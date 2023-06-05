@@ -20,7 +20,7 @@ export class DefinitionBuilder {
      */
     public pushParameters(parameters: DatumParameters): DefinitionBuilder {
         if (! this._definition) {
-            throw new Error(`Please load a definition file before applying parameters`);
+            throw new Error(`Definition file must be loaded before applying parameters`);
         }
 
         this._definition = this.applyParameters(this._definition, parameters);
@@ -33,7 +33,7 @@ export class DefinitionBuilder {
      */
     public pullParameters(definedDefinition: DefinitionConstr): DatumParameters {
         if (! this._definition) {
-            throw new Error(`Please load a definition file before pulling parameters`);
+            throw new Error(`Definition file must be loaded before pulling parameters`);
         }
 
         return this.extractParameters(definedDefinition, this._definition);

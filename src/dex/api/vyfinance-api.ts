@@ -46,11 +46,13 @@ export class VyfinanceApi extends BaseApi {
 
                     let liquidityPool: LiquidityPool = new LiquidityPool(
                         this.dex.name,
-                        pool['poolValidatorUtxoAddress'],
                         tokenA,
                         tokenB,
                         pool['tokenAQuantity'],
                         pool['tokenBQuantity'],
+                        pool['poolValidatorUtxoAddress'],
+                        pool['orderValidatorUtxoAddress'],
+                        pool['orderValidatorUtxoAddress'],
                     );
 
                     const lpTokenDetails: string[] = pool['lpPolicyId-assetId'].split('-');

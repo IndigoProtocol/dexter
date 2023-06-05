@@ -8,7 +8,7 @@ interface TransactionCallback {
 
 export class DexTransaction {
 
-    public providerData: any;
+    public providerData: any = {};
     public error: DexTransactionError | undefined = undefined;
 
     private _hash: string;

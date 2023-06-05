@@ -1,4 +1,4 @@
-import { AssetBalance, BlockfrostConfig, Cip30Api, PayToAddress, UTxO, WalletOptions } from '@app/types';
+import { AssetBalance, BlockfrostConfig, Cip30Api, KupmiosConfig, PayToAddress, UTxO, WalletOptions } from '@app/types';
 import { DexTransaction } from '@dex/models/dex-transaction';
 import { BaseWalletProvider } from './base-wallet-provider';
 import {
@@ -6,7 +6,7 @@ import {
     AddressDetails,
     Assets,
     Blockfrost,
-    Datum,
+    Datum, Kupmios,
     Lucid,
     TxComplete,
     TxHash,
@@ -24,19 +24,6 @@ export class LucidProvider extends BaseWalletProvider {
     private _paymentCredential: string;
     private _stakingCredential: string | undefined;
 
-    constructor(config: BlockfrostConfig) {
-        super();
-
-        Lucid.new(
-            new Blockfrost(
-                config.url,
-                config.projectId
-            ),
-        ).then((lucid: Lucid) => {
-            this._api = lucid;
-        });
-    }
-
     public address(): string {
         return this._usableAddress;
     }
@@ -49,26 +36,36 @@ export class LucidProvider extends BaseWalletProvider {
         return this._stakingCredential ?? '';
     }
 
-    public loadWallet(walletApi: Cip30Api): Promise<BaseWalletProvider> {
-        this._api.selectWallet(walletApi);
+    public loadWallet(walletApi: Cip30Api, config: BlockfrostConfig | KupmiosConfig): Promise<BaseWalletProvider> {
+        return this.loadLucid(config)
+            .then((lucid: Lucid) => {
+                this._api = lucid;
 
-        return this.loadWalletInformation();
+                this._api.selectWallet(walletApi);
+
+                return this.loadWalletInformation();
+            });
     }
 
-    public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions = {}): Promise<BaseWalletProvider> {
-        const addressType: 'Base' | 'Enterprise' = options.addressType === AddressType.Enterprise
-            ? 'Enterprise'
-            : 'Base';
+    public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions = {}, config: BlockfrostConfig | KupmiosConfig): Promise<BaseWalletProvider> {
+        return this.loadLucid(config)
+            .then((lucid: Lucid) => {
+                this._api = lucid;
 
-        this._api.selectWalletFromSeed(
-            seed.join(' '),
-            {
-                addressType: addressType,
-                accountIndex: options.accountIndex ?? 0,
-            },
-        );
+                const addressType: 'Base' | 'Enterprise' = options.addressType === AddressType.Enterprise
+                    ? 'Enterprise'
+                    : 'Base';
 
-        return this.loadWalletInformation();
+                this._api.selectWalletFromSeed(
+                    seed.join(' '),
+                    {
+                        addressType: addressType,
+                        accountIndex: options.accountIndex ?? 0,
+                    },
+                );
+
+                return this.loadWalletInformation();
+            });
     }
 
     public createTransaction(): DexTransaction {
@@ -169,6 +166,20 @@ export class LucidProvider extends BaseWalletProvider {
 
                 return this as BaseWalletProvider;
             });
+    }
+
+    private loadLucid(config: BlockfrostConfig | KupmiosConfig): Promise<Lucid> {
+        return Lucid.new(
+            'kupoUrl' in config
+                ? new Kupmios(
+                    config.kupoUrl,
+                    config.ogmiosUrl
+                )
+                : new Blockfrost(
+                    config.url,
+                    config.projectId
+                )
+        );
     }
 
 }

@@ -77,7 +77,7 @@ export class SwapRequest {
 
     public withSwapInAmount(swapInAmount: bigint): SwapRequest {
         if (swapInAmount < 0n) {
-            throw new Error('Swap in amount must be a positive number.');
+            throw new Error('Swap in amount must be zero or above.');
         }
 
         this._swapInAmount = swapInAmount;
@@ -87,7 +87,7 @@ export class SwapRequest {
 
     public withSlippagePercent(slippagePercent: number): SwapRequest {
         if (slippagePercent < 0) {
-            throw new Error('Swap in amount must be a positive number.');
+            throw new Error('Slippage percent must be zero or above.');
         }
 
         this._slippagePercent = slippagePercent;
@@ -139,19 +139,25 @@ export class SwapRequest {
 
     public submit(): DexTransaction {
         if (! this._dexter.walletProvider) {
-            throw new Error('Please set a wallet provider before submitting a swap order.');
+            throw new Error('Wallet provider must be set before submitting a swap order.');
         }
         if (! this._dexter.walletProvider.isWalletLoaded) {
-            throw new Error('Please load your wallet before submitting a swap order.');
+            throw new Error('Wallet must be loaded before submitting a swap order.');
         }
         if (! this._liquidityPool) {
-            throw new Error('Please set a liquidity pool before submitting a swap order.');
+            throw new Error('Liquidity pool must be set before submitting a swap order.');
         }
         if (! this._swapInToken) {
-            throw new Error('Please set a swap in token before submitting a swap order.');
+            throw new Error('Swap in token must be set before submitting a swap order.');
         }
         if (this._swapInAmount <= 0n) {
-            throw new Error('Please set a swap in amount before submitting a swap order.');
+            throw new Error('Swap in amount must be set before submitting a swap order.');
+        }
+
+        const swapTransaction: DexTransaction = this._dexter.walletProvider.createTransaction();
+
+        if (! this._dexter.config.shouldSubmitOrders) {
+            return swapTransaction;
         }
 
         // Standard parameters for a swap order
@@ -169,14 +175,10 @@ export class SwapRequest {
             [DatumParameterKey.SwapOutTokenAssetName]: this._swapOutToken === 'lovelace' ? '' : this._swapOutToken.assetNameHex,
         };
 
-        const swapTransaction: DexTransaction = this._dexter.walletProvider.createTransaction();
-
-        if (this._dexter.config.shouldSubmitOrders) {
-            this._dexter.availableDexs[this._liquidityPool.dex].buildSwapOrder(defaultSwapParameters)
-                .then((payToAddresses: PayToAddress[]) => {
-                    this.sendSwapOrder(swapTransaction, payToAddresses);
-                });
-        }
+        this._dexter.availableDexs[this._liquidityPool.dex].buildSwapOrder(this._liquidityPool, defaultSwapParameters)
+            .then((payToAddresses: PayToAddress[]) => {
+                this.sendSwapOrder(swapTransaction, payToAddresses);
+            });
 
         return swapTransaction;
     }

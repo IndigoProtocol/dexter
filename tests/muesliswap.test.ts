@@ -15,6 +15,7 @@ import {
 describe('MuesliSwap', () => {
 
     const walletProvider: MockWalletProvider = new MockWalletProvider();
+    walletProvider.loadWalletFromSeedPhrase(['']);
     const dexter: Dexter = (new Dexter())
         .withDataProvider(new MockDataProvider())
         .withWalletProvider(walletProvider);
@@ -57,7 +58,7 @@ describe('MuesliSwap', () => {
             [DatumParameterKey.SwapOutTokenAssetName]: asset.assetNameHex,
         };
 
-        return muesliswap.buildSwapOrder(defaultSwapParameters)
+        return muesliswap.buildSwapOrder(liquidityPool, defaultSwapParameters)
             .then((payments: PayToAddress[]) => {
                 expect(payments[0].addressType).toBe(AddressType.Contract);
                 expect(payments[0].assetBalances[0].quantity).toEqual(100002650000n);

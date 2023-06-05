@@ -1,5 +1,4 @@
 import { BaseDataProvider } from '@providers/data/base-data-provider';
-import { FetchRequest } from '@requests/fetch-request';
 import { AvailableDexs, DexterConfig, RequestConfig } from '@app/types';
 import { Minswap } from '@dex/minswap';
 import { SundaeSwap } from '@dex/sundaeswap';
@@ -12,6 +11,7 @@ import { VyFinance } from '@dex/vyfinance';
 import { BaseMetadataProvider } from '@providers/asset-metadata/base-metadata-provider';
 import { TokenRegistryProvider } from '@providers/asset-metadata/token-registry-provider';
 import { CancelSwapRequest } from '@requests/cancel-swap-request';
+import { FetchRequest } from '@requests/fetch-request';
 
 export class Dexter {
 
@@ -28,6 +28,7 @@ export class Dexter {
         this.config = Object.assign(
             {},
             {
+                debug: false,
                 shouldFetchMetadata: true,
                 shouldFallbackToApi: true,
                 shouldSubmitOrders: false,
@@ -99,10 +100,10 @@ export class Dexter {
      */
     public newSwapRequest(): SwapRequest {
         if (! this.walletProvider) {
-            throw new Error('Please set a wallet provider before requesting a swap order.');
+            throw new Error('Wallet provider must be set before requesting a swap order.');
         }
         if (! this.walletProvider.isWalletLoaded) {
-            throw new Error('Please load your wallet before requesting a swap order.');
+            throw new Error('Wallet must be loaded before requesting a swap order.');
         }
 
         return new SwapRequest(this);
@@ -113,10 +114,10 @@ export class Dexter {
      */
     public newCancelSwapRequest(): CancelSwapRequest {
         if (! this.walletProvider) {
-            throw new Error('Please set a wallet provider before requesting a cancel order.');
+            throw new Error('Wallet provider must be set before requesting a cancel order.');
         }
         if (! this.walletProvider.isWalletLoaded) {
-            throw new Error('Please load your wallet before requesting a cancel order.');
+            throw new Error('Wallet must be loaded before requesting a cancel order.');
         }
 
         return new CancelSwapRequest(this);

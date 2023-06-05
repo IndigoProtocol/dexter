@@ -15,6 +15,7 @@ import {
 describe('VyFinance', () => {
 
     const walletProvider: MockWalletProvider = new MockWalletProvider();
+    walletProvider.loadWalletFromSeedPhrase(['']);
     const dexter: Dexter = (new Dexter())
         .withDataProvider(new MockDataProvider())
         .withWalletProvider(walletProvider);
@@ -29,6 +30,7 @@ describe('VyFinance', () => {
         5455789926n,
     );
     liquidityPool.poolFeePercent = 0.3;
+    liquidityPool.extra.orderAddress = 'addr1testorder';
 
     swapRequest
         .forLiquidityPool(liquidityPool)
@@ -57,11 +59,11 @@ describe('VyFinance', () => {
             [DatumParameterKey.SwapOutTokenAssetName]: asset.assetNameHex,
         };
 
-        return vyfi.buildSwapOrder(defaultSwapParameters)
+        return vyfi.buildSwapOrder(liquidityPool, defaultSwapParameters)
             .then((payments: PayToAddress[]) => {
                 expect(payments[0].addressType).toBe(AddressType.Contract);
                 expect(payments[0].assetBalances[0].quantity).toBe(100_003_900000n);
-                expect(payments[0].datum).toBe('d8799f42ed56d87c9f1ae924c381ffff');
+                expect(payments[0].datum).toBe('d8799f44ed56bac6d87c9f1ae924c381ffff');
             });
     });
 

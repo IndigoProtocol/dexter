@@ -73,7 +73,6 @@ export class MinswapApi extends BaseApi {
                 const liquidityPools = pools.map((pool: any) => {
                     let liquidityPool: LiquidityPool = new LiquidityPool(
                         this.dex.name,
-                        this.dex.poolAddress,
                         pool.assetA.currencySymbol !== ''
                             ? new Asset(pool.assetA.currencySymbol, pool.assetA.tokenName, pool.assetA.metadata?.decimals ?? 0)
                             : 'lovelace',
@@ -82,6 +81,9 @@ export class MinswapApi extends BaseApi {
                             : 'lovelace',
                         BigInt(pool.reserveA),
                         BigInt(pool.reserveB),
+                        this.dex.poolAddress,
+                        this.dex.marketOrderAddress,
+                        this.dex.limitOrderAddress,
                     );
 
                     liquidityPool.lpToken = new Asset(pool.lpAsset.currencySymbol, pool.lpAsset.tokenName);

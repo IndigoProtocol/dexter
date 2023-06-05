@@ -28,7 +28,7 @@ export class CancelSwapRequest {
 
     public cancel(): DexTransaction {
         if (! this._dexter.walletProvider) {
-            throw new Error('Please set a wallet provider before submitting a swap order.');
+            throw new Error('Wallet provider must be set before submitting a swap order.');
         }
         if (! this._txHash) {
             throw new Error('Tx hash must be provided before cancelling a swap order.');
@@ -51,7 +51,7 @@ export class CancelSwapRequest {
                     });
             })
             .catch(() => {
-                throw new Error('Unable to grab UTxOs for the provided Tx hash. Please check the one provided is a valid Tx hash.')
+                throw new Error('Unable to grab UTxOs for the provided Tx hash. Ensure the one provided is a valid Tx hash.')
             });
 
         return cancelTransaction;

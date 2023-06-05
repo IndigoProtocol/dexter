@@ -15,6 +15,7 @@ import {
 describe('SundaeSwap', () => {
 
     const walletProvider: MockWalletProvider = new MockWalletProvider();
+    walletProvider.loadWalletFromSeedPhrase(['']);
     const dexter: Dexter = (new Dexter())
         .withDataProvider(new MockDataProvider())
         .withWalletProvider(walletProvider);
@@ -58,7 +59,7 @@ describe('SundaeSwap', () => {
             [DatumParameterKey.SwapOutTokenAssetName]: asset.assetNameHex,
         };
 
-        return sundaeswap.buildSwapOrder(defaultSwapParameters)
+        return sundaeswap.buildSwapOrder(liquidityPool, defaultSwapParameters)
             .then((payments: PayToAddress[]) => {
                 expect(payments[0].addressType).toBe(AddressType.Contract);
                 expect(payments[0].assetBalances[0].quantity).toEqual(10004500000n);

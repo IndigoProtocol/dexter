@@ -4,7 +4,7 @@ export default {
   constructor: 0,
   fields: [
     {
-      bytes: DatumParameterKey.SenderPubKeyHash
+      bytes: DatumParameterKey.SenderKeyHashes
     },
     {
       constructor: DatumParameterKey.Action,

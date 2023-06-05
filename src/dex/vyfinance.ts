@@ -53,7 +53,7 @@ export class VyFinance extends BaseDex {
         return (1 - estimatedReceive / ((Number(swapInAmount) - swapFee) * (reserveOut / reserveIn))) * 100;
     }
 
-    public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
+    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters): Promise<PayToAddress[]> {
         const isDoubleSidedSwap: boolean = (swapParameters.SwapInTokenPolicyId as string) !== '' && (swapParameters.SwapOutTokenPolicyId as string) !== '';
         const swapDirection: number = (swapParameters.SwapInTokenPolicyId as string) === '' || isDoubleSidedSwap
             ? SWAP_ACTION_EXPECT_ASSET
@@ -62,6 +62,7 @@ export class VyFinance extends BaseDex {
         swapParameters = {
             ...swapParameters,
             [DatumParameterKey.Action]: swapDirection,
+            [DatumParameterKey.SenderKeyHashes]: (swapParameters.SenderPubKeyHash as string) + (swapParameters.SenderStakingKeyHash as string),
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
@@ -74,7 +75,7 @@ export class VyFinance extends BaseDex {
             this.buildSwapOrderPayment(
                 swapParameters,
                 {
-                    address: '', //todo need liquidity pool
+                    address: liquidityPool.extra.orderAddress,
                     addressType: AddressType.Contract,
                     assetBalances: [
                         {

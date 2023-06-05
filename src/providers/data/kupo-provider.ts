@@ -14,7 +14,7 @@ import {
 import axios, { AxiosInstance } from 'axios';
 import { Data } from 'lucid-cardano';
 
-export class KupmiosProvider extends BaseDataProvider {
+export class KupoProvider extends BaseDataProvider {
 
     private _config: KupmiosConfig;
     private _kupoApi: AxiosInstance;

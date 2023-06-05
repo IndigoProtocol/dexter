@@ -11,9 +11,9 @@ export abstract class BaseWalletProvider {
 
     abstract stakingKeyHash(): string;
 
-    abstract loadWallet(walletApi: Cip30Api): Promise<BaseWalletProvider>;
+    abstract loadWallet(walletApi: Cip30Api, config: any): Promise<BaseWalletProvider>;
 
-    abstract loadWalletFromSeedPhrase(seed: string[], options: WalletOptions): Promise<BaseWalletProvider>;
+    abstract loadWalletFromSeedPhrase(seed: string[], options: WalletOptions, config: any): Promise<BaseWalletProvider>;
 
     abstract createTransaction(): DexTransaction;
 

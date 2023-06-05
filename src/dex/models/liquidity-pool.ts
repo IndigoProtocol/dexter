@@ -3,25 +3,29 @@ import { Asset, Token } from './asset';
 export class LiquidityPool {
 
     dex: string;
-    address: string;
     assetA: Token;
     assetB: Token;
     reserveA: bigint;
     reserveB: bigint;
+    address: string;
+    marketOrderAddress: string;
+    limitOrderAddress: string;
 
     lpToken: Asset;
     totalLpTokens: bigint = 0n;
     identifier: string = '';
     poolFeePercent: number = 0;
-    extra: any;
+    extra: any = {};
 
-    constructor(dex: string, address: string, assetA: Token, assetB: Token, reserveA: bigint, reserveB: bigint) {
+    constructor(dex: string, assetA: Token, assetB: Token, reserveA: bigint, reserveB: bigint, address: string, marketOrderAddress: string = '', limitOrderAddress: string = '') {
         this.dex = dex;
-        this.address = address;
         this.assetA = assetA;
         this.assetB = assetB;
         this.reserveA = reserveA;
         this.reserveB = reserveB;
+        this.address = address;
+        this.marketOrderAddress = marketOrderAddress;
+        this.limitOrderAddress = limitOrderAddress;
     }
 
     get uuid(): string {

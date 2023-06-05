@@ -113,11 +113,13 @@ export class Minswap extends BaseDex {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
             this.name,
-            utxo.address,
             relevantAssets[assetAIndex].asset,
             relevantAssets[assetBIndex].asset,
             relevantAssets[assetAIndex].quantity,
             relevantAssets[assetBIndex].quantity,
+            utxo.address,
+            this.marketOrderAddress,
+            this.limitOrderAddress,
         );
 
         const lpToken: Asset | undefined = utxo.assetBalances.find((assetBalance) => {
@@ -162,7 +164,7 @@ export class Minswap extends BaseDex {
         return Number(priceImpactNumerator * 100n) / Number(priceImpactDenominator);
     }
 
-    public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
+    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters): Promise<PayToAddress[]> {
         const batcherFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'batcherFee');
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
 

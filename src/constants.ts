@@ -11,6 +11,7 @@ export enum DatumParameterKey {
      */
     SenderPubKeyHash = 'SenderPubKeyHash',
     SenderStakingKeyHash = 'SenderStakingKeyHash',
+    SenderKeyHashes = 'SenderKeyHashes',
     ReceiverPubKeyHash = 'ReceiverPubKeyHash',
     ReceiverStakingKeyHash = 'ReceiverStakingKeyHash',
     SwapInAmount = 'SwapInAmount',

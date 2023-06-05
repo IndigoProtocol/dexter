@@ -105,7 +105,6 @@ export class WingRiders extends BaseDex {
         const assetBQuantity: bigint = relevantAssets[assetBIndex].quantity;
         const liquidityPool: LiquidityPool = new LiquidityPool(
             this.name,
-            utxo.address,
             relevantAssets[assetAIndex].asset,
             relevantAssets[assetBIndex].asset,
             relevantAssets[assetAIndex].asset === 'lovelace'
@@ -118,6 +117,9 @@ export class WingRiders extends BaseDex {
                     ? assetBQuantity - MIN_POOL_ADA
                     : assetBQuantity
                 : assetBQuantity,
+            utxo.address,
+            this.orderAddress,
+            this.orderAddress,
         );
 
         const lpTokenBalance: AssetBalance | undefined = utxo.assetBalances.find((assetBalance) => {
@@ -152,7 +154,7 @@ export class WingRiders extends BaseDex {
             * 100;
     }
 
-    public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
+    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters): Promise<PayToAddress[]> {
         const agentFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'agentFee');
         const oil: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'oil');
 

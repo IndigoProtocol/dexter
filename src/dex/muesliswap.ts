@@ -114,11 +114,13 @@ export class MuesliSwap extends BaseDex {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
             this.name,
-            utxo.address,
             relevantAssets[assetAIndex].asset,
             relevantAssets[assetBIndex].asset,
             relevantAssets[assetAIndex].quantity,
             relevantAssets[assetBIndex].quantity,
+            utxo.address,
+            this.orderAddress,
+            this.orderAddress,
         );
 
         const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
@@ -155,7 +157,7 @@ export class MuesliSwap extends BaseDex {
         return(swapPrice - oldPrice) / oldPrice * 100;
     }
 
-    public async buildSwapOrder(swapParameters: DatumParameters): Promise<PayToAddress[]> {
+    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters): Promise<PayToAddress[]> {
         const matchMakerFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'matchmakerFee');
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
 
