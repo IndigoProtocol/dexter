@@ -33,7 +33,6 @@ yarn add https://github.com/Sluder/dexter
 
 ```js
 const dexterConfig: DexterConfig = {
-    debug: false,               // Enable logging
     shouldFetchMetadata: true,  // Whether to fetch asset metadata (Best to leave this `true` for accurate pool info)
     shouldFallbackToApi: true,  // Only use when using Blockfrost or Kupo as data providers. On failure, fallback to the DEX API to grab necessary data
     shouldSubmitOrders: false,  // Allow Dexter to submit orders from swap requests. Useful during development

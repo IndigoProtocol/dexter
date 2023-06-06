@@ -28,7 +28,6 @@ export class Dexter {
         this.config = Object.assign(
             {},
             {
-                debug: false,
                 shouldFetchMetadata: true,
                 shouldFallbackToApi: true,
                 shouldSubmitOrders: false,
