@@ -1,11 +1,11 @@
 <div align="center">
     <h1 align="center">Dexter</h1>
     <p align="center">Typescript SDK for interacting with Cardano DEXs.</p>
-    <img src="./src/dex/logo/sundaeswap.png" width="30" style="border-radius: 50%; margin-right: 5px" />
-    <img src="./src/dex/logo/minswap.png" width="30" style="border-radius: 50%; margin-right: 5px" /> 
-    <img src="./src/dex/logo/muesliswap.png" width="30" style="border-radius: 50%; margin-right: 5px" />
-    <img src="./src/dex/logo/wingriders.png" width="30" style="border-radius: 50%; margin-right: 5px" />
-    <img src="./src/dex/logo/vyfinance.png" width="30" style="border-radius: 50%" />
+    <img src="./src/dex/logo/sundaeswap.png" width="30"  />
+    <img src="./src/dex/logo/minswap.png" width="30" /> 
+    <img src="./src/dex/logo/muesliswap.png" width="30" />
+    <img src="./src/dex/logo/wingriders.png" width="30" />
+    <img src="./src/dex/logo/vyfinance.png" width="30" />
 </div>
 
 ### Abilities
@@ -15,6 +15,7 @@
 - Build swap datums given specific parameters using Dexters _Definition Builder_
 - Build your own data, wallet, or asset metadata providers to plug into Dexter
 - Load wallets using a seedphrase or CIP-30 interface using [Lucid](https://github.com/spacebudz/lucid)
+- Act on steps for your transactions using transaction listeners
 
 ### Install
 
