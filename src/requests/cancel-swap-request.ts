@@ -1,7 +1,7 @@
 import { Dexter } from '@app/dexter';
 import { DexTransaction } from '@dex/models/dex-transaction';
 import { PayToAddress, UTxO } from '@app/types';
-import { TransactionStatus } from '@app/constants';
+import { MetadataKey, TransactionStatus } from '@app/constants';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 
 export class CancelSwapRequest {
@@ -60,6 +60,10 @@ export class CancelSwapRequest {
     private sendCancelOrder(cancelTransaction: DexTransaction, payToAddresses: PayToAddress[]) {
         cancelTransaction.status = TransactionStatus.Building;
 
+        cancelTransaction.attachMetadata(MetadataKey.Message, {
+            msg: `[${this._dexter.config.metadataMsgBranding}] ${this._dexName} Cancel Swap`
+        });
+
         // Build transaction
         cancelTransaction.payToAddresses(payToAddresses)
             .then(() => {
@@ -74,8 +78,32 @@ export class CancelSwapRequest {
                         cancelTransaction.submit()
                             .then(() => {
                                 cancelTransaction.status = TransactionStatus.Submitted;
+                            })
+                            .catch((error) => {
+                                cancelTransaction.status = TransactionStatus.Errored;
+                                cancelTransaction.error = {
+                                    step: TransactionStatus.Submitting,
+                                    reason: 'Failed submitting transaction.',
+                                    reasonRaw: error,
+                                };
                             });
+                    })
+                    .catch((error) => {
+                        cancelTransaction.status = TransactionStatus.Errored;
+                        cancelTransaction.error = {
+                            step: TransactionStatus.Signing,
+                            reason: 'Failed to sign transaction.',
+                            reasonRaw: error,
+                        };
                     });
+            })
+            .catch((error) => {
+                cancelTransaction.status = TransactionStatus.Errored;
+                cancelTransaction.error = {
+                    step: TransactionStatus.Building,
+                    reason: 'Failed to build transaction.',
+                    reasonRaw: error,
+                };
             });
     }
 

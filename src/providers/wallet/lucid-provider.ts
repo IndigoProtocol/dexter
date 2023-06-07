@@ -75,6 +75,16 @@ export class LucidProvider extends BaseWalletProvider {
         return transaction;
     }
 
+    public attachMetadata(transaction: DexTransaction, key: number, json: Object): DexTransaction {
+        if (! transaction.providerData.tx) {
+            return transaction;
+        }
+
+        transaction.providerData.tx.attachMetadata(key, json);
+
+        return transaction;
+    }
+
     public paymentsForTransaction(transaction: DexTransaction, payToAddresses: PayToAddress[]): Promise<DexTransaction> {
         payToAddresses.forEach((payToAddress: PayToAddress) => {
             const payment: Assets = this.paymentFromAssets(payToAddress.assetBalances);

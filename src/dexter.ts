@@ -31,6 +31,7 @@ export class Dexter {
                 shouldFetchMetadata: true,
                 shouldFallbackToApi: true,
                 shouldSubmitOrders: false,
+                metadataMsgBranding: 'Dexter',
             } as DexterConfig,
             config,
         );

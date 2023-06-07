@@ -17,6 +17,8 @@ export abstract class BaseWalletProvider {
 
     abstract createTransaction(): DexTransaction;
 
+    abstract attachMetadata(transaction: DexTransaction, key: number, json: Object): DexTransaction;
+
     abstract paymentsForTransaction(transaction: DexTransaction, payToAddresses: PayToAddress[]): Promise<DexTransaction>;
 
     abstract signTransaction(transaction: DexTransaction): Promise<DexTransaction>;

@@ -1,21 +1,19 @@
 <div align="center">
     <h1 align="center">Dexter</h1>
-    <p align="center">Typescript SDK for interacting with Cardano DEXs.</p>
-    <img src="./src/dex/logo/sundaeswap.png" width="30"  />
+    <p align="center">Customizable Typescript SDK for interacting with Cardano DEXs.</p>
+    <img src="./src/dex/logo/sundaeswap.png" width="30" />
     <img src="./src/dex/logo/minswap.png" width="30" /> 
     <img src="./src/dex/logo/muesliswap.png" width="30" />
     <img src="./src/dex/logo/wingriders.png" width="30" />
     <img src="./src/dex/logo/vyfinance.png" width="30" />
 </div>
 
-### Abilities
-[View Docs](./docs/)
+### What You Can Do
 - Pull Liquidity Pools from DEX APIs or On-chain using [Blockfrost](https://blockfrost.io/) / [Kupo](https://github.com/CardanoSolutions/kupo)
 - Submit and cancel swap orders
-- Build swap datums given specific parameters using Dexters _Definition Builder_
 - Build your own data, wallet, or asset metadata providers to plug into Dexter
+- Build swap datums given specific parameters using Dexters _Definition Builder_
 - Load wallets using a seedphrase or CIP-30 interface using [Lucid](https://github.com/spacebudz/lucid)
-- Act on steps for your transactions using transaction listeners
 
 ### Install
 
@@ -33,9 +31,10 @@ yarn add https://github.com/Sluder/dexter
 
 ```js
 const dexterConfig: DexterConfig = {
-    shouldFetchMetadata: true,  // Whether to fetch asset metadata (Best to leave this `true` for accurate pool info)
-    shouldFallbackToApi: true,  // Only use when using Blockfrost or Kupo as data providers. On failure, fallback to the DEX API to grab necessary data
-    shouldSubmitOrders: false,  // Allow Dexter to submit orders from swap requests. Useful during development
+    shouldFetchMetadata: true,      // Whether to fetch asset metadata (Best to leave this `true` for accurate pool info)
+    shouldFallbackToApi: true,      // Only use when using Blockfrost or Kupo as data providers. On failure, fallback to the DEX API to grab necessary data
+    shouldSubmitOrders: false,      // Allow Dexter to submit orders from swap requests. Useful during development
+    metadataMsgBranding: 'Dexter',  // Prepend branding name in Tx message
 };
 const requestConfig: RequestConfig = {
     timeout: 5000,  // How long outside network requests have to reply
@@ -192,3 +191,12 @@ dexter.newCancelSwapRequest()
     ...
 ```
 </details>
+
+### More Docs
+- [Data Providers](./docs/providers/data.md)
+- [Wallet Providers](./docs/providers/wallet.md)
+- [Creating a Fetch Request](./docs/requests/fetch-request.md)
+- [Creating a Swap Request](./docs/requests/swap-request.md)
+- [Creating a Cancel Swap Request](./docs/requests/cancel-swap-request.md)
+- [Listening for transaction events](./docs/dex-transaction.md)
+- [Commonly returned models](./docs/models.md)

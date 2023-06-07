@@ -3,7 +3,7 @@ import { Token } from '@dex/models/asset';
 import { Dexter } from '@app/dexter';
 import { tokensMatch } from '@app/utils';
 import { DatumParameters, PayToAddress, SwapFee } from '@app/types';
-import { DatumParameterKey, TransactionStatus } from '@app/constants';
+import { DatumParameterKey, MetadataKey, TransactionStatus } from '@app/constants';
 import { DexTransaction } from '@dex/models/dex-transaction';
 
 export class SwapRequest {
@@ -185,6 +185,12 @@ export class SwapRequest {
 
     private sendSwapOrder(swapTransaction: DexTransaction, payToAddresses: PayToAddress[]) {
         swapTransaction.status = TransactionStatus.Building;
+
+        const swapInTokenName: string = this._swapInToken === 'lovelace' ? 'ADA' : this._swapInToken.assetName;
+        const swapOutTokenName: string = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.assetName;
+        swapTransaction.attachMetadata(MetadataKey.Message, {
+            msg: `[${this._dexter.config.metadataMsgBranding}] ${this._liquidityPool.dex} ${swapInTokenName} -> ${swapOutTokenName} Swap`
+        });
 
         // Build transaction
         swapTransaction.payToAddresses(payToAddresses)

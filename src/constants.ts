@@ -1,3 +1,7 @@
+export enum MetadataKey {
+    Message = 674,
+}
+
 export enum DatumParameterKey {
     /**
      * Generics.

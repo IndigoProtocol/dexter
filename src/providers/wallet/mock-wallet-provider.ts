@@ -46,6 +46,10 @@ export class MockWalletProvider extends BaseWalletProvider {
         return new DexTransaction(this);
     }
 
+    public attachMetadata(transaction: DexTransaction, key: number, json: Object): DexTransaction {
+        return transaction;
+    }
+
     public paymentsForTransaction(transaction: DexTransaction, payToAddresses: PayToAddress[]): Promise<DexTransaction> {
         return Promise.resolve(transaction);
     }

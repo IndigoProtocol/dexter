@@ -41,6 +41,10 @@ export class DexTransaction {
         });
     }
 
+    public attachMetadata(key: number, json: Object): DexTransaction {
+        return this._walletProvider.attachMetadata(this, key, json);
+    }
+
     public payToAddresses(payToAddresses: PayToAddress[]): Promise<DexTransaction> {
         return this._walletProvider.paymentsForTransaction(this, payToAddresses)
             .then(() => {

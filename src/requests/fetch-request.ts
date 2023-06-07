@@ -48,7 +48,8 @@ export class FetchRequest {
         const liquidityPoolPromises: Promise<LiquidityPool[]>[] =
             this._onDexs.map((dex: BaseDex) => {
                 if (! this._dexter.dataProvider) {
-                    return dex.api.liquidityPools(assetA, assetB);
+                    return dex.api.liquidityPools(assetA, assetB)
+                        .catch(() => []);
                 }
 
                 return dex.liquidityPools(this._dexter.dataProvider as BaseDataProvider, assetA, assetB)

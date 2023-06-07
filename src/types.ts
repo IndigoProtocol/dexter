@@ -3,10 +3,10 @@ import { Token } from '@dex/models/asset';
 import { BaseDex } from '@dex/base-dex';
 
 export interface DexterConfig {
-    debug?: boolean,
     shouldFetchMetadata?: boolean,
     shouldFallbackToApi?: boolean,
     shouldSubmitOrders?: boolean,
+    metadataMsgBranding?: string,
 }
 
 export interface RequestConfig {
