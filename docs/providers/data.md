@@ -9,6 +9,8 @@ const mockProvider: BaseDataProvider = new MockDataProvider();
 ```
 
 ### Blockfrost
+Dexter requires a lot of requests when pulling liquidity pools, so it is advised to either [host your own Blockfrost backend](https://github.com/blockfrost/blockfrost-backend-ryo), 
+or use an API plan sufficient to handle enough requests.
 ```js
 const blockfrostProvider: BaseDataProvider = new BlockfrostProvider(
     {
