@@ -19,12 +19,12 @@
 
 ##### NPM
 ```
-npm install https://github.com/Sluder/dexter
+npm install https://github.com/IndigoProtocol/dexter
 ```
 
 ##### Yarn
 ```
-yarn add https://github.com/Sluder/dexter
+yarn add https://github.com/IndigoProtocol/dexter
 ```
 
 ### Quick Start
