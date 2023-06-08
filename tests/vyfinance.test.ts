@@ -23,11 +23,11 @@ describe('VyFinance', () => {
     const asset: Asset = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344', 6);
     const liquidityPool: LiquidityPool = new LiquidityPool(
         VyFinance.name,
-        'addr1',
         'lovelace',
         asset,
         38670441543n,
         5455789926n,
+        'addr1',
     );
     liquidityPool.poolFeePercent = 0.3;
     liquidityPool.extra.orderAddress = 'addr1testorder';

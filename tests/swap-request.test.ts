@@ -11,11 +11,11 @@ describe('SwapRequest', () => {
     const asset: Asset = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344', 6);
     const liquidityPool: LiquidityPool = new LiquidityPool(
         WingRiders.name,
-        'addr1',
         'lovelace',
         asset,
         1000000n,
         1000000n,
+        'addr1',
     );
 
     describe('Parameter setting', () => {

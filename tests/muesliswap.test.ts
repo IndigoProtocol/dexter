@@ -23,11 +23,11 @@ describe('MuesliSwap', () => {
     const asset: Asset = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344', 6);
     const liquidityPool: LiquidityPool = new LiquidityPool(
         MuesliSwap.name,
-        'addr1',
         'lovelace',
         asset,
         1386837721743n,
         485925n,
+        'addr1',
     );
     liquidityPool.poolFeePercent = 0.3;
 
