@@ -86,7 +86,9 @@ dexter.dexByName(Minswap.name)
 <details>
 <summary><code>withDataProvider(BaseDataProvider): Dexter</code> Set where Dexter should grab liquidity pool data.</summary>
 
-By default, Dexter will use the DEX APIs to grab information. However, you can use [Blockfrost](./docs/providers/data.md) or [Kupo](./docs/providers/data.md) to supply your own data.
+By default, Dexter will use the DEX APIs to grab information. However, you can use
+[Blockfrost](https://github.com/IndigoProtocol/dexter/blob/master/docs/providers/data.md) or
+[Kupo](https://github.com/IndigoProtocol/dexter/blob/master/docs/providers/data.md) to supply your own data.
 
 ##### Using
 
@@ -152,7 +154,8 @@ dexter.withMetadataProvider(provider)
 <details>
 <summary><code>newFetchRequest(): FetchRequest</code> Create new request for liquidity pool data.</summary>
 
-For available methods on the `FetchRequest` instance, please see those specific [docs](./docs/requests/fetch-request.md).
+For available methods on the `FetchRequest` instance, please see those specific
+[docs](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/fetch-request.md).
 
 ##### Using
 
@@ -167,7 +170,8 @@ dexter.newFetchRequest()
 <details>
 <summary><code>newSwapRequest(): SwapRequest</code> Create new request for a swap order.</summary>
 
-For available methods on the `SwapRequest` instance, please see those specific [docs](./docs/requests/swap-request.md).
+For available methods on the `SwapRequest` instance, please see those specific
+[docs](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/swap-request.md).
 
 ##### Using
 
@@ -182,7 +186,8 @@ dexter.newSwapRequest()
 <details>
 <summary><code>newCancelSwapRequest(): CancelSwapRequest</code> Create new request for cancelling a swap order.</summary>
 
-For available methods on the `CancelSwapRequest` instance, please see those specific [docs](./docs/requests/cancel-swap-request.md).
+For available methods on the `CancelSwapRequest` instance, please see those specific
+[docs](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/cancel-swap-request.md).
 
 ##### Using
 
@@ -193,10 +198,11 @@ dexter.newCancelSwapRequest()
 </details>
 
 ### More Docs
-- [Data Providers](./docs/providers/data.md)
-- [Wallet Providers](./docs/providers/wallet.md)
-- [Creating a Fetch Request](./docs/requests/fetch-request.md)
-- [Creating a Swap Request](./docs/requests/swap-request.md)
-- [Creating a Cancel Swap Request](./docs/requests/cancel-swap-request.md)
-- [Listening for transaction events](./docs/dex-transaction.md)
-- [Commonly returned models](./docs/models.md)
+
+- [Data Providers](https://github.com/IndigoProtocol/dexter/blob/master/docs/providers/data.md)
+- [Wallet Providers](https://github.com/IndigoProtocol/dexter/blob/master/docs/providers/wallet.md)
+- [Creating a Fetch Request](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/fetch-request.md)
+- [Creating a Swap Request](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/swap-request.md)
+- [Creating a Cancel Swap Request](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/cancel-swap-request.md)
+- [Listening for transaction events](https://github.com/IndigoProtocol/dexter/blob/master/docs/dex-transaction.md)
+- [Commonly returned models](https://github.com/IndigoProtocol/dexter/blob/master/docs/models.md)
