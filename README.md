@@ -19,12 +19,12 @@
 
 ##### NPM
 ```
-npm install https://github.com/IndigoProtocol/dexter
+npm i @indigo-labs/dexter
 ```
 
 ##### Yarn
 ```
-yarn add https://github.com/IndigoProtocol/dexter
+yarn add @indigo-labs/dexter
 ```
 
 ### Quick Start
