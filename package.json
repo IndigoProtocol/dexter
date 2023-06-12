@@ -1,19 +1,21 @@
 {
-  "name": "@indigoprotocol/dexter",
+  "name": "@indigo-labs/dexter",
   "version": "1.0.0",
   "license": "MIT",
   "author": "Zachary Sluder",
-  "description": "",
+  "keywords": ["dexter", "Cardano", "DEX"],
+  "description": "Customizable Typescript SDK for interacting with Cardano DEXs",
   "type": "module",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "files": [
-    "build"
+    "build/**/*"
   ],
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "prepublishOnly" : "npm run test"
   },
   "dependencies": {
     "axios": "^0.26.1",
