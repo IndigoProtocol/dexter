@@ -1,11 +1,11 @@
 <div align="center">
     <h1 align="center">Dexter</h1>
     <p align="center">Customizable Typescript SDK for interacting with Cardano DEXs.</p>
-    <img src="./src/dex/logo/sundaeswap.png" width="30" />
-    <img src="./src/dex/logo/minswap.png" width="30" /> 
-    <img src="./src/dex/logo/muesliswap.png" width="30" />
-    <img src="./src/dex/logo/wingriders.png" width="30" />
-    <img src="./src/dex/logo/vyfinance.png" width="30" />
+    <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/sundaeswap.png" width="30" />
+    <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/minswap.png" width="30" /> 
+    <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/muesliswap.png" width="30" />
+    <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/wingriders.png" width="30" />
+    <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/vyfinance.png" width="30" />
 </div>
 
 ### What You Can Do
