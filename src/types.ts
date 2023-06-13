@@ -102,6 +102,8 @@ export type DexTransactionError = {
 };
 
 export type AssetMetadata = {
+    policyId: string,
+    nameHex: string,
     decimals: number,
 };
 
