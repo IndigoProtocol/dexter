@@ -29,9 +29,11 @@ export class TokenRegistryProvider extends BaseMetadataProvider {
         return this._api.post('/metadata/query', {
             subjects: assets.map((asset: Asset) => asset.id()),
         }).then((response) => {
-            return response.data.subjects.map((subject: any) => {
+            return response.data.subjects.map((entry: any) => {
                return {
-                   decimals: Number(subject.decimals.value),
+                   policyId: entry.subject.slice(0, 56),
+                   nameHex: entry.subject.slice(56),
+                   decimals: Number(entry.decimals.value),
                } as AssetMetadata;
             });
         });
