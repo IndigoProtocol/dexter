@@ -81,7 +81,7 @@ export class MinswapApi extends BaseApi {
                             : 'lovelace',
                         BigInt(pool.reserveA),
                         BigInt(pool.reserveB),
-                        this.dex.poolAddress,
+                        '', // Not provided
                         this.dex.marketOrderAddress,
                         this.dex.limitOrderAddress,
                     );

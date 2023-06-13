@@ -3,6 +3,7 @@ import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
 import {
+    AssetAddress,
     AssetBalance,
     DatumParameters,
     DefinitionConstr,
@@ -30,7 +31,6 @@ export class Minswap extends BaseDex {
      */
     public readonly marketOrderAddress: string = 'addr1wxn9efv2f6w82hagxqtn62ju4m293tqvw0uhmdl64ch8uwc0h43gt';
     public readonly limitOrderAddress: string = 'addr1zxn9efv2f6w82hagxqtn62ju4m293tqvw0uhmdl64ch8uw6j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq6s3z70';
-    public readonly poolAddress: string = 'addr1z8snz7c4974vzdpxu65ruphl3zjdvtxw8strf2c2tmqnxz2j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq0xmsha';
     public readonly lpTokenPolicyId: string = 'e4214b7cce62ac6fbba385d164df48e157eae5863521b4b67ca71d86';
     public readonly poolNftPolicyId: string = '0be55d262b29f564998ff81efe21bdc0022621c12f15af08d0f2ddb1';
     public readonly poolValidityAsset: string = '13aa2accf2e1561723aa26871e071fdf32c867cff7e7d50ad470d62f4d494e53574150';
@@ -42,31 +42,40 @@ export class Minswap extends BaseDex {
     }
 
     public async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? undefined : assetA));
+        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
+
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
             .loadDefinition(pool);
 
-        const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO) => {
-            const liquidityPool: LiquidityPool | undefined = this.liquidityPoolFromUtxo(utxo, assetA, assetB);
+        const addressPromises: Promise<LiquidityPool[]>[] = assetAddresses.map(async (assetAddress: AssetAddress) => {
+            const utxos: UTxO[] = await provider.utxos(assetAddress.address, validityAsset);
 
-            if (liquidityPool) {
-                const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-                const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+            const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO) => {
+                const liquidityPool: LiquidityPool | undefined = this.liquidityPoolFromUtxo(utxo, assetA, assetB);
 
-                liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
-                    ? BigInt(parameters.TotalLpTokens)
-                    : 0n;
-            }
+                if (liquidityPool) {
+                    const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+                    const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
 
-            return liquidityPool;
+                    liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
+                        ? BigInt(parameters.TotalLpTokens)
+                        : 0n;
+                }
+
+                return liquidityPool;
+            });
+
+            return await Promise.all(liquidityPoolPromises)
+                .then((liquidityPools: (LiquidityPool | undefined)[]) => {
+                    return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
+                        return liquidityPool !== undefined;
+                    }) as LiquidityPool[]
+                });
         });
 
-        return await Promise.all(liquidityPoolPromises)
-            .then((liquidityPools: (LiquidityPool | undefined)[]) => {
-                return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
-                    return liquidityPool !== undefined;
-                }) as LiquidityPool[]
-            });
+        return Promise.all(addressPromises)
+            .then((liquidityPools: (Awaited<LiquidityPool[]>)[]) => liquidityPools.flat());
     }
 
     public liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB?: Token): LiquidityPool | undefined {
