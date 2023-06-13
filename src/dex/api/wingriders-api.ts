@@ -65,10 +65,11 @@ export class WingRidersApi extends BaseApi {
                     : 'lovelace';
 
                 // Filtering for supplied assets
-                const isWanted: boolean = tokensMatch(tokenA, assetA)
-                    || tokensMatch(tokenB, assetA)
-                    || (assetB ? tokensMatch(tokenA, assetB) : false)
-                    || (assetB ? tokensMatch(tokenB, assetB) : false)
+                let isWanted: boolean = tokensMatch(tokenA, assetA) || tokensMatch(tokenB, assetA);
+
+                if (assetB) {
+                    isWanted = isWanted && (tokensMatch(tokenA, assetB) || tokensMatch(tokenB, assetB));
+                }
 
                 if (! isWanted) {
                     return undefined;
