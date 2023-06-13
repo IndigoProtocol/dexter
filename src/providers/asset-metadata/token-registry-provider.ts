@@ -28,15 +28,13 @@ export class TokenRegistryProvider extends BaseMetadataProvider {
     fetch(assets: Asset[]): Promise<AssetMetadata[]> {
         return this._api.post('/metadata/query', {
             subjects: assets.map((asset: Asset) => asset.id()),
-        }).then((response) => {
-            return response.data.subjects.map((entry: any) => {
-               return {
-                   policyId: entry.subject.slice(0, 56),
-                   nameHex: entry.subject.slice(56),
-                   decimals: Number(entry.decimals.value),
-               } as AssetMetadata;
-            });
-        });
+        }).then((response) => response.data.subjects.map((entry: any) => {
+            return {
+                policyId: entry.subject.slice(0, 56),
+                nameHex: entry.subject.slice(56),
+                decimals: Number(entry.decimals.value),
+            } as AssetMetadata;
+        }));
     }
 
 }
