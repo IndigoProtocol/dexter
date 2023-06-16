@@ -1,5 +1,6 @@
 import { BaseDex } from './base-dex';
 import {
+    AssetAddress,
     AssetBalance,
     DatumParameters,
     DefinitionConstr,
@@ -32,7 +33,7 @@ export class MuesliSwap extends BaseDex {
     public readonly poolAddress: string = 'addr1z9cy2gmar6cpn8yymll93lnd7lw96f27kn2p3eq5d4tjr7xnh3gfhnqcwez2pzmr4tryugrr0uahuk49xqw7dc645chscql0d7';
     public readonly lpTokenPolicyId: string = 'af3d70acf4bd5b3abb319a7d75c89fb3e56eafcdd46b2e9b57a2557f';
     public readonly poolNftPolicyId: string = '909133088303c49f3a30f1cc8ed553a73857a29779f6c6561cd8093f';
-    public readonly factoryTokenPolicyId: string = 'de9b756719341e79785aa13c164e7fe68c189ed04d61c9876b2fe53f';
+    public readonly factoryToken: string = 'de9b756719341e79785aa13c164e7fe68c189ed04d61c9876b2fe53f4d7565736c69537761705f414d4d';
 
     constructor(requestConfig: RequestConfig = {}) {
         super();
@@ -41,34 +42,43 @@ export class MuesliSwap extends BaseDex {
     }
 
     async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const utxos: UTxO[] = await provider.utxos(this.poolAddress, (assetA === 'lovelace' ? undefined : assetA));
+        const factoryAsset: Asset = Asset.fromId(this.factoryToken);
+        const assetAddresses: AssetAddress[] = await provider.assetAddresses(factoryAsset);
+
         const builder: DefinitionBuilder = await (new DefinitionBuilder())
             .loadDefinition(pool);
 
-        const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO) => {
-            const liquidityPool: LiquidityPool | undefined = this.liquidityPoolFromUtxo(utxo, assetA, assetB);
+        const addressPromises: Promise<LiquidityPool[]>[] = assetAddresses.map(async (assetAddress: AssetAddress) => {
+            const utxos: UTxO[] = await provider.utxos(assetAddress.address, (assetA === 'lovelace' ? undefined : assetA));
 
-            if (liquidityPool) {
-                const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-                const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+            const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO): Promise<LiquidityPool | undefined> => {
+                const liquidityPool: LiquidityPool | undefined = this.liquidityPoolFromUtxo(utxo, assetA, assetB);
 
-                liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
-                    ? BigInt(parameters.TotalLpTokens)
-                    : 0n;
-                liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number'
-                    ? parameters.LpFee / 100
-                    : 0;
-            }
+                if (liquidityPool) {
+                    const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+                    const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
 
-            return liquidityPool;
+                    liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
+                        ? BigInt(parameters.TotalLpTokens)
+                        : 0n;
+                    liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number'
+                        ? parameters.LpFee / 100
+                        : 0;
+                }
+
+                return liquidityPool;
+            });
+
+            return await Promise.all(liquidityPoolPromises)
+                .then((liquidityPools: (LiquidityPool | undefined)[]) => {
+                    return liquidityPools.filter((liquidityPool?: LiquidityPool): boolean => {
+                        return liquidityPool !== undefined;
+                    }) as LiquidityPool[]
+                });
         });
 
-        return await Promise.all(liquidityPoolPromises)
-            .then((liquidityPools: (LiquidityPool | undefined)[]) => {
-                return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
-                    return liquidityPool !== undefined;
-                }) as LiquidityPool[]
-            });
+        return Promise.all(addressPromises)
+            .then((liquidityPools: (Awaited<LiquidityPool[]>)[]) => liquidityPools.flat());
     }
 
     liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB?: Token): LiquidityPool | undefined {
@@ -82,7 +92,7 @@ export class MuesliSwap extends BaseDex {
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
             const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
 
-            return ! assetBalanceId.startsWith(this.factoryTokenPolicyId)
+            return ! assetBalanceId.startsWith(this.factoryToken.slice(0, 56))
                 && ! assetBalanceId.startsWith(this.poolNftPolicyId);
         });
 
@@ -123,7 +133,7 @@ export class MuesliSwap extends BaseDex {
             this.orderAddress,
         );
 
-        const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
+        const lpToken: Asset = utxo.assetBalances.find((assetBalance: AssetBalance) => {
             return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.poolNftPolicyId;
         })?.asset as Asset;
 
@@ -158,8 +168,8 @@ export class MuesliSwap extends BaseDex {
     }
 
     public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters): Promise<PayToAddress[]> {
-        const matchMakerFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'matchmakerFee');
-        const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
+        const matchMakerFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee): boolean => fee.id === 'matchmakerFee');
+        const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee): boolean => fee.id === 'deposit');
 
         if (! matchMakerFee || ! deposit || ! swapParameters[DatumParameterKey.MinReceive]) {
             return Promise.reject('Parameters for datum are not set.');
@@ -201,7 +211,7 @@ export class MuesliSwap extends BaseDex {
     }
 
     public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
-        const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
+        const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO): boolean => {
             return utxo.address === this.orderAddress;
         });
 
