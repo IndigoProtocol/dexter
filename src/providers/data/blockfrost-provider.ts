@@ -128,8 +128,6 @@ export class BlockfrostProvider extends BaseDataProvider {
             }
 
             return results;
-        }).catch((e) => {
-            return Promise.reject(e);
         });
     }
 
