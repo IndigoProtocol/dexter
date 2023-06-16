@@ -26,28 +26,24 @@ export class BlockfrostProvider extends BaseDataProvider {
      * https://docs.blockfrost.io/#tag/Cardano-Addresses/paths/~1addresses~1%7Baddress%7D~1utxos~1%7Basset%7D/get
      */
     public async utxos(address: string, asset?: Asset): Promise<UTxO[]> {
-        try {
-            return this.sendPaginatedRequest(`/addresses/${address}/utxos/${asset ? asset.id() : ''}`)
-                .then((results: any) => {
-                    return results.map((utxo: any) => {
-                        return {
-                            txHash: utxo.tx_hash,
-                            address: utxo.address,
-                            datumHash: utxo.data_hash,
-                            outputIndex: utxo.output_index,
-                            assetBalances: utxo.amount.reduce((assets: AssetBalance[], amount: any) => {
-                                assets.push({
-                                    asset: amount.unit === 'lovelace' ? amount.unit : Asset.fromId(amount.unit),
-                                    quantity: BigInt(amount.quantity),
-                                })
-                                return assets;
-                            }, []),
-                        } as UTxO;
-                    }) as UTxO[];
-                });
-        } catch (e) {
-            return [];
-        }
+        return this.sendPaginatedRequest(`/addresses/${address}/utxos/${asset ? asset.id() : ''}`)
+            .then((results: any) => {
+                return results.map((utxo: any) => {
+                    return {
+                        txHash: utxo.tx_hash,
+                        address: utxo.address,
+                        datumHash: utxo.data_hash,
+                        outputIndex: utxo.output_index,
+                        assetBalances: utxo.amount.reduce((assets: AssetBalance[], amount: any) => {
+                            assets.push({
+                                asset: amount.unit === 'lovelace' ? amount.unit : Asset.fromId(amount.unit),
+                                quantity: BigInt(amount.quantity),
+                            })
+                            return assets;
+                        }, []),
+                    } as UTxO;
+                }) as UTxO[];
+            });
     }
 
     /**
@@ -78,38 +74,30 @@ export class BlockfrostProvider extends BaseDataProvider {
      * https://docs.blockfrost.io/#tag/Cardano-Assets/paths/~1assets~1%7Basset%7D~1transactions/get
      */
     public async assetTransactions(asset: Asset): Promise<Transaction[]> {
-        try {
-            return this.sendPaginatedRequest(`/assets/${asset.id()}/transactions`)
-                .then((results: any) => {
-                    return results.map((tx: any) => {
-                        return {
-                            txHash: tx.tx_hash,
-                            txIndex: tx.tx_index,
-                        } as Transaction;
-                    }) as Transaction[];
-                });
-        } catch (e) {
-            return [];
-        }
+        return this.sendPaginatedRequest(`/assets/${asset.id()}/transactions`)
+            .then((results: any) => {
+                return results.map((tx: any) => {
+                    return {
+                        txHash: tx.tx_hash,
+                        txIndex: tx.tx_index,
+                    } as Transaction;
+                }) as Transaction[];
+            });
     }
 
     /**
      * https://docs.blockfrost.io/#tag/Cardano-Assets/paths/~1assets~1%7Basset%7D~1transactions/get
      */
     public async assetAddresses(asset: Asset): Promise<AssetAddress[]> {
-        try {
-            return this.sendPaginatedRequest(`/assets/${asset.id()}/addresses`)
-                .then((results: any) => {
-                    return results.map((result: any) => {
-                        return {
-                            address: result.address,
-                            quantity: BigInt(result.quantity),
-                        } as AssetAddress;
-                    }) as AssetAddress[];
-                });
-        } catch (e) {
-            return [];
-        }
+        return this.sendPaginatedRequest(`/assets/${asset.id()}/addresses`)
+            .then((results: any) => {
+                return results.map((result: any) => {
+                    return {
+                        address: result.address,
+                        quantity: BigInt(result.quantity),
+                    } as AssetAddress;
+                }) as AssetAddress[];
+            });
     }
 
     /**
@@ -140,8 +128,8 @@ export class BlockfrostProvider extends BaseDataProvider {
             }
 
             return results;
-        }).catch(() => {
-            return Promise.resolve([]);
+        }).catch((e) => {
+            return Promise.reject(e);
         });
     }
 
