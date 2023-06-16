@@ -24,11 +24,11 @@ export class SundaeSwapApi extends BaseApi {
         const maxPerPage: number = 100;
 
         const assetAId: string = (assetA === 'lovelace')
-            ? 'cardano.ada'
+            ? ''
             : assetA.id('.');
-        const assetBId: string = (assetB && assetB !== 'lovelace')
+        let assetBId: string = (assetB && assetB !== 'lovelace')
             ? assetB.id('.')
-            : 'cardano.ada';
+            : '';
 
         const getPaginatedResponse = (page: number): Promise<LiquidityPool[]> => {
             return this.api.post('', {
