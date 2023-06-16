@@ -2,7 +2,7 @@ import { BaseDex } from '@dex/base-dex';
 import { Asset, Token } from '@dex/models/asset';
 import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Dexter } from '@app/dexter';
-import { Transaction, UTxO } from '@app/types';
+import { AssetMetadata, Transaction, UTxO } from '@app/types';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 
 export class FetchRequest {
@@ -125,18 +125,18 @@ export class FetchRequest {
         }, [] as Asset[]);
 
         await this._dexter.metadataProvider.fetch(assets)
-            .then((response: any) => {
+            .then((response: AssetMetadata[]) => {
                 liquidityPools.forEach((liquidityPool: LiquidityPool) => {
                     [liquidityPool.assetA, liquidityPool.assetB].forEach((asset: Token) => {
                         if (! (asset instanceof Asset)) {
                             return;
                         }
 
-                        const responseAsset = response.find((metadata: any) => {
-                            return metadata.subject === asset.id();
+                        const responseAsset: AssetMetadata | undefined = response.find((metadata: AssetMetadata) => {
+                            return (metadata.policyId === asset.policyId) && (metadata.nameHex === asset.assetNameHex);
                         });
 
-                        asset.decimals = responseAsset.decimals.value;
+                        asset.decimals = responseAsset ? responseAsset.decimals : 0;
                     });
                 });
             })
