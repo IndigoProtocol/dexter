@@ -25,7 +25,7 @@ export class MinswapApi extends BaseApi {
         const maxPerPage: number = 20;
 
         const getPaginatedResponse = (page: number): Promise<LiquidityPool[]> => {
-            return this.api.post(`?PoolsByAsset`, {
+            return this.api.post(``, {
                 operationName: 'PoolsByAsset',
                 query: `
                     query PoolsByAsset($asset: InputAsset!, $limit: Int, $offset: Int) {
