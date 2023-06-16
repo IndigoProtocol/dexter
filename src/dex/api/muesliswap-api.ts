@@ -42,7 +42,7 @@ export class MuesliSwapApi extends BaseApi {
                             : 'lovelace',
                         BigInt(pool.tokenA.amount),
                         BigInt(pool.tokenB.amount),
-                        this.dex.poolAddress,
+                        '', // Not provided
                         this.dex.orderAddress,
                         this.dex.orderAddress,
                     );
