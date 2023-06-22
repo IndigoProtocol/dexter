@@ -1,0 +1,42 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: dropdown
+    id: data-provider
+    attributes:
+      label: Data Provider
+      description: Which Data Provider you were using
+      options:
+        - Blockfrost
+        - Kupo
+        - Custom
+    validations:
+      required: true
+  - type: dropdown
+    id: dex
+    attributes:
+      label: DEX
+      description: Which DEX this bug occurred for
+      options:
+        - All
+        - Minswap
+        - SundaeSwap
+        - MuesliSwap
+        - WingRiders
+        - VyFinance
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Give context for the bug
+      placeholder: What happened?
+    validations:
+      required: true
