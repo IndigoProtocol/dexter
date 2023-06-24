@@ -78,8 +78,8 @@ export class BlockfrostProvider extends BaseDataProvider {
             .then((results: any) => {
                 return results.map((tx: any) => {
                     return {
-                        txHash: tx.tx_hash,
-                        txIndex: tx.tx_index,
+                        hash: tx.tx_hash,
+                        index: tx.tx_index,
                     } as Transaction;
                 }) as Transaction[];
             });

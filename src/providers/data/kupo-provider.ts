@@ -62,8 +62,8 @@ export class KupoProvider extends BaseDataProvider {
             .then((results: any) => {
                 return results.data.map((result: any) => {
                     return {
-                        txHash: result.transaction_id,
-                        txIndex: result.transaction_index,
+                        hash: result.transaction_id,
+                        index: result.transaction_index,
                     } as Transaction
                 }) as Transaction[];
             }).catch(() => {

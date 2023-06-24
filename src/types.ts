@@ -50,8 +50,10 @@ export type UTxO = {
 };
 
 export type Transaction = {
-    txHash: string,
-    txIndex: number,
+    hash: string,
+    index: number,
+    inputs: UTxO[],
+    outputs: UTxO[],
 };
 
 export type AssetAddress = {

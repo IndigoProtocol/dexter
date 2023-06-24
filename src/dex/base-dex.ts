@@ -1,7 +1,7 @@
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
-import { AssetBalance, DatumParameters, PayToAddress, SwapFee, UTxO } from '@app/types';
+import { AssetBalance, DatumParameters, PayToAddress, SwapFee, Transaction, UTxO } from '@app/types';
 import { DatumParameterKey } from '@app/constants';
 import { tokensMatch } from '@app/utils';
 import { BaseApi } from '@dex/api/base-api';
@@ -19,14 +19,19 @@ export abstract class BaseDex {
     public abstract readonly api: BaseApi;
 
     /**
+     * Fetch addresses mapped to a liquidity pool.
+     */
+    abstract liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]>;
+
+    /**
      * Fetch all liquidity pools matching assetA & assetB.
      */
-    abstract liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]>;
+    abstract liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]>;
 
     /**
      * Craft liquidity pool state from a valid UTxO given the matching assetA & assetB.
      */
-    abstract liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB: Token): LiquidityPool | undefined;
+    abstract liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO): Promise<LiquidityPool | undefined>;
 
     /**
      * Estimated swap out amount received for a swap in token & amount on a liquidity pool.

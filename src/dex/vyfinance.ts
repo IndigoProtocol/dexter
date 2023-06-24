@@ -27,12 +27,16 @@ export class VyFinance extends BaseDex {
         this.api = new VyfinanceApi(this, requestConfig);
     }
 
-    public async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        return this.api.liquidityPools(assetA, assetB);
+    public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
+        return Promise.reject('Unimplemented');
     }
 
-    public liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB?: Token): LiquidityPool | undefined {
-        return undefined;
+    public async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
+        return Promise.reject('Unimplemented');
+    }
+
+    public liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO): Promise<LiquidityPool | undefined> {
+        return Promise.reject('Unimplemented');
     }
 
     public estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
