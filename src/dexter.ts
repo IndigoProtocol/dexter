@@ -12,7 +12,6 @@ import { BaseMetadataProvider } from '@providers/asset-metadata/base-metadata-pr
 import { TokenRegistryProvider } from '@providers/asset-metadata/token-registry-provider';
 import { CancelSwapRequest } from '@requests/cancel-swap-request';
 import { FetchRequest } from '@requests/fetch-request';
-import { ListenerRequest } from "@requests/listener-request";
 
 export class Dexter {
 
@@ -122,17 +121,6 @@ export class Dexter {
         }
 
         return new CancelSwapRequest(this);
-    }
-
-    /**
-     * New request for a listener for on-chain events.
-     */
-    public newListenerRequest(): ListenerRequest {
-        if (! this.dataProvider) {
-            throw new Error('Data provider must be set before requesting a websocket listener.');
-        }
-
-        return new ListenerRequest(this);
     }
 
 }
