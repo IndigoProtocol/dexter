@@ -4,6 +4,7 @@ import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Dexter } from '@app/dexter';
 import { AssetMetadata, Transaction, UTxO } from '@app/types';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
+import { tokensMatch } from "@app/utils";
 
 export class FetchRequest {
 
@@ -72,16 +73,8 @@ export class FetchRequest {
 
             return liquidityPools.filter((pool: LiquidityPool) => {
                 // Check if pool matches provided filter assets
-                const filterAssetAId: string = assetA === 'lovelace' ? 'lovelace' : assetA.id();
-                const filterAssetBId: string = assetB ? (assetB === 'lovelace' ? 'lovelace' : assetB.id()) : '';
-
-                const poolAssetAId: string = pool.assetA === 'lovelace' ? 'lovelace' : pool.assetA.id();
-                const poolAssetBId: string = pool.assetB === 'lovelace' ? 'lovelace' : pool.assetB.id();
-
-                return (poolAssetAId === filterAssetAId && poolAssetBId === filterAssetBId)
-                    || (poolAssetAId === filterAssetBId && poolAssetBId === filterAssetAId)
-                    || (poolAssetAId === filterAssetAId && ! filterAssetBId)
-                    || (poolAssetAId === filterAssetBId && ! filterAssetBId);
+                return tokensMatch(pool.assetA, assetA) || tokensMatch(pool.assetB, assetA)
+                    || (assetB && (tokensMatch(pool.assetA, assetB) || tokensMatch(pool.assetB, assetB)));
             });
         });
     }

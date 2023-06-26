@@ -64,17 +64,6 @@ export class WingRidersApi extends BaseApi {
                     ? new Asset(pool.tokenB.policyId, pool.tokenB.assetName)
                     : 'lovelace';
 
-                // Filtering for supplied assets
-                let isWanted: boolean = tokensMatch(tokenA, assetA) || tokensMatch(tokenB, assetA);
-
-                if (assetB) {
-                    isWanted = isWanted && (tokensMatch(tokenA, assetB) || tokensMatch(tokenB, assetB));
-                }
-
-                if (! isWanted) {
-                    return undefined;
-                }
-
                 let liquidityPool: LiquidityPool = new LiquidityPool(
                     this.dex.name,
                     tokenA,
