@@ -49,7 +49,7 @@ export class WingRiders extends BaseDex {
             ? this._assetAddresses
             : await provider.assetAddresses(validityAsset);
 
-        return Promise.resolve(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address));
+        return Promise.resolve([...new Set(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address))]);
     }
 
     async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {

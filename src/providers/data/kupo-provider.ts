@@ -36,8 +36,6 @@ export class KupoProvider extends BaseDataProvider {
         return this._kupoApi.get(url)
             .then((results: any) => {
                 return this.toUtxos(results.data);
-            }).catch(() => {
-                return Promise.resolve([]);
             });
     }
 
@@ -45,14 +43,16 @@ export class KupoProvider extends BaseDataProvider {
         return this._kupoApi.get(`/matches/${txHash}`)
             .then((results: any) => {
                 return this.toUtxos(results.data);
-            }).catch(() => {
-                return Promise.resolve([]);
             });
     }
 
     public async datumValue(datumHash: string): Promise<DefinitionField> {
         return this._kupoApi.get(`/datums/${datumHash}`)
             .then((result: any) => {
+                if (! result.data.datum) {
+                    throw new Error('Datum hash not found.');
+                }
+
                 return this.toDefinitionDatum(Data.from(result.data.datum));
             });
     }
@@ -63,11 +63,8 @@ export class KupoProvider extends BaseDataProvider {
                 return results.data.map((result: any) => {
                     return {
                         hash: result.transaction_id,
-                        index: result.transaction_index,
                     } as Transaction
                 }) as Transaction[];
-            }).catch(() => {
-                return Promise.resolve([]);
             });
     }
 
@@ -80,8 +77,6 @@ export class KupoProvider extends BaseDataProvider {
                         quantity: BigInt(result.value.assets[asset.id('.')]),
                     } as AssetAddress
                 }) as AssetAddress[];
-            }).catch(() => {
-                return Promise.resolve([]);
             });
     }
 
@@ -101,7 +96,7 @@ export class KupoProvider extends BaseDataProvider {
                     ];
                     Object.keys(utxo.value.assets).forEach((unit: string) => {
                         balances.push({
-                            asset: Asset.fromId(unit.replace('.', '')),
+                            asset: Asset.fromId(unit),
                             quantity: BigInt(utxo.value.assets[unit]),
                         });
                     });

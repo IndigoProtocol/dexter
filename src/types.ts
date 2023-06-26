@@ -51,7 +51,6 @@ export type UTxO = {
 
 export type Transaction = {
     hash: string,
-    index: number,
     inputs: UTxO[],
     outputs: UTxO[],
 };

@@ -98,20 +98,24 @@ export class SundaeSwap extends BaseDex {
             liquidityPool.lpToken = lpToken;
         }
 
-        const builder: DefinitionBuilder = await (new DefinitionBuilder())
-            .loadDefinition(pool);
-        const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-        const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+        try {
+            const builder: DefinitionBuilder = await (new DefinitionBuilder())
+                .loadDefinition(pool);
+            const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+            const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
 
-        liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string'
-            ? parameters.PoolIdentifier
-            : '';
-        liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
-            ? BigInt(parameters.TotalLpTokens)
-            : 0n;
-        liquidityPool.poolFeePercent = typeof parameters.LpFeeNumerator === 'number' && typeof parameters.LpFeeDenominator === 'number'
-            ? parameters.LpFeeNumerator / parameters.LpFeeDenominator
-            : 0;
+            liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string'
+                ? parameters.PoolIdentifier
+                : '';
+            liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
+                ? BigInt(parameters.TotalLpTokens)
+                : 0n;
+            liquidityPool.poolFeePercent = typeof parameters.LpFeeNumerator === 'number' && typeof parameters.LpFeeDenominator === 'number'
+                ? parameters.LpFeeNumerator / parameters.LpFeeDenominator
+                : 0;
+        } catch (e) {
+            return liquidityPool;
+        }
 
         return liquidityPool;
     }

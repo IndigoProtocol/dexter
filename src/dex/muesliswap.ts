@@ -44,7 +44,7 @@ export class MuesliSwap extends BaseDex {
         const validityAsset: Asset = Asset.fromId(this.factoryToken);
         const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
 
-        return Promise.resolve(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address));
+        return Promise.resolve([...new Set(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address))]);
     }
 
     async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
@@ -112,17 +112,22 @@ export class MuesliSwap extends BaseDex {
             liquidityPool.lpToken = lpToken;
         }
 
-        const builder: DefinitionBuilder = await (new DefinitionBuilder())
-            .loadDefinition(pool);
-        const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-        const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+        try {
+            const builder: DefinitionBuilder = await (new DefinitionBuilder())
+                .loadDefinition(pool);
+            const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+            const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
 
-        liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
-            ? BigInt(parameters.TotalLpTokens)
-            : 0n;
-        liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number'
-            ? parameters.LpFee / 100
-            : 0;
+            liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
+                ? BigInt(parameters.TotalLpTokens)
+                : 0n;
+            liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number'
+                ? parameters.LpFee / 100
+                : 0;
+
+        } catch (e) {
+            return liquidityPool;
+        }
 
         return liquidityPool;
     }

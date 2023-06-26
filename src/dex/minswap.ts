@@ -45,7 +45,7 @@ export class Minswap extends BaseDex {
         const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
         const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
 
-        return Promise.resolve(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address));
+        return Promise.resolve([...new Set(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address))]);
     }
 
     public async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
@@ -114,15 +114,20 @@ export class Minswap extends BaseDex {
             liquidityPool.identifier = lpToken.policyId;
         }
 
-        const builder: DefinitionBuilder = await (new DefinitionBuilder())
-            .loadDefinition(pool);
-        const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-        const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+        try {
+            liquidityPool.poolFeePercent = 0.3;
 
-        liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
-            ? BigInt(parameters.TotalLpTokens)
-            : 0n;
-        liquidityPool.poolFeePercent = 0.3;
+            const builder: DefinitionBuilder = await (new DefinitionBuilder())
+                .loadDefinition(pool);
+            const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+            const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+
+            liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
+                ? BigInt(parameters.TotalLpTokens)
+                : 0n;
+        } catch (e) {
+            return liquidityPool;
+        }
 
         return liquidityPool;
     }
