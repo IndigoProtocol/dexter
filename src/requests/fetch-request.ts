@@ -53,21 +53,6 @@ export class FetchRequest {
                 }
 
                 return dex.liquidityPools(this._dexter.dataProvider as BaseDataProvider)
-                    .then((pools: LiquidityPool[]) => {
-                        return pools.filter((pool: LiquidityPool) => {
-                            // Check if pool matches provided filter assets
-                            const filterAssetAId: string = assetA === 'lovelace' ? 'lovelace' : assetA.id();
-                            const filterAssetBId: string = assetB ? (assetB === 'lovelace' ? 'lovelace' : assetB.id()) : '';
-
-                            const poolAssetAId: string = pool.assetA === 'lovelace' ? 'lovelace' : pool.assetA.id();
-                            const poolAssetBId: string = pool.assetB === 'lovelace' ? 'lovelace' : pool.assetB.id();
-
-                            return (poolAssetAId === filterAssetAId && poolAssetBId === filterAssetBId)
-                                || (poolAssetAId === filterAssetBId && poolAssetBId === filterAssetAId)
-                                || (poolAssetAId === filterAssetAId && ! filterAssetBId)
-                                || (poolAssetAId === filterAssetBId && ! filterAssetBId);
-                        });
-                    })
                     .catch(() => {
                         // Attempt fallback to API
                         return this._dexter.config.shouldFallbackToApi
@@ -85,7 +70,19 @@ export class FetchRequest {
                 await this.fetchAssetMetadata(liquidityPools);
             }
 
-            return liquidityPools;
+            return liquidityPools.filter((pool: LiquidityPool) => {
+                // Check if pool matches provided filter assets
+                const filterAssetAId: string = assetA === 'lovelace' ? 'lovelace' : assetA.id();
+                const filterAssetBId: string = assetB ? (assetB === 'lovelace' ? 'lovelace' : assetB.id()) : '';
+
+                const poolAssetAId: string = pool.assetA === 'lovelace' ? 'lovelace' : pool.assetA.id();
+                const poolAssetBId: string = pool.assetB === 'lovelace' ? 'lovelace' : pool.assetB.id();
+
+                return (poolAssetAId === filterAssetAId && poolAssetBId === filterAssetBId)
+                    || (poolAssetAId === filterAssetBId && poolAssetBId === filterAssetAId)
+                    || (poolAssetAId === filterAssetAId && ! filterAssetBId)
+                    || (poolAssetAId === filterAssetBId && ! filterAssetBId);
+            });
         });
     }
 
