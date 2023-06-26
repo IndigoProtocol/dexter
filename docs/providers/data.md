@@ -22,9 +22,6 @@ const blockfrostProvider: BaseDataProvider = new BlockfrostProvider(
 
 ### Kupo
 
-Requires either a full chain sync, or specific patterns so each DEX can grab the necessary data. The latter
-will be optimized, and will be published here once available.
-
 ```js
 const kupoProvider: BaseDataProvider = new KupoProvider(
     {
