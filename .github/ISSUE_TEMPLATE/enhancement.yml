@@ -1,0 +1,16 @@
+name: Enhancement
+description: Suggest an Enhancement
+title: "[Enhancement]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to help us improve Dexter!
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Give context for your idea
+    validations:
+      required: true
