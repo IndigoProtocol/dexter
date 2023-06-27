@@ -65,20 +65,22 @@ export class FetchRequest {
         return Promise.all(
             liquidityPoolPromises,
         ).then(async (mappedLiquidityPools: Awaited<LiquidityPool[]>[]) => {
-            const liquidityPools: LiquidityPool[] = mappedLiquidityPools.flat();
+            const liquidityPools: LiquidityPool[] = mappedLiquidityPools
+                .flat()
+                .filter((pool: LiquidityPool) => {
+                    // Check if pool matches provided filter assets
+                    let isWanted: boolean = tokensMatch(pool.assetA, assetA) || tokensMatch(pool.assetB, assetA);
+
+                    return assetB
+                        ? (isWanted && (tokensMatch(pool.assetA, assetB) || tokensMatch(pool.assetB, assetB)))
+                        : isWanted;
+                });
 
             if (this._dexter.config.shouldFetchMetadata) {
                 await this.fetchAssetMetadata(liquidityPools);
             }
 
-            // Check if pool matches provided filter assets
-            return liquidityPools.filter((pool: LiquidityPool) => {
-                let isWanted: boolean = tokensMatch(pool.assetA, assetA) || tokensMatch(pool.assetB, assetA);
-
-                return assetB
-                    ? (isWanted && (tokensMatch(pool.assetA, assetB) || tokensMatch(pool.assetB, assetB)))
-                    : isWanted;
-            });
+            return liquidityPools;
         });
     }
 
