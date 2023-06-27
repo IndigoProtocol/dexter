@@ -71,10 +71,13 @@ export class FetchRequest {
                 await this.fetchAssetMetadata(liquidityPools);
             }
 
+            // Check if pool matches provided filter assets
             return liquidityPools.filter((pool: LiquidityPool) => {
-                // Check if pool matches provided filter assets
-                return tokensMatch(pool.assetA, assetA) || tokensMatch(pool.assetB, assetA)
-                    || (assetB && (tokensMatch(pool.assetA, assetB) || tokensMatch(pool.assetB, assetB)));
+                let isWanted: boolean = tokensMatch(pool.assetA, assetA) || tokensMatch(pool.assetB, assetA);
+
+                return assetB
+                    ? (isWanted && (tokensMatch(pool.assetA, assetB) || tokensMatch(pool.assetB, assetB)))
+                    : isWanted;
             });
         });
     }
