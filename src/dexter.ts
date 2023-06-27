@@ -12,6 +12,7 @@ import { BaseMetadataProvider } from '@providers/asset-metadata/base-metadata-pr
 import { TokenRegistryProvider } from '@providers/asset-metadata/token-registry-provider';
 import { CancelSwapRequest } from '@requests/cancel-swap-request';
 import { FetchRequest } from '@requests/fetch-request';
+import axios from "axios";
 
 export class Dexter {
 
@@ -43,6 +44,8 @@ export class Dexter {
             } as RequestConfig,
             requestConfig,
         );
+
+        axios.defaults.timeout = this.requestConfig.timeout;
 
         this.metadataProvider = new TokenRegistryProvider(this.requestConfig);
         this.availableDexs = {

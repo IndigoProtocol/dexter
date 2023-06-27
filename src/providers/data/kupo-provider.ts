@@ -7,7 +7,7 @@ import {
     DefinitionConstr,
     DefinitionField,
     DefinitionInt,
-    KupoConfig,
+    KupoConfig, RequestConfig,
     Transaction,
     UTxO
 } from '@app/types';
@@ -18,13 +18,24 @@ export class KupoProvider extends BaseDataProvider {
 
     private _config: KupoConfig;
     private _kupoApi: AxiosInstance;
+    private _requestConfig: RequestConfig;
 
-    constructor(config: KupoConfig) {
+    constructor(config: KupoConfig, requestConfig: RequestConfig = {}) {
         super();
+
+        this._requestConfig = Object.assign(
+            {},
+            {
+                timeout: 5000,
+                proxyUrl: '',
+            } as RequestConfig,
+            requestConfig,
+        );
 
         this._config = config;
         this._kupoApi = axios.create({
-            baseURL: config.url,
+            baseURL: requestConfig.proxyUrl + config.url,
+            timeout: requestConfig.timeout,
         });
     }
 
