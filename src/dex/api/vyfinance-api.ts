@@ -22,7 +22,18 @@ export class VyfinanceApi extends BaseApi {
     }
 
     liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        return this.api.get('/lp?networkId=1&v2=true')
+        const assetAId: string = (assetA === 'lovelace')
+            ? 'lovelace'
+            : assetA.id();
+        let assetBId: string = (assetB && assetB !== 'lovelace')
+            ? assetB.id()
+            : 'lovelace';
+
+        const url: string = assetB
+            ? `'/lp?networkId=1&v2=true&tokenAUnit=${assetAId}&tokenBUnit=${assetBId}'`
+            : '/lp?networkId=1&v2=true';
+
+        return this.api.get(url)
             .then((poolResponse: any) => {
                 return poolResponse.data.map((pool: any) => {
                     const poolDetails: any = JSON.parse(pool.json);

@@ -75,7 +75,6 @@ export class FetchRequest {
                     })
                 });
         } else {
-            //todo: look into better API endpoints
             liquidityPoolPromises = dexInstance.api.liquidityPools(liquidityPool.assetA, liquidityPool.assetB);
         }
 
