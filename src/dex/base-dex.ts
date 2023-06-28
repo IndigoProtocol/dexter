@@ -24,12 +24,12 @@ export abstract class BaseDex {
     abstract liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]>;
 
     /**
-     * Fetch all liquidity pools matching assetA & assetB.
+     * Fetch all liquidity pools.
      */
     abstract liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]>;
 
     /**
-     * Craft liquidity pool state from a valid UTxO given the matching assetA & assetB.
+     * Craft liquidity pool state from a valid UTxO.
      */
     abstract liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO): Promise<LiquidityPool | undefined>;
 

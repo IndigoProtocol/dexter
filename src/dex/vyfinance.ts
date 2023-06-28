@@ -28,15 +28,15 @@ export class VyFinance extends BaseDex {
     }
 
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
-        return Promise.reject('Unimplemented');
+        return Promise.reject('Not implemented as VyFinance pools are not easily identifiable on-chain.');
     }
 
     public async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
-        return Promise.reject('Unimplemented');
+        return Promise.reject('Not implemented as VyFinance pools are not easily identifiable on-chain.');
     }
 
     public liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO): Promise<LiquidityPool | undefined> {
-        return Promise.reject('Unimplemented');
+        return Promise.reject('Not implemented until pools are identifiable on-chain');
     }
 
     public estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
