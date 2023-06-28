@@ -38,6 +38,7 @@ export class SundaeSwap extends BaseDex {
         this.api = new SundaeSwapApi(this, requestConfig);
     }
 
+
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
         return Promise.resolve([this.poolAddress]);
     }
