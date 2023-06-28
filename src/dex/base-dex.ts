@@ -34,6 +34,11 @@ export abstract class BaseDex {
     abstract liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO): Promise<LiquidityPool | undefined>;
 
     /**
+     * Estimated swap in amount given for a swap out token & amount on a liquidity pool.
+     */
+    abstract estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint;
+
+    /**
      * Estimated swap out amount received for a swap in token & amount on a liquidity pool.
      */
     abstract estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint;

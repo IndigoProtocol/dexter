@@ -39,6 +39,10 @@ export class VyFinance extends BaseDex {
         return Promise.reject('Unimplemented');
     }
 
+    estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
+        return 0n;
+    }
+
     public estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 

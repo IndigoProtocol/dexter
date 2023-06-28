@@ -132,14 +132,26 @@ export class Minswap extends BaseDex {
         return liquidityPool;
     }
 
+    estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
+        const poolFeeMultiplier: bigint = 1000n;
+        const poolFeeModifier: bigint = poolFeeMultiplier - BigInt((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier));
+
+        const [reserveOut, reserveIn]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
+
+        const swapInNumerator: bigint = swapOutAmount * reserveIn * poolFeeMultiplier;
+        const swapInDenominator: bigint = (reserveOut - swapOutAmount) * poolFeeModifier;
+
+        return swapInNumerator / swapInDenominator + 1n;
+    }
+
     public estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
         const poolFeeMultiplier: bigint = 1000n;
         const poolFeeModifier: bigint = poolFeeMultiplier - BigInt((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier));
 
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
-        const swapOutNumerator: bigint = swapInAmount * poolFeeModifier * reserveOut;
-        const swapOutDenominator: bigint = swapInAmount * poolFeeModifier + reserveIn * poolFeeMultiplier;
+        const swapOutNumerator: bigint = swapInAmount * reserveOut * poolFeeModifier;
+        const swapOutDenominator: bigint = (swapInAmount + reserveIn) * poolFeeMultiplier;
 
         return swapOutNumerator / swapOutDenominator;
     }

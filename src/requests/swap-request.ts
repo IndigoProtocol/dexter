@@ -52,6 +52,7 @@ export class SwapRequest {
     public flip(): SwapRequest {
         if (this._swapInToken) {
             [this._swapInToken, this._swapOutToken] = [this._swapOutToken, this._swapInToken];
+            this._swapInAmount = this.getEstimatedReceive();
         }
 
         return this;
@@ -81,6 +82,23 @@ export class SwapRequest {
         }
 
         this._swapInAmount = swapInAmount;
+
+        return this;
+    }
+
+    public withSwapOutAmount(swapOutAmount: bigint): SwapRequest {
+        if (swapOutAmount < 0n) {
+            throw new Error('Swap out amount must be zero or above.');
+        }
+        if (! this._liquidityPool) {
+            throw new Error('Liquidity pool must be set before setting a swap out amount.');
+        }
+
+        this._swapInAmount = this._dexter.availableDexs[this._liquidityPool.dex].estimatedGive(
+            this._liquidityPool,
+            this._swapOutToken,
+            swapOutAmount,
+        );
 
         return this;
     }
@@ -118,8 +136,10 @@ export class SwapRequest {
         );
     }
 
-    public getPriceImpactPercent(): number {
-        if (! this._liquidityPool) {
+    public getPriceImpactPercent(liquidityPool?: LiquidityPool): number {
+        const poolToCheck: LiquidityPool | undefined = liquidityPool ?? this._liquidityPool;
+
+        if (! poolToCheck) {
             throw new Error('Liquidity pool must be set before providing calculating the price impact.');
         }
         if (! this._swapInToken) {
@@ -127,7 +147,7 @@ export class SwapRequest {
         }
 
         return this._dexter.availableDexs[this._liquidityPool.dex].priceImpactPercent(
-            this._liquidityPool,
+            poolToCheck,
             this._swapInToken,
             this._swapInAmount,
         );
