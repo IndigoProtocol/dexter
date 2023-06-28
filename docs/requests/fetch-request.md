@@ -71,3 +71,19 @@ dexter.newFetchRequest()
     });
 ```
 </details>
+
+<br>
+
+<details>
+<summary><code>getLiquidityPoolState(LiquidityPool): Promise&lt;LiquidityPool&gt;</code> Fetch latest state for a liquidity pool</summary>
+
+##### Using
+
+```js
+dexter.newFetchRequest()
+    .getLiquidityPoolState(liquidityPool)
+    .then((pool: LiquidityPool) => {
+        console.log(pool);
+    });
+```
+</details>
