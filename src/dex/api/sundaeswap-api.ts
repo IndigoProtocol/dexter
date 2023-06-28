@@ -65,9 +65,7 @@ export class SundaeSwapApi extends BaseApi {
                 variables: {
                     page: page,
                     pageSize: maxPerPage,
-                    assetIds: assetBId !== ''
-                        ? [assetAId, assetBId]
-                        : [assetAId],
+                    assetIds: [assetBId !== '' ? assetBId : assetAId],
                 },
             }).then((response: any) => {
                 const pools = response.data.data.pools;
