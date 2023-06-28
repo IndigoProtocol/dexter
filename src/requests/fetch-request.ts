@@ -79,13 +79,17 @@ export class FetchRequest {
         }
 
         return liquidityPoolPromises
-            .then((liquidityPools: LiquidityPool[]) => {
+            .then(async (liquidityPools: LiquidityPool[]) => {
                 const possiblePools: LiquidityPool[] = liquidityPools.filter((pool?: LiquidityPool) => {
                     return pool !== undefined && pool.uuid === liquidityPool.uuid;
                 }) as LiquidityPool[];
 
                 if (possiblePools.length > 1) {
                     return Promise.reject('Encountered more than 1 possible pool state.');
+                }
+
+                if (this._dexter.config.shouldFetchMetadata) {
+                    await this.fetchAssetMetadata(possiblePools);
                 }
 
                 return possiblePools[0];
