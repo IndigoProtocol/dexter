@@ -31,6 +31,10 @@ export class VyFinance extends BaseDex {
         return Promise.reject('Not implemented as VyFinance pools are not easily identifiable on-chain.');
     }
 
+    public liquidityPool(provider: BaseDataProvider, liquidityPool: LiquidityPool): Promise<LiquidityPool> {
+        return Promise.reject('Not implemented as VyFinance pools are not easily identifiable on-chain.');
+    }
+
     public async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
         return Promise.reject('Not implemented as VyFinance pools are not easily identifiable on-chain.');
     }

@@ -42,6 +42,58 @@ export class FetchRequest {
     }
 
     /**
+     * Fetch latest state for a liquidity pool.
+     */
+    public getLiquidityPoolState(liquidityPool: LiquidityPool): Promise<LiquidityPool> {
+        const dexInstance: BaseDex | undefined = this._dexter.dexByName(liquidityPool.dex);
+
+        if (! dexInstance) {
+            return Promise.reject('Unable to determine DEX from the provided liquidity pool.');
+        }
+
+        let liquidityPoolPromises: Promise<LiquidityPool[]>;
+
+        if (this._dexter.dataProvider) {
+            if (! liquidityPool.address) {
+                return Promise.reject('Liquidity pool must have a set address.');
+            }
+
+            const filterableAsset: Asset = liquidityPool.assetA === 'lovelace'
+                ? liquidityPool.assetB as Asset
+                : liquidityPool.assetA as Asset;
+
+            liquidityPoolPromises = this._dexter.dataProvider.utxos(liquidityPool.address, filterableAsset)
+                .then(async (utxos: UTxO[]) => {
+                    return await Promise.all(
+                        utxos.map(async (utxo: UTxO) => {
+                            return await dexInstance.liquidityPoolFromUtxo(this._dexter.dataProvider as BaseDataProvider, utxo);
+                        })
+                    ).then((liquidityPools: (LiquidityPool | undefined)[]) => {
+                        return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
+                            return liquidityPool !== undefined;
+                        }) as LiquidityPool[];
+                    })
+                });
+        } else {
+            //todo: look into better API endpoints
+            liquidityPoolPromises = dexInstance.api.liquidityPools(liquidityPool.assetA, liquidityPool.assetB);
+        }
+
+        return liquidityPoolPromises
+            .then((liquidityPools: LiquidityPool[]) => {
+                const possiblePools: LiquidityPool[] = liquidityPools.filter((pool?: LiquidityPool) => {
+                    return pool !== undefined && pool.uuid === liquidityPool.uuid;
+                }) as LiquidityPool[];
+
+                if (possiblePools.length > 1) {
+                    return Promise.reject('Encountered more than 1 possible pool state.');
+                }
+
+                return possiblePools[0];
+            });
+    }
+
+    /**
      * Fetch all liquidity pools matching assetA & assetB.
      * All liquidity pools will be returned if assetA & assetB are not provided.
      */
