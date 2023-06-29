@@ -3,7 +3,11 @@
   "version": "1.0.5",
   "license": "MIT",
   "author": "Zachary Sluder",
-  "keywords": ["dexter", "Cardano", "DEX"],
+  "keywords": [
+    "dexter",
+    "Cardano",
+    "DEX"
+  ],
   "description": "Customizable Typescript SDK for interacting with Cardano DEXs",
   "type": "module",
   "main": "./build/index.js",
@@ -15,10 +19,11 @@
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
     "prepare": "npm run build",
-    "prepublishOnly" : "npm run test"
+    "prepublishOnly": "npm run test"
   },
   "dependencies": {
     "axios": "^0.26.1",
+    "axios-retry": "^3.5.1",
     "lucid-cardano": "^0.8.7"
   },
   "devDependencies": {
