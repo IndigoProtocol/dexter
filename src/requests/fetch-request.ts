@@ -4,6 +4,7 @@ import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Dexter } from '@app/dexter';
 import { AssetMetadata, Transaction, UTxO } from '@app/types';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
+import { tokensMatch } from "@app/utils";
 
 export class FetchRequest {
 
@@ -52,8 +53,7 @@ export class FetchRequest {
                         .catch(() => []);
                 }
 
-                return dex.liquidityPools(this._dexter.dataProvider as BaseDataProvider, assetA, assetB)
-                    .then((pools: LiquidityPool[]) => pools)
+                return dex.liquidityPools(this._dexter.dataProvider as BaseDataProvider)
                     .catch(() => {
                         // Attempt fallback to API
                         return this._dexter.config.shouldFallbackToApi
@@ -65,7 +65,16 @@ export class FetchRequest {
         return Promise.all(
             liquidityPoolPromises,
         ).then(async (mappedLiquidityPools: Awaited<LiquidityPool[]>[]) => {
-            const liquidityPools: LiquidityPool[] = mappedLiquidityPools.flat();
+            const liquidityPools: LiquidityPool[] = mappedLiquidityPools
+                .flat()
+                .filter((pool: LiquidityPool) => {
+                    // Check if pool matches provided filter assets
+                    let isWanted: boolean = tokensMatch(pool.assetA, assetA) || tokensMatch(pool.assetB, assetA);
+
+                    return assetB
+                        ? (isWanted && (tokensMatch(pool.assetA, assetB) || tokensMatch(pool.assetB, assetB)))
+                        : isWanted;
+                });
 
             if (this._dexter.config.shouldFetchMetadata) {
                 await this.fetchAssetMetadata(liquidityPools);
@@ -87,7 +96,7 @@ export class FetchRequest {
 
         const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = transactions.map(async (transaction: Transaction) => {
             const utxos: UTxO[] = await (this._dexter.dataProvider as BaseDataProvider)
-                .transactionUtxos(transaction.txHash);
+                .transactionUtxos(transaction.hash);
 
             const relevantUtxo: UTxO | undefined = utxos.find((utxo: UTxO) => {
                 return utxo.address === liquidityPool.address;
@@ -97,10 +106,9 @@ export class FetchRequest {
                 return undefined;
             }
 
-            return this._dexter.availableDexs[liquidityPool.dex].liquidityPoolFromUtxo(
+            return await this._dexter.availableDexs[liquidityPool.dex].liquidityPoolFromUtxo(
+                this._dexter.dataProvider as BaseDataProvider,
                 relevantUtxo,
-                liquidityPool.assetA,
-                liquidityPool.assetB
             ) as LiquidityPool | undefined;
         });
 

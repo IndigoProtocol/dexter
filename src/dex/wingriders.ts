@@ -1,5 +1,13 @@
 import { BaseDex } from './base-dex';
-import { AssetAddress, AssetBalance, DatumParameters, PayToAddress, RequestConfig, SwapFee, UTxO } from '@app/types';
+import {
+    AssetAddress,
+    AssetBalance,
+    DatumParameters,
+    PayToAddress,
+    RequestConfig,
+    SwapFee,
+    UTxO
+} from '@app/types';
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
@@ -35,39 +43,44 @@ export class WingRiders extends BaseDex {
         this.api = new WingRidersApi(this, requestConfig);
     }
 
-    async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+    public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
         const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
         const assetAddresses: AssetAddress[] = this._assetAddresses.length > 0
             ? this._assetAddresses
             : await provider.assetAddresses(validityAsset);
 
-        const addressPromises: Promise<LiquidityPool[]>[] = assetAddresses.map(async (assetAddress: AssetAddress) => {
-            const utxos: UTxO[] = await provider.utxos(assetAddress.address, validityAsset);
+        return Promise.resolve([...new Set(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address))]);
+    }
 
-            const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO) => {
-                return this.liquidityPoolFromUtxo(utxo, assetA, assetB);
+    async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
+        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const poolAddresses: string[] = await this.liquidityPoolAddresses(provider);
+
+        const addressPromises: Promise<LiquidityPool[]>[] = poolAddresses.map(async (address: string) => {
+            const utxos: UTxO[] = await provider.utxos(address, validityAsset);
+
+            return await Promise.all(
+                utxos.map(async (utxo: UTxO) => {
+                    return await this.liquidityPoolFromUtxo(provider, utxo);
+                })
+            )
+            .then((liquidityPools: (LiquidityPool | undefined)[]) => {
+                return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
+                    return liquidityPool !== undefined;
+                }) as LiquidityPool[]
             });
-
-            return await Promise.all(liquidityPoolPromises)
-                .then((liquidityPools: (LiquidityPool | undefined)[]) => {
-                    return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
-                        return liquidityPool !== undefined;
-                    }) as LiquidityPool[]
-                });
         });
 
         return Promise.all(addressPromises)
             .then((liquidityPools: (Awaited<LiquidityPool[]>)[]) => liquidityPools.flat());
     }
 
-    liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB?: Token): LiquidityPool | undefined {
+    public async liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO): Promise<LiquidityPool | undefined> {
         if (! utxo.datumHash) {
-            return undefined;
+            return Promise.resolve(undefined);
         }
 
         const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
-        const assetAId: string = assetA === 'lovelace' ? 'lovelace' : assetA.id();
-        const assetBId: string = assetB ? (assetB === 'lovelace' ? 'lovelace' : assetB.id()) : '';
 
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
             const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
@@ -77,29 +90,12 @@ export class WingRiders extends BaseDex {
 
         // Irrelevant UTxO
         if (relevantAssets.length < 2) {
-            return undefined;
+            return Promise.resolve(undefined);
         }
 
         // Could be ADA/X or X/X pool
         const assetAIndex: number = relevantAssets.length === 2 ? 0 : 1;
         const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
-
-        const relevantAssetAId: string = relevantAssets[assetAIndex].asset === 'lovelace'
-            ? 'lovelace'
-            : (relevantAssets[assetAIndex].asset as Asset).id()
-        const relevantAssetBId: string = relevantAssets[assetBIndex].asset === 'lovelace'
-            ? 'lovelace'
-            : (relevantAssets[assetBIndex].asset as Asset).id()
-
-        // Only grab requested pools
-        const matchesFilter: boolean = (relevantAssetAId === assetAId && relevantAssetBId === assetBId)
-            || (relevantAssetAId === assetBId && relevantAssetBId === assetAId)
-            || (relevantAssetAId === assetAId && ! assetBId)
-            || (relevantAssetBId === assetAId && ! assetBId);
-
-        if (! matchesFilter) {
-            return undefined;
-        }
 
         const assetAQuantity: bigint = relevantAssets[assetAIndex].quantity;
         const assetBQuantity: bigint = relevantAssets[assetBIndex].quantity;

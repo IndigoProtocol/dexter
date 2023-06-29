@@ -7,7 +7,7 @@ import {
     DefinitionConstr,
     DefinitionField,
     DefinitionInt,
-    KupoConfig,
+    KupoConfig, RequestConfig,
     Transaction,
     UTxO
 } from '@app/types';
@@ -18,13 +18,24 @@ export class KupoProvider extends BaseDataProvider {
 
     private _config: KupoConfig;
     private _kupoApi: AxiosInstance;
+    private _requestConfig: RequestConfig;
 
-    constructor(config: KupoConfig) {
+    constructor(config: KupoConfig, requestConfig: RequestConfig = {}) {
         super();
+
+        this._requestConfig = Object.assign(
+            {},
+            {
+                timeout: 5000,
+                proxyUrl: '',
+            } as RequestConfig,
+            requestConfig,
+        );
 
         this._config = config;
         this._kupoApi = axios.create({
-            baseURL: config.url,
+            baseURL: requestConfig.proxyUrl + config.url,
+            timeout: requestConfig.timeout,
         });
     }
 
@@ -36,8 +47,6 @@ export class KupoProvider extends BaseDataProvider {
         return this._kupoApi.get(url)
             .then((results: any) => {
                 return this.toUtxos(results.data);
-            }).catch(() => {
-                return Promise.resolve([]);
             });
     }
 
@@ -45,14 +54,16 @@ export class KupoProvider extends BaseDataProvider {
         return this._kupoApi.get(`/matches/${txHash}`)
             .then((results: any) => {
                 return this.toUtxos(results.data);
-            }).catch(() => {
-                return Promise.resolve([]);
             });
     }
 
     public async datumValue(datumHash: string): Promise<DefinitionField> {
         return this._kupoApi.get(`/datums/${datumHash}`)
             .then((result: any) => {
+                if (! result.data.datum) {
+                    throw new Error('Datum hash not found.');
+                }
+
                 return this.toDefinitionDatum(Data.from(result.data.datum));
             });
     }
@@ -62,12 +73,9 @@ export class KupoProvider extends BaseDataProvider {
             .then((results: any) => {
                 return results.data.map((result: any) => {
                     return {
-                        txHash: result.transaction_id,
-                        txIndex: result.transaction_index,
+                        hash: result.transaction_id,
                     } as Transaction
                 }) as Transaction[];
-            }).catch(() => {
-                return Promise.resolve([]);
             });
     }
 
@@ -80,8 +88,6 @@ export class KupoProvider extends BaseDataProvider {
                         quantity: BigInt(result.value.assets[asset.id('.')]),
                     } as AssetAddress
                 }) as AssetAddress[];
-            }).catch(() => {
-                return Promise.resolve([]);
             });
     }
 
@@ -101,7 +107,7 @@ export class KupoProvider extends BaseDataProvider {
                     ];
                     Object.keys(utxo.value.assets).forEach((unit: string) => {
                         balances.push({
-                            asset: Asset.fromId(unit.replace('.', '')),
+                            asset: Asset.fromId(unit),
                             quantity: BigInt(utxo.value.assets[unit]),
                         });
                     });

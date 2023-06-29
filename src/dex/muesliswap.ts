@@ -30,7 +30,6 @@ export class MuesliSwap extends BaseDex {
      * On-Chain constants.
      */
     public readonly orderAddress: string = 'addr1zyq0kyrml023kwjk8zr86d5gaxrt5w8lxnah8r6m6s4jp4g3r6dxnzml343sx8jweqn4vn3fz2kj8kgu9czghx0jrsyqqktyhv';
-    public readonly poolAddress: string = 'addr1z9cy2gmar6cpn8yymll93lnd7lw96f27kn2p3eq5d4tjr7xnh3gfhnqcwez2pzmr4tryugrr0uahuk49xqw7dc645chscql0d7';
     public readonly lpTokenPolicyId: string = 'af3d70acf4bd5b3abb319a7d75c89fb3e56eafcdd46b2e9b57a2557f';
     public readonly poolNftPolicyId: string = '909133088303c49f3a30f1cc8ed553a73857a29779f6c6561cd8093f';
     public readonly factoryToken: string = 'de9b756719341e79785aa13c164e7fe68c189ed04d61c9876b2fe53f4d7565736c69537761705f414d4d';
@@ -41,53 +40,40 @@ export class MuesliSwap extends BaseDex {
         this.api = new MuesliSwapApi(this, requestConfig);
     }
 
-    async liquidityPools(provider: BaseDataProvider, assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const factoryAsset: Asset = Asset.fromId(this.factoryToken);
-        const assetAddresses: AssetAddress[] = await provider.assetAddresses(factoryAsset);
+    public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
+        const validityAsset: Asset = Asset.fromId(this.factoryToken);
+        const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
 
-        const builder: DefinitionBuilder = await (new DefinitionBuilder())
-            .loadDefinition(pool);
+        return Promise.resolve([...new Set(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address))]);
+    }
 
-        const addressPromises: Promise<LiquidityPool[]>[] = assetAddresses.map(async (assetAddress: AssetAddress) => {
-            const utxos: UTxO[] = await provider.utxos(assetAddress.address, (assetA === 'lovelace' ? undefined : assetA));
+    async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
+        const validityAsset: Asset = Asset.fromId(this.factoryToken);
+        const poolAddresses: string[] = await this.liquidityPoolAddresses(provider);
 
-            const liquidityPoolPromises: Promise<LiquidityPool | undefined>[] = utxos.map(async (utxo: UTxO): Promise<LiquidityPool | undefined> => {
-                const liquidityPool: LiquidityPool | undefined = this.liquidityPoolFromUtxo(utxo, assetA, assetB);
+        const addressPromises: Promise<LiquidityPool[]>[] = poolAddresses.map(async (address: string) => {
+            const utxos: UTxO[] = await provider.utxos(address, validityAsset);
 
-                if (liquidityPool) {
-                    const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-                    const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
-
-                    liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
-                        ? BigInt(parameters.TotalLpTokens)
-                        : 0n;
-                    liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number'
-                        ? parameters.LpFee / 100
-                        : 0;
-                }
-
-                return liquidityPool;
+            return await Promise.all(
+                utxos.map(async (utxo: UTxO): Promise<LiquidityPool | undefined> => {
+                    return await this.liquidityPoolFromUtxo(provider, utxo);
+                })
+            )
+            .then((liquidityPools: (LiquidityPool | undefined)[]) => {
+                return liquidityPools.filter((liquidityPool?: LiquidityPool): boolean => {
+                    return liquidityPool !== undefined;
+                }) as LiquidityPool[]
             });
-
-            return await Promise.all(liquidityPoolPromises)
-                .then((liquidityPools: (LiquidityPool | undefined)[]) => {
-                    return liquidityPools.filter((liquidityPool?: LiquidityPool): boolean => {
-                        return liquidityPool !== undefined;
-                    }) as LiquidityPool[]
-                });
         });
 
         return Promise.all(addressPromises)
             .then((liquidityPools: (Awaited<LiquidityPool[]>)[]) => liquidityPools.flat());
     }
 
-    liquidityPoolFromUtxo(utxo: UTxO, assetA: Token, assetB?: Token): LiquidityPool | undefined {
+    public async liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO): Promise<LiquidityPool | undefined> {
         if (! utxo.datumHash) {
-            return undefined;
+            return Promise.resolve(undefined);
         }
-
-        const assetAId: string = assetA === 'lovelace' ? 'lovelace' : assetA.id();
-        const assetBId: string = assetB ? (assetB === 'lovelace' ? 'lovelace' : assetB.id()) : '';
 
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
             const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
@@ -98,29 +84,12 @@ export class MuesliSwap extends BaseDex {
 
         // Irrelevant UTxO
         if (relevantAssets.length < 2) {
-            return undefined;
+            return Promise.resolve(undefined);
         }
 
         // Could be ADA/X or X/X pool
         const assetAIndex: number = relevantAssets.length === 2 ? 0 : 1;
         const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
-
-        const relevantAssetAId: string = relevantAssets[assetAIndex].asset === 'lovelace'
-            ? 'lovelace'
-            : (relevantAssets[assetAIndex].asset as Asset).id()
-        const relevantAssetBId: string = relevantAssets[assetBIndex].asset === 'lovelace'
-            ? 'lovelace'
-            : (relevantAssets[assetBIndex].asset as Asset).id()
-
-        // Only grab requested pools
-        const matchesFilter: boolean = (relevantAssetAId === assetAId && relevantAssetBId === assetBId)
-            || (relevantAssetAId === assetBId && relevantAssetBId === assetAId)
-            || (relevantAssetAId === assetAId && ! assetBId)
-            || (relevantAssetBId === assetAId && ! assetBId);
-
-        if (! matchesFilter) {
-            return undefined;
-        }
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
             this.name,
@@ -133,6 +102,7 @@ export class MuesliSwap extends BaseDex {
             this.orderAddress,
         );
 
+        // Load additional pool information
         const lpToken: Asset = utxo.assetBalances.find((assetBalance: AssetBalance) => {
             return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.poolNftPolicyId;
         })?.asset as Asset;
@@ -140,6 +110,23 @@ export class MuesliSwap extends BaseDex {
         if (lpToken) {
             lpToken.policyId = this.lpTokenPolicyId;
             liquidityPool.lpToken = lpToken;
+        }
+
+        try {
+            const builder: DefinitionBuilder = await (new DefinitionBuilder())
+                .loadDefinition(pool);
+            const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+            const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+
+            liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
+                ? BigInt(parameters.TotalLpTokens)
+                : 0n;
+            liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number'
+                ? parameters.LpFee / 100
+                : 0;
+
+        } catch (e) {
+            return liquidityPool;
         }
 
         return liquidityPool;

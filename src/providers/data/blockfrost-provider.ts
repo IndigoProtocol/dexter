@@ -1,20 +1,39 @@
 import { BaseDataProvider } from './base-data-provider';
 import axios, { AxiosInstance } from 'axios';
-import { AssetAddress, AssetBalance, BlockfrostConfig, DefinitionField, Transaction, UTxO } from '@app/types';
+import {
+    AssetAddress,
+    AssetBalance,
+    BlockfrostConfig,
+    DefinitionField,
+    RequestConfig,
+    Transaction,
+    UTxO
+} from '@app/types';
 import { Asset } from '@dex/models/asset';
 
 export class BlockfrostProvider extends BaseDataProvider {
 
     private _api: AxiosInstance;
+    private _requestConfig: RequestConfig;
 
     /**
      * https://docs.blockfrost.io/
      */
-    constructor(config: BlockfrostConfig) {
+    constructor(config: BlockfrostConfig, requestConfig: RequestConfig = {}) {
         super();
 
+        this._requestConfig = Object.assign(
+            {},
+            {
+                timeout: 5000,
+                proxyUrl: '',
+            } as RequestConfig,
+            requestConfig,
+        );
+
         this._api = axios.create({
-            baseURL: config.url,
+            baseURL: (requestConfig.proxyUrl ?? '') + config.url,
+            timeout: requestConfig.timeout,
             headers: {
                 project_id: config.projectId,
             },
@@ -78,8 +97,7 @@ export class BlockfrostProvider extends BaseDataProvider {
             .then((results: any) => {
                 return results.map((tx: any) => {
                     return {
-                        txHash: tx.tx_hash,
-                        txIndex: tx.tx_index,
+                        hash: tx.tx_hash,
                     } as Transaction;
                 }) as Transaction[];
             });
