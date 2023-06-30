@@ -19,7 +19,6 @@ describe('Minswap', () => {
     const dexter: Dexter = (new Dexter())
         .withDataProvider(new MockDataProvider())
         .withWalletProvider(walletProvider);
-    const swapRequest: SwapRequest = dexter.newSwapRequest();
     const asset: Asset = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344', 6);
 
     describe('Set Swap In', () => {
@@ -34,7 +33,7 @@ describe('Minswap', () => {
         );
         liquidityPool.poolFeePercent = 0.3;
 
-        swapRequest
+        const swapRequest: SwapRequest = dexter.newSwapRequest()
             .forLiquidityPool(liquidityPool)
             .withSwapInToken('lovelace')
             .withSwapInAmount(10_000_000_000000n)
@@ -82,7 +81,7 @@ describe('Minswap', () => {
         );
         liquidityPool.poolFeePercent = 0.3;
 
-        swapRequest
+        const swapRequest: SwapRequest = dexter.newSwapRequest()
             .forLiquidityPool(liquidityPool)
             .withSwapInToken('lovelace')
             .withSwapOutAmount(100_000000n)

@@ -19,9 +19,7 @@ describe('SundaeSwap', () => {
     const dexter: Dexter = (new Dexter())
         .withDataProvider(new MockDataProvider())
         .withWalletProvider(walletProvider);
-    const swapRequest: SwapRequest = dexter.newSwapRequest();
     const asset: Asset = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344', 6);
-
 
     describe('Set Swap In', () => {
 
@@ -35,13 +33,14 @@ describe('SundaeSwap', () => {
         );
         liquidityPool.poolFeePercent = 0.3;
 
-        swapRequest
+
+        const swapRequest: SwapRequest = dexter.newSwapRequest()
             .forLiquidityPool(liquidityPool)
             .withSwapInToken('lovelace')
             .withSwapInAmount(10_000_000000n)
             .withSlippagePercent(1.0);
 
-        it.only('Can calculate swap parameters', () => {
+        it('Can calculate swap parameters', () => {
             expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(0.27);
             expect(swapRequest.getEstimatedReceive()).toEqual(210_684_680649n);
             expect(swapRequest.getMinimumReceive()).toEqual(208_598_693711n);
@@ -73,7 +72,6 @@ describe('SundaeSwap', () => {
 
     });
 
-
     describe('Set Swap Out', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
@@ -86,17 +84,14 @@ describe('SundaeSwap', () => {
         );
         liquidityPool.poolFeePercent = 0.3;
 
-        swapRequest
+        const swapRequest: SwapRequest = dexter.newSwapRequest()
             .forLiquidityPool(liquidityPool)
             .withSwapInToken('lovelace')
             .withSwapOutAmount(100_000000n)
             .withSlippagePercent(0.5);
 
         it('Can calculate swap parameters', () => {
-            // out: 100
-            // in: 1384.428874
-            console.log(swapRequest.swapInAmount)
-            // expect(swapRequest.swapInAmount).toEqual(366754158n);
+            expect(swapRequest.swapInAmount).toEqual(1384410858n);
         });
 
     });
