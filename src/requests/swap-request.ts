@@ -51,6 +51,7 @@ export class SwapRequest {
 
     public flip(): SwapRequest {
         if (this._swapInToken) {
+            this._swapInAmount = this.getEstimatedReceive();
             [this._swapInToken, this._swapOutToken] = [this._swapOutToken, this._swapInToken];
         }
 
@@ -81,6 +82,23 @@ export class SwapRequest {
         }
 
         this._swapInAmount = swapInAmount;
+
+        return this;
+    }
+
+    public withSwapOutAmount(swapOutAmount: bigint): SwapRequest {
+        if (swapOutAmount < 0n) {
+            throw new Error('Swap out amount must be zero or above.');
+        }
+        if (! this._liquidityPool) {
+            throw new Error('Liquidity pool must be set before setting a swap out amount.');
+        }
+
+        this._swapInAmount = this._dexter.availableDexs[this._liquidityPool.dex].estimatedGive(
+            this._liquidityPool,
+            this._swapOutToken,
+            swapOutAmount,
+        );
 
         return this;
     }

@@ -7,7 +7,8 @@ import {
     DefinitionConstr,
     DefinitionField,
     DefinitionInt,
-    KupoConfig, RequestConfig,
+    KupoConfig,
+    RequestConfig,
     Transaction,
     UTxO
 } from '@app/types';

@@ -133,6 +133,10 @@ export class WingRiders extends BaseDex {
         return liquidityPool;
     }
 
+    estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
+        return 0n;
+    }
+
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
