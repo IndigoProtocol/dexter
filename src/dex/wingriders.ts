@@ -134,15 +134,27 @@ export class WingRiders extends BaseDex {
     }
 
     estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
-        return 0n;
+        const poolFeeMultiplier: bigint = 10000n;
+        const poolFeeModifier: bigint = poolFeeMultiplier - BigInt(Math.round((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier)));
+
+        const [reserveOut, reserveIn]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
+
+        const swapInNumerator: bigint = swapOutAmount * reserveIn * poolFeeMultiplier;
+        const swapInDenominator: bigint = (reserveOut - swapOutAmount) * poolFeeModifier;
+
+        return swapInNumerator / swapInDenominator;
     }
 
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
+        const poolFeeMultiplier: bigint = 10000n;
+        const poolFeeModifier: bigint = poolFeeMultiplier - BigInt(Math.round((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier)));
+
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
-        const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
+        const swapOutNumerator: bigint = swapInAmount * reserveOut * poolFeeModifier;
+        const swapOutDenominator: bigint = swapInAmount * poolFeeModifier + reserveIn * poolFeeMultiplier;
 
-        return reserveOut - (reserveIn * reserveOut - 1n) / (reserveIn + swapInAmount - swapFee) - 1n;
+        return swapOutNumerator / swapOutDenominator;
     }
 
     priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {

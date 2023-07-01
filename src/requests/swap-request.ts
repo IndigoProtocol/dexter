@@ -51,8 +51,8 @@ export class SwapRequest {
 
     public flip(): SwapRequest {
         if (this._swapInToken) {
-            this._swapInAmount = this.getEstimatedReceive();
             [this._swapInToken, this._swapOutToken] = [this._swapOutToken, this._swapInToken];
+            this.withSwapOutAmount(this._swapInAmount);
         }
 
         return this;

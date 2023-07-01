@@ -40,16 +40,27 @@ export class VyFinance extends BaseDex {
     }
 
     estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
-        return 0n;
+        const poolFeeMultiplier: bigint = 1000n;
+        const poolFeeModifier: bigint = poolFeeMultiplier - BigInt(Math.round((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier)));
+
+        const [reserveOut, reserveIn]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
+
+        const swapInNumerator: bigint = swapOutAmount * reserveIn * poolFeeMultiplier;
+        const swapInDenominator: bigint = (reserveOut - swapOutAmount) * poolFeeModifier;
+
+        return swapInNumerator / swapInDenominator + 1n;
     }
 
     public estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
+        const poolFeeMultiplier: bigint = 1000n;
+        const poolFeeModifier: bigint = poolFeeMultiplier - BigInt(Math.round((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier)));
+
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
-        const constFactor: bigint = reserveIn * reserveOut;
-        const swapFee: bigint = BigInt((Number(swapInAmount) * liquidityPool.poolFeePercent / 100));
+        const swapOutNumerator: bigint = swapInAmount * reserveOut * poolFeeModifier;
+        const swapOutDenominator: bigint = swapInAmount * poolFeeModifier + reserveIn * poolFeeMultiplier;
 
-        return reserveOut - constFactor / (reserveIn + swapInAmount - swapFee);
+        return swapOutNumerator / swapOutDenominator;
     }
 
     public priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
