@@ -18,7 +18,7 @@ export class FetchRequest {
     /**
      * Set the DEX(s) Dexter will fetch data for.
      */
-    public forDexs(dexs: string | string[]): FetchRequest {
+    public onDexs(dexs: string | string[]): FetchRequest {
         (Array.isArray(dexs) ? dexs : [dexs]).forEach((dexName: string) => {
             if (! Object.keys(this._dexter.availableDexs).includes(dexName)) {
                 throw new Error(`DEX ${dexName} is not available.`);
@@ -35,7 +35,7 @@ export class FetchRequest {
     /**
      * Fetch data for all available DEXs.
      */
-    public forAllDexs(): FetchRequest {
+    public onAllDexs(): FetchRequest {
         this._onDexs = Object.values(this._dexter.availableDexs);
 
         return this;
@@ -196,7 +196,7 @@ export class FetchRequest {
                         }
 
                         const responseAsset: AssetMetadata | undefined = response.find((metadata: AssetMetadata) => {
-                            return (metadata.policyId === asset.policyId) && (metadata.nameHex === asset.assetNameHex);
+                            return (metadata.policyId === asset.policyId) && (metadata.nameHex === asset.nameHex);
                         });
 
                         asset.decimals = responseAsset ? responseAsset.decimals : 0;

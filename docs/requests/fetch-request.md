@@ -11,19 +11,19 @@ dexter.newFetchRequest()
 ### FetchRequest API
 
 <details>
-<summary><code>forDexs(string | string[]): FetchRequest</code> Set which DEXs to grab information for.</summary>
+<summary><code>onDexs(string | string[]): FetchRequest</code> Set which DEXs to grab information for.</summary>
 
 ##### Using
 
 ```js
 dexter.newFetchRequest()
-    .forDexs(WingRiders.name)
+    .onDexs(WingRiders.name)
     ...
 ```
 or
 ```js
 dexter.newFetchRequest()
-    .forDexs([WingRiders.name, SundaeSwap.name])
+    .onDexs([WingRiders.name, SundaeSwap.name])
     ...
 ```
 </details>
@@ -31,13 +31,13 @@ dexter.newFetchRequest()
 <br>
 
 <details>
-<summary><code>forAllDexs(): FetchRequest</code> Grab information from <i>all</i> available DEXs.</summary>
+<summary><code>onAllDexs(): FetchRequest</code> Grab information from <i>all</i> available DEXs.</summary>
 
 ##### Using
 
 ```js
 dexter.newFetchRequest()
-    .forAllDexs()
+    .onAllDexs()
     ...
 ```
 </details>
@@ -53,7 +53,7 @@ Providing the first or first & second parameters will filter the returned pools 
 
 ```js
 dexter.newFetchRequest()
-    .forAllDexs()
+    .onAllDexs()
     .getLiquidityPools('lovelace')
     .then((pools: LiquidityPool[]) => {
         console.log(pools);
@@ -64,7 +64,7 @@ or
 const indyAsset: Asset = new Asset('533bb94a8850ee3ccbe483106489399112b74c905342cb1792a797a0', '494e4459', 6);
 
 dexter.newFetchRequest()
-    .forAllDexs()
+    .onAllDexs()
     .getLiquidityPools('lovelace', indyAsset)
     .then((pools: LiquidityPool[]) => {
         console.log(pools);
