@@ -102,13 +102,6 @@ export class Dexter {
      * New request for a swap order.
      */
     public newSwapRequest(): SwapRequest {
-        if (! this.walletProvider) {
-            throw new Error('Wallet provider must be set before requesting a swap order.');
-        }
-        if (! this.walletProvider.isWalletLoaded) {
-            throw new Error('Wallet must be loaded before requesting a swap order.');
-        }
-
         return new SwapRequest(this);
     }
 
