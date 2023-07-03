@@ -10,13 +10,16 @@ export class FetchRequest {
 
     private _dexter: Dexter;
     private _onDexs: BaseDex[] = [];
+    private _filteredTokens: Token[] = [];
+    private _filteredPairs: Array<Token[]> = [];
 
     constructor(dexter: Dexter) {
         this._dexter = dexter;
+        this._onDexs = Object.values(dexter.availableDexs);
     }
 
     /**
-     * Set the DEX(s) Dexter will fetch data for.
+     * Set the DEX(s) Dexter will fetch data on.
      */
     public onDexs(dexs: string | string[]): FetchRequest {
         (Array.isArray(dexs) ? dexs : [dexs]).forEach((dexName: string) => {
@@ -33,10 +36,38 @@ export class FetchRequest {
     }
 
     /**
-     * Fetch data for all available DEXs.
+     * Fetch data on all available DEXs.
      */
     public onAllDexs(): FetchRequest {
         this._onDexs = Object.values(this._dexter.availableDexs);
+
+        return this;
+    }
+
+    /**
+     * Only fetch pools containing these tokens.
+     */
+    public forTokens(tokens: Token[]): FetchRequest {
+        this._filteredTokens = tokens;
+
+        return this;
+    }
+
+    /**
+     * Only fetch pools containing these token pairs.
+     */
+    public forTokenPairs(tokenPairs: Array<Token[]>): FetchRequest {
+        tokenPairs.forEach((pair: Token[]) => {
+           if (pair.length !== 2) {
+               throw new Error('Token pair must contain two tokens.');
+           }
+
+           if (tokensMatch(pair[0], pair[1])) {
+               throw new Error('Provided pair contains the same tokens. Ensure each pair has differing tokens.');
+           }
+        });
+
+        this._filteredPairs = tokenPairs;
 
         return this;
     }
@@ -97,22 +128,20 @@ export class FetchRequest {
     }
 
     /**
-     * Fetch all liquidity pools matching assetA & assetB.
-     * All liquidity pools will be returned if assetA & assetB are not provided.
+     * Fetch all liquidity pools matching token filters.
      */
-    public getLiquidityPools(assetA: Token = 'lovelace', assetB?: Token): Promise<LiquidityPool[]> {
+    public getLiquidityPools(): Promise<LiquidityPool[]> {
         const liquidityPoolPromises: Promise<LiquidityPool[]>[] =
             this._onDexs.map((dex: BaseDex) => {
                 if (! this._dexter.dataProvider) {
-                    return dex.api.liquidityPools(assetA, assetB)
-                        .catch(() => []);
+                    return this.fetchPoolsFromApi();
                 }
 
                 return dex.liquidityPools(this._dexter.dataProvider as BaseDataProvider)
                     .catch(() => {
                         // Attempt fallback to API
                         return this._dexter.config.shouldFallbackToApi
-                            ? dex.api.liquidityPools(assetA, assetB)
+                            ? this.fetchPoolsFromApi()
                             : [];
                     });
             });
@@ -122,14 +151,7 @@ export class FetchRequest {
         ).then(async (mappedLiquidityPools: Awaited<LiquidityPool[]>[]) => {
             const liquidityPools: LiquidityPool[] = mappedLiquidityPools
                 .flat()
-                .filter((pool: LiquidityPool) => {
-                    // Check if pool matches provided filter assets
-                    let isWanted: boolean = tokensMatch(pool.assetA, assetA) || tokensMatch(pool.assetB, assetA);
-
-                    return assetB
-                        ? (isWanted && (tokensMatch(pool.assetA, assetB) || tokensMatch(pool.assetB, assetB)))
-                        : isWanted;
-                });
+                .filter((pool: LiquidityPool) => this.poolMatchesFilter(pool));
 
             if (this._dexter.config.shouldFetchMetadata) {
                 await this.fetchAssetMetadata(liquidityPools);
@@ -175,6 +197,9 @@ export class FetchRequest {
             });
     }
 
+    /**
+     * Fetch asset metadata for the assets in the provided liquidity pools.
+     */
     private async fetchAssetMetadata(liquidityPools: LiquidityPool[]) {
         const assets: Asset[] = liquidityPools.reduce((results: Asset[], liquidityPool: LiquidityPool) => {
             if (liquidityPool.assetA !== 'lovelace' && ! results.some((asset: Asset) => asset.id() === (liquidityPool.assetA as Asset).id())) {
@@ -206,6 +231,47 @@ export class FetchRequest {
             .catch(() => {
                 return liquidityPools;
             });
+    }
+
+    /**
+     * Check if a pools assets match the supplied token filters.
+     */
+    private poolMatchesFilter(liquidityPool: LiquidityPool): boolean {
+        if (! this._filteredTokens.length && ! this._filteredPairs.length) {
+            return true;
+        }
+
+        const inFilteredTokens: boolean = this._filteredTokens.some((filterToken: Token) => {
+            return tokensMatch(filterToken, liquidityPool.assetA) || tokensMatch(filterToken, liquidityPool.assetB);
+        });
+        const inFilteredPairs: boolean = this._filteredPairs.some((filterPair: Token[]) => {
+            return (tokensMatch(filterPair[0], liquidityPool.assetA) && tokensMatch(filterPair[1], liquidityPool.assetB))
+                || (tokensMatch(filterPair[0], liquidityPool.assetB) && tokensMatch(filterPair[1], liquidityPool.assetA));
+        });
+
+        return inFilteredTokens || inFilteredPairs;
+    }
+
+    /**
+     * Fetch liquidity pools from DEX APIs using the provided token filters.
+     */
+    private fetchPoolsFromApi(): Promise<LiquidityPool[]> {
+        const filterTokenPromises: Promise<LiquidityPool[]>[] = this._onDexs.map((dex: BaseDex) => {
+            return this._filteredTokens.map((token: Token) => {
+                return dex.api.liquidityPools(token)
+                    .catch(() => []);
+            })
+        }).flat();
+        const filterPairPromises: Promise<LiquidityPool[]>[] = this._onDexs.map((dex: BaseDex) => {
+            return this._filteredPairs.map((pair: Token[]) => {
+                return dex.api.liquidityPools(pair[0], pair[1])
+                    .catch(() => []);
+            })
+        }).flat();
+
+        return Promise.all(
+            filterTokenPromises.concat(filterPairPromises),
+        ).then((allLiquidityPools: Awaited<LiquidityPool[]>[]) => allLiquidityPools.flat());
     }
 
 }
