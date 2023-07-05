@@ -206,9 +206,9 @@ export class SwapRequest {
             [DatumParameterKey.SwapInAmount]: this._swapInAmount,
             [DatumParameterKey.MinReceive]: this.getMinimumReceive(),
             [DatumParameterKey.SwapInTokenPolicyId]: this._swapInToken === 'lovelace' ? '' : this._swapInToken.policyId,
-            [DatumParameterKey.SwapInTokenAssetName]: this._swapInToken === 'lovelace' ? '' : this._swapInToken.assetNameHex,
+            [DatumParameterKey.SwapInTokenAssetName]: this._swapInToken === 'lovelace' ? '' : this._swapInToken.nameHex,
             [DatumParameterKey.SwapOutTokenPolicyId]: this._swapOutToken === 'lovelace' ? '' : this._swapOutToken.policyId,
-            [DatumParameterKey.SwapOutTokenAssetName]: this._swapOutToken === 'lovelace' ? '' : this._swapOutToken.assetNameHex,
+            [DatumParameterKey.SwapOutTokenAssetName]: this._swapOutToken === 'lovelace' ? '' : this._swapOutToken.nameHex,
         };
 
         this._dexter.availableDexs[this._liquidityPool.dex].buildSwapOrder(this._liquidityPool, defaultSwapParameters)

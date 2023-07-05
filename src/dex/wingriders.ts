@@ -121,7 +121,7 @@ export class WingRiders extends BaseDex {
         const lpTokenBalance: AssetBalance | undefined = utxo.assetBalances.find((assetBalance) => {
             return assetBalance.asset !== 'lovelace'
                 && assetBalance.asset.policyId === validityAsset.policyId
-                && assetBalance.asset.assetNameHex !== validityAsset.assetNameHex;
+                && assetBalance.asset.nameHex !== validityAsset.nameHex;
         });
 
         if (lpTokenBalance) {

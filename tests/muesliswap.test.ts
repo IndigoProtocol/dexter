@@ -90,7 +90,7 @@ describe('MuesliSwap', () => {
         it('Can calculate swap parameters', () => {
             expect(swapRequest.swapInAmount).toEqual(133971309n);
         });
-
+      
     });
 
 });

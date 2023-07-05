@@ -94,7 +94,7 @@ export class SundaeSwap extends BaseDex {
         })?.asset as Asset;
 
         if (lpToken) {
-            lpToken.assetNameHex = '6c' + lpToken.assetNameHex;
+            lpToken.nameHex = '6c' + lpToken.nameHex;
             liquidityPool.lpToken = lpToken;
         }
 

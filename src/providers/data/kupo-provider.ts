@@ -35,14 +35,14 @@ export class KupoProvider extends BaseDataProvider {
 
         this._config = config;
         this._kupoApi = axios.create({
-            baseURL: requestConfig.proxyUrl + config.url,
-            timeout: requestConfig.timeout,
+            baseURL: this._requestConfig.proxyUrl + config.url,
+            timeout: this._requestConfig.timeout,
         });
     }
 
     public async utxos(address: string, asset?: Asset): Promise<UTxO[]> {
         const url: string = asset
-            ? `/matches/${address}?policy_id=${asset.policyId}&asset_name=${asset.assetNameHex}&unspent`
+            ? `/matches/${address}?policy_id=${asset.policyId}&asset_name=${asset.nameHex}&unspent`
             : `/matches/${address}`;
 
         return this._kupoApi.get(url)

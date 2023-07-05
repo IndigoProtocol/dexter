@@ -90,7 +90,7 @@ describe('Minswap', () => {
         it('Can calculate swap parameters', () => {
             expect(swapRequest.swapInAmount).toEqual(365844367n);
         });
-
+      
     });
 
 });
