@@ -63,7 +63,7 @@ export class MinswapApi extends BaseApi {
                 variables: {
                     asset: {
                         currencySymbol: assetA === 'lovelace' ? '' : assetA.policyId,
-                        tokenName: assetA === 'lovelace' ? '' : assetA.assetNameHex,
+                        tokenName: assetA === 'lovelace' ? '' : assetA.nameHex,
                     },
                     limit: maxPerPage,
                     offset: page * maxPerPage,

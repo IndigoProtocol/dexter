@@ -56,7 +56,7 @@ describe('VyFinance', () => {
             [DatumParameterKey.SwapInTokenPolicyId]: '',
             [DatumParameterKey.SwapInTokenAssetName]: '',
             [DatumParameterKey.SwapOutTokenPolicyId]: asset.policyId,
-            [DatumParameterKey.SwapOutTokenAssetName]: asset.assetNameHex,
+            [DatumParameterKey.SwapOutTokenAssetName]: asset.nameHex,
         };
 
         return vyfi.buildSwapOrder(liquidityPool, defaultSwapParameters)

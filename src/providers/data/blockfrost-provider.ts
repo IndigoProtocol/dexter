@@ -32,8 +32,8 @@ export class BlockfrostProvider extends BaseDataProvider {
         );
 
         this._api = axios.create({
-            baseURL: (requestConfig.proxyUrl ?? '') + config.url,
-            timeout: requestConfig.timeout,
+            baseURL: (this._requestConfig.proxyUrl ?? '') + config.url,
+            timeout: this._requestConfig.timeout,
             headers: {
                 project_id: config.projectId,
             },
