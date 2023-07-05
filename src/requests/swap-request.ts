@@ -76,6 +76,24 @@ export class SwapRequest {
         return this;
     }
 
+    public withSwapOutToken(swapOutToken: Token): SwapRequest {
+        if (! this._liquidityPool) {
+            throw new Error('Liquidity pool must be set before providing an input token.');
+        }
+
+        if (tokensMatch(swapOutToken, this._liquidityPool.assetA)) {
+            this._swapInToken = this._liquidityPool.assetB;
+        } else if (tokensMatch(swapOutToken, this._liquidityPool.assetB)) {
+            this._swapInToken = this._liquidityPool.assetA;
+        } else {
+            throw new Error("Output token doesn't exist in the set liquidity pool.");
+        }
+
+        this._swapOutToken = swapOutToken;
+
+        return this;
+    }
+
     public withSwapInAmount(swapInAmount: bigint): SwapRequest {
         if (swapInAmount < 0n) {
             throw new Error('Swap in amount must be zero or above.');
