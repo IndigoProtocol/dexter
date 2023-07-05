@@ -4,7 +4,6 @@ import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { VyFinance } from '../vyfinance';
 import { RequestConfig } from '@app/types';
-import { tokensMatch } from '@app/utils';
 
 export class VyfinanceApi extends BaseApi {
 
@@ -49,8 +48,8 @@ export class VyfinanceApi extends BaseApi {
                         this.dex.name,
                         tokenA,
                         tokenB,
-                        pool['tokenAQuantity'],
-                        pool['tokenBQuantity'],
+                        BigInt(pool['tokenAQuantity']),
+                        BigInt(pool['tokenBQuantity']),
                         pool['poolValidatorUtxoAddress'],
                         pool['orderValidatorUtxoAddress'],
                         pool['orderValidatorUtxoAddress'],

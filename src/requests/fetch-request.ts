@@ -214,6 +214,7 @@ export class FetchRequest {
 
         await this._dexter.metadataProvider.fetch(assets)
             .then((response: AssetMetadata[]) => {
+                console.log(response)
                 liquidityPools.forEach((liquidityPool: LiquidityPool) => {
                     [liquidityPool.assetA, liquidityPool.assetB].forEach((asset: Token) => {
                         if (! (asset instanceof Asset)) {
@@ -227,9 +228,6 @@ export class FetchRequest {
                         asset.decimals = responseAsset ? responseAsset.decimals : 0;
                     });
                 });
-            })
-            .catch(() => {
-                return liquidityPools;
             });
     }
 
