@@ -134,14 +134,14 @@ export class FetchRequest {
         const liquidityPoolPromises: Promise<LiquidityPool[]>[] =
             this._onDexs.map((dex: BaseDex) => {
                 if (! this._dexter.dataProvider) {
-                    return this.fetchPoolsFromApi();
+                    return this.fetchPoolsFromApi(dex);
                 }
 
                 return dex.liquidityPools(this._dexter.dataProvider as BaseDataProvider)
                     .catch(() => {
                         // Attempt fallback to API
                         return this._dexter.config.shouldFallbackToApi
-                            ? this.fetchPoolsFromApi()
+                            ? this.fetchPoolsFromApi(dex)
                             : [];
                     });
             });
@@ -255,22 +255,18 @@ export class FetchRequest {
     /**
      * Fetch liquidity pools from DEX APIs using the provided token filters.
      */
-    private fetchPoolsFromApi(): Promise<LiquidityPool[]> {
-        const filterTokenPromises: Promise<LiquidityPool[]>[] = this._onDexs.map((dex: BaseDex) => {
-            return this._filteredTokens.map((token: Token) => {
-                return dex.api.liquidityPools(token)
-                    .catch(() => []);
-            })
-        }).flat();
-        const filterPairPromises: Promise<LiquidityPool[]>[] = this._onDexs.map((dex: BaseDex) => {
-            return this._filteredPairs.map((pair: Token[]) => {
-                return dex.api.liquidityPools(pair[0], pair[1])
-                    .catch(() => []);
-            })
-        }).flat();
+    private fetchPoolsFromApi(dex: BaseDex): Promise<LiquidityPool[]> {
+        const filterTokenPromises: Promise<LiquidityPool[]>[] = this._filteredTokens.map((token: Token) => {
+            return dex.api.liquidityPools(token)
+                .catch(() => []);
+        });
+        const filterPairPromises: Promise<LiquidityPool[]>[] = this._filteredPairs.map((pair: Token[]) => {
+            return dex.api.liquidityPools(pair[0], pair[1])
+                .catch(() => []);
+        });
 
         return Promise.all(
-            filterTokenPromises.concat(filterPairPromises),
+            filterTokenPromises.concat(filterPairPromises).flat(),
         ).then((allLiquidityPools: Awaited<LiquidityPool[]>[]) => allLiquidityPools.flat());
     }
 

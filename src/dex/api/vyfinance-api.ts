@@ -30,7 +30,7 @@ export class VyfinanceApi extends BaseApi {
             : 'lovelace';
 
         const url: string = assetB
-            ? `'/lp?networkId=1&v2=true&tokenAUnit=${assetAId}&tokenBUnit=${assetBId}'`
+            ? `/lp?networkId=1&v2=true&tokenAUnit=${assetAId}&tokenBUnit=${assetBId}`
             : '/lp?networkId=1&v2=true';
 
         return this.api.get(url)
