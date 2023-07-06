@@ -95,18 +95,15 @@ export class SwapRequest {
     }
 
     public withSwapInAmount(swapInAmount: bigint): SwapRequest {
-        if (swapInAmount < 0n) {
-            throw new Error('Swap in amount must be zero or above.');
-        }
-
-        this._swapInAmount = swapInAmount;
+        this._swapInAmount = swapInAmount > 0n ? swapInAmount : 0n;
 
         return this;
     }
 
     public withSwapOutAmount(swapOutAmount: bigint): SwapRequest {
-        if (swapOutAmount < 0n) {
-            throw new Error('Swap out amount must be zero or above.');
+        if (swapOutAmount <= 0n) {
+            this._swapInAmount = 0n;
+            return this;
         }
         if (! this._liquidityPool) {
             throw new Error('Liquidity pool must be set before setting a swap out amount.');
