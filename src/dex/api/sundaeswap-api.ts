@@ -16,7 +16,10 @@ export class SundaeSwapApi extends BaseApi {
         this.dex = dex;
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: `${requestConfig.proxyUrl}https://stats.sundaeswap.finance/graphql`
+            baseURL: `${requestConfig.proxyUrl}https://stats.sundaeswap.finance/graphql`,
+            headers: {
+                'Content-Type': 'application/json',
+            }
         });
     }
 

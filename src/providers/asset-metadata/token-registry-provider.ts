@@ -18,7 +18,10 @@ export class TokenRegistryProvider extends BaseMetadataProvider {
 
         this._api = axios.create({
             timeout: requestConfig.timeout ?? 5000,
-            baseURL: `${requestConfig.proxyUrl ?? ''}https://tokens.cardano.org/`
+            baseURL: `${requestConfig.proxyUrl ?? ''}https://tokens.cardano.org/`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
         });
     }
 

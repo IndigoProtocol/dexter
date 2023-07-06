@@ -16,7 +16,10 @@ export class VyfinanceApi extends BaseApi {
         this.dex = dex;
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: `${requestConfig.proxyUrl}https://api.vyfi.io`
+            baseURL: `${requestConfig.proxyUrl}https://api.vyfi.io`,
+            headers: {
+                'Content-Type': 'application/json',
+            }
         });
     }
 

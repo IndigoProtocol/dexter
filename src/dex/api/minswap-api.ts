@@ -4,6 +4,10 @@ import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { Minswap } from '../minswap';
 import { RequestConfig } from '@app/types';
+import AES from 'crypto-js/aes';
+import Utf8 from 'crypto-js/enc-utf8';
+
+const AES_KEY: string = '22eaca439bfd89cf125827a7a33fe3970d735dbfd5d84f19dd95820781fc47be';
 
 export class MinswapApi extends BaseApi {
 
@@ -22,6 +26,12 @@ export class MinswapApi extends BaseApi {
     }
 
     liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
+        // Small optimization for providing both tokens
+        if (assetA && assetB) {
+            return this.poolsByPair(assetA, assetB)
+                .then((pool: LiquidityPool) => [pool]);
+        }
+
         const maxPerPage: number = 20;
 
         const getPaginatedResponse = (page: number): Promise<LiquidityPool[]> => {
@@ -69,29 +79,11 @@ export class MinswapApi extends BaseApi {
                     offset: page * maxPerPage,
                 },
             }).then((response: any) => {
-                const pools = response.data.data.poolsByAsset;
-                const liquidityPools = pools.map((pool: any) => {
-                    let liquidityPool: LiquidityPool = new LiquidityPool(
-                        this.dex.name,
-                        pool.assetA.currencySymbol !== ''
-                            ? new Asset(pool.assetA.currencySymbol, pool.assetA.tokenName, pool.assetA.metadata?.decimals ?? 0)
-                            : 'lovelace',
-                        pool.assetB.currencySymbol !== ''
-                            ? new Asset(pool.assetB.currencySymbol, pool.assetB.tokenName, pool.assetB.metadata?.decimals ?? 0)
-                            : 'lovelace',
-                        BigInt(pool.reserveA),
-                        BigInt(pool.reserveB),
-                        '', // Not provided
-                        this.dex.marketOrderAddress,
-                        this.dex.limitOrderAddress,
-                    );
+                response = JSON.parse(this.decryptResponse(response.data.data.encryptedData));
 
-                    liquidityPool.lpToken = new Asset(pool.lpAsset.currencySymbol, pool.lpAsset.tokenName);
-                    liquidityPool.totalLpTokens = BigInt(pool.totalLiquidity);
-                    liquidityPool.poolFeePercent = 0.3;
+                const pools = response.poolsByAsset;
 
-                    return liquidityPool;
-                });
+                const liquidityPools = pools.map((pool: any) => this.liquidityPoolFromResponse(pool));
 
                 if (pools.length < maxPerPage) {
                     return liquidityPools;
@@ -104,6 +96,92 @@ export class MinswapApi extends BaseApi {
         };
 
         return getPaginatedResponse(0);
+    }
+
+    private poolsByPair(assetA: Token, assetB: Token): Promise<LiquidityPool> {
+        return this.api.post('', {
+            operationName: 'PoolByPair',
+            query: `
+                query PoolByPair($pair: InputPoolByPair!) {
+                    poolByPair(pair: $pair) {
+                        assetA {
+                            currencySymbol
+                            tokenName
+                            isVerified
+                            ...allMetadata
+                        }
+                        assetB {
+                            currencySymbol
+                            tokenName
+                            isVerified
+                            ...allMetadata
+                        }
+                        reserveA
+                        reserveB
+                        lpAsset {
+                            currencySymbol
+                            tokenName
+                        }
+                        totalLiquidity
+                        profitSharing {
+                            feeTo
+                        }
+                    }
+                }
+                fragment allMetadata on Asset {
+                    metadata {
+                        name
+                        ticker
+                        url
+                        decimals
+                        description
+                    }
+                }
+            `,
+            variables: {
+                pair: {
+                    assetA: {
+                        currencySymbol: assetA === 'lovelace' ? '' : assetA.policyId,
+                        tokenName: assetA === 'lovelace' ? '' : assetA.nameHex,
+                    },
+                    assetB: {
+                        currencySymbol: assetB === 'lovelace' ? '' : assetB.policyId,
+                        tokenName: assetB === 'lovelace' ? '' : assetB.nameHex,
+                    },
+                },
+            },
+        }).then((response: any) => {
+            response = JSON.parse(this.decryptResponse(response.data.data.encryptedData));
+
+            return this.liquidityPoolFromResponse(response.poolByPair)
+        });
+    }
+
+    private liquidityPoolFromResponse(poolData: any): LiquidityPool {
+        const liquidityPool: LiquidityPool = new LiquidityPool(
+            this.dex.name,
+            poolData.assetA.currencySymbol !== ''
+                ? new Asset(poolData.assetA.currencySymbol, poolData.assetA.tokenName, poolData.assetA.metadata?.decimals ?? 0)
+                : 'lovelace',
+            poolData.assetB.currencySymbol !== ''
+                ? new Asset(poolData.assetB.currencySymbol, poolData.assetB.tokenName, poolData.assetB.metadata?.decimals ?? 0)
+                : 'lovelace',
+            BigInt(poolData.reserveA),
+            BigInt(poolData.reserveB),
+            '', // Not provided
+            this.dex.marketOrderAddress,
+            this.dex.limitOrderAddress,
+        );
+
+        liquidityPool.lpToken = new Asset(poolData.lpAsset.currencySymbol, poolData.lpAsset.tokenName);
+        liquidityPool.totalLpTokens = BigInt(poolData.totalLiquidity);
+        liquidityPool.poolFeePercent = 0.3;
+
+        return liquidityPool;
+    }
+
+    private decryptResponse(encryptedResponse: string): any {
+        return AES.decrypt(encryptedResponse, AES_KEY).toString(Utf8);
     }
 
 }
