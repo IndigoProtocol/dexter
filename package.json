@@ -24,6 +24,7 @@
   "dependencies": {
     "axios": "^0.26.1",
     "axios-retry": "^3.5.1",
+    "bottleneck": "^2.19.5",
     "lucid-cardano": "^0.8.7"
   },
   "devDependencies": {

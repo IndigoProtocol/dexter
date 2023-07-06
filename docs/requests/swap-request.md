@@ -42,6 +42,20 @@ dexter.newSwapRequest()
 <br>
 
 <details>
+<summary><code>withSwapOutToken(Token): SwapRequest</code> Set which Token in the pool you are swapping out.</summary>
+
+##### Using
+
+```js
+dexter.newSwapRequest()
+    .withSwapOutToken('lovelace')
+    ...
+```
+</details>
+
+<br>
+
+<details>
 <summary><code>withSwapInAmount(bigint): SwapRequest</code> Set how much you are swapping in.</summary>
 
 ##### Using
@@ -49,6 +63,20 @@ dexter.newSwapRequest()
 ```js
 dexter.newSwapRequest()
     .withSwapInAmount(10_000000n)
+    ...
+```
+</details>
+
+<br>
+
+<details>
+<summary><code>withSwapOutAmount(bigint): SwapRequest</code> Set how much you are swapping out.</summary>
+
+##### Using
+
+```js
+dexter.newSwapRequest()
+    .withSwapOutAmount(10_000000n)
     ...
 ```
 </details>

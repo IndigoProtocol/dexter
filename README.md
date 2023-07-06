@@ -49,7 +49,7 @@ const dexter: Dexter = new Dexter(dexterConfig, requestConfig);
 
 // Basic fetch example
 dexter.newFetchRequest()
-    .forAllDexs()
+    .onAllDexs()
     .getLiquidityPools()
     .then((pools: LiquidityPool[]) => {
         console.log(pools);

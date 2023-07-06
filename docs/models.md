@@ -8,7 +8,7 @@ Below are commonly returned models & types for your requests, along with example
 ```js
 {
     policyId: string     // '533bb94a8850ee3c...'
-    assetNameHex: Token  // '494e4459'
+    nameHex: Token  // '494e4459'
     decimals: Token      // 6
 }
 ```

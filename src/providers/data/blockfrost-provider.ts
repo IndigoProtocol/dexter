@@ -10,11 +10,17 @@ import {
     UTxO
 } from '@app/types';
 import { Asset } from '@dex/models/asset';
+import Bottleneck from 'bottleneck';
+
+const API_BURST_SIZE: number = 500;
+const API_COOLDOWN_SIZE: number = 10;
+const API_COOLDOWN_MS: number = 1000;
 
 export class BlockfrostProvider extends BaseDataProvider {
 
     private _api: AxiosInstance;
     private _requestConfig: RequestConfig;
+    private _limiter: Bottleneck;
 
     /**
      * https://docs.blockfrost.io/
@@ -32,11 +38,19 @@ export class BlockfrostProvider extends BaseDataProvider {
         );
 
         this._api = axios.create({
-            baseURL: (requestConfig.proxyUrl ?? '') + config.url,
-            timeout: requestConfig.timeout,
+            baseURL: (this._requestConfig.proxyUrl ?? '') + config.url,
+            timeout: this._requestConfig.timeout,
             headers: {
                 project_id: config.projectId,
             },
+        });
+
+        // https://docs.blockfrost.io/#section/Limits
+        this._limiter = new Bottleneck({
+            reservoir: API_BURST_SIZE,
+            reservoirIncreaseAmount: API_COOLDOWN_SIZE,
+            reservoirIncreaseInterval: API_COOLDOWN_MS,
+            reservoirIncreaseMaximum: API_BURST_SIZE,
         });
     }
 
@@ -69,7 +83,7 @@ export class BlockfrostProvider extends BaseDataProvider {
      * https://docs.blockfrost.io/#tag/Cardano-Transactions/paths/~1txs~1%7Bhash%7D~1utxos/get
      */
     public async transactionUtxos(txHash: string): Promise<UTxO[]> {
-        return this._api.get(`/txs/${txHash}/utxos`)
+        return this._limiter.schedule(() => this._api.get(`/txs/${txHash}/utxos`))
             .then((response: any) => {
                 return response.data.outputs.map((utxo: any) => {
                     return {
@@ -122,7 +136,7 @@ export class BlockfrostProvider extends BaseDataProvider {
      * https://docs.blockfrost.io/#tag/Cardano-Scripts/paths/~1scripts~1datum~1%7Bdatum_hash%7D/get
      */
     public async datumValue(datumHash: string): Promise<DefinitionField> {
-        return this._api.get(`/scripts/datum/${datumHash}`)
+        return this._limiter.schedule(() => this._api.get(`/scripts/datum/${datumHash}`))
             .then((response: any) => {
                 return response.data.json_value as DefinitionField;
             });
@@ -132,11 +146,13 @@ export class BlockfrostProvider extends BaseDataProvider {
      * https://docs.blockfrost.io/#section/Concepts
      */
     private sendPaginatedRequest(url: string, page: number = 1, results: any = []): Promise<any> {
-        return this._api.get(url, {
-            params: {
-                page,
-            },
-        }).then((response: any) => {
+        return this._limiter.schedule(() =>
+            this._api.get(url, {
+                params: {
+                    page,
+                },
+            })
+        ).then((response: any) => {
             results = results.concat(response.data);
             page++;
 
