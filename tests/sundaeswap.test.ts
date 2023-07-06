@@ -59,7 +59,7 @@ describe('SundaeSwap', () => {
                 [DatumParameterKey.SwapInTokenPolicyId]: '',
                 [DatumParameterKey.SwapInTokenAssetName]: '',
                 [DatumParameterKey.SwapOutTokenPolicyId]: asset.policyId,
-                [DatumParameterKey.SwapOutTokenAssetName]: asset.assetNameHex,
+                [DatumParameterKey.SwapOutTokenAssetName]: asset.nameHex,
             };
 
             return sundaeswap.buildSwapOrder(liquidityPool, defaultSwapParameters)
