@@ -13,6 +13,7 @@ import { TokenRegistryProvider } from '@providers/asset-metadata/token-registry-
 import { CancelSwapRequest } from '@requests/cancel-swap-request';
 import { FetchRequest } from '@requests/fetch-request';
 import axios from "axios";
+import axiosRetry from "axios-retry";
 
 export class Dexter {
 
@@ -41,10 +42,13 @@ export class Dexter {
             {
                 timeout: 5000,
                 proxyUrl: '',
+                retries: 3,
             } as RequestConfig,
             requestConfig,
         );
 
+        // Axios configurations
+        axiosRetry(axios, { retries: this.requestConfig.retries });
         axios.defaults.timeout = this.requestConfig.timeout;
 
         this.metadataProvider = new TokenRegistryProvider(this.requestConfig);

@@ -15,6 +15,9 @@
 - Build swap datums given specific parameters using Dexters _Definition Builder_
 - Load wallets using a seedphrase or CIP-30 interface using [Lucid](https://github.com/spacebudz/lucid)
 
+### Notes
+- All figures/parameters represented as a bigint are denominated in lovelaces
+
 ### Install
 
 ##### NPM
@@ -39,6 +42,7 @@ const dexterConfig: DexterConfig = {
 const requestConfig: RequestConfig = {
     timeout: 5000,  // How long outside network requests have to reply
     proxyUrl: '',   // URL to prepend to all outside URLs. Useful when dealing with CORs
+    retries: 3,     // Number of times to reattempt any outside request
 };
 
 const dexter: Dexter = new Dexter(dexterConfig, requestConfig);
