@@ -2,7 +2,6 @@ import { BaseApi } from './base-api';
 import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
-import { tokensMatch } from '@app/utils';
 import { RequestConfig } from '@app/types';
 import { WingRiders } from '@dex/wingriders';
 
@@ -70,7 +69,7 @@ export class WingRidersApi extends BaseApi {
                     tokenB,
                     BigInt(pool.treasuryA),
                     BigInt(pool.treasuryB),
-                    '', // todo unavailable
+                    pool._utxo.address,
                     this.dex.orderAddress,
                     this.dex.orderAddress,
                 );
