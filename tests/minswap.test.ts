@@ -57,7 +57,7 @@ describe('Minswap', () => {
                 [DatumParameterKey.SwapInTokenPolicyId]: '',
                 [DatumParameterKey.SwapInTokenAssetName]: '',
                 [DatumParameterKey.SwapOutTokenPolicyId]: asset.policyId,
-                [DatumParameterKey.SwapOutTokenAssetName]: asset.assetNameHex,
+                [DatumParameterKey.SwapOutTokenAssetName]: asset.nameHex,
             };
 
             return minswap.buildSwapOrder(liquidityPool, defaultSwapParameters)
@@ -90,7 +90,7 @@ describe('Minswap', () => {
         it('Can calculate swap parameters', () => {
             expect(swapRequest.swapInAmount).toEqual(365844367n);
         });
-      
+
     });
 
 });

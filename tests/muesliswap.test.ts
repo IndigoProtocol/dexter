@@ -57,7 +57,7 @@ describe('MuesliSwap', () => {
                 [DatumParameterKey.SwapInTokenPolicyId]: '',
                 [DatumParameterKey.SwapInTokenAssetName]: '',
                 [DatumParameterKey.SwapOutTokenPolicyId]: asset.policyId,
-                [DatumParameterKey.SwapOutTokenAssetName]: asset.assetNameHex,
+                [DatumParameterKey.SwapOutTokenAssetName]: asset.nameHex,
             };
 
             return muesliswap.buildSwapOrder(liquidityPool, defaultSwapParameters)
@@ -90,7 +90,7 @@ describe('MuesliSwap', () => {
         it('Can calculate swap parameters', () => {
             expect(swapRequest.swapInAmount).toEqual(133971309n);
         });
-      
+
     });
 
 });
