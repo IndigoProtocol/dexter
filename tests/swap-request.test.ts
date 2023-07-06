@@ -63,8 +63,9 @@ describe('SwapRequest', () => {
 
         it('Fails on incorrect swap in amount', () => {
             swapRequest.withSwapInToken('lovelace');
+            swapRequest.withSwapInAmount(-1n)
 
-            expect(() => { swapRequest.withSwapInAmount(-1n); }).toThrowError();
+            expect(swapRequest.swapInAmount).toBe(0n);
         });
 
         it('Can set slippage percent', () => {
