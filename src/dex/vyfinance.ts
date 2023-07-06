@@ -94,7 +94,7 @@ export class VyFinance extends BaseDex {
             this.buildSwapOrderPayment(
                 swapParameters,
                 {
-                    address: liquidityPool.extra.orderAddress,
+                    address: liquidityPool.marketOrderAddress,
                     addressType: AddressType.Contract,
                     assetBalances: [
                         {

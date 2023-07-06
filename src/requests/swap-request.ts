@@ -103,7 +103,6 @@ export class SwapRequest {
     public withSwapOutAmount(swapOutAmount: bigint): SwapRequest {
         if (swapOutAmount <= 0n) {
             this._swapInAmount = 0n;
-            return this;
         }
         if (! this._liquidityPool) {
             throw new Error('Liquidity pool must be set before setting a swap out amount.');
@@ -222,7 +221,9 @@ export class SwapRequest {
         const swapInTokenName: string = this._swapInToken === 'lovelace' ? 'ADA' : this._swapInToken.assetName;
         const swapOutTokenName: string = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.assetName;
         swapTransaction.attachMetadata(MetadataKey.Message, {
-            msg: `[${this._dexter.config.metadataMsgBranding}] ${this._liquidityPool.dex} ${swapInTokenName} -> ${swapOutTokenName} Swap`
+            msg: [
+                `[${this._dexter.config.metadataMsgBranding}] ${this._liquidityPool.dex} ${swapInTokenName} -> ${swapOutTokenName} Swap`
+            ]
         });
 
         // Build transaction

@@ -32,7 +32,7 @@ describe('VyFinance', () => {
             'addr1',
         );
         liquidityPool.poolFeePercent = 0.3;
-        liquidityPool.extra.orderAddress = 'addr1testorder';
+        liquidityPool.marketOrderAddress = 'addr1testorder';
 
         const swapRequest: SwapRequest = dexter.newSwapRequest()
             .forLiquidityPool(liquidityPool)
