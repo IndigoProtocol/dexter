@@ -94,7 +94,7 @@ export class SundaeSwap extends BaseDex {
         })?.asset as Asset;
 
         if (lpToken) {
-            lpToken.assetNameHex = '6c' + lpToken.assetNameHex;
+            lpToken.nameHex = '6c' + lpToken.nameHex;
             liquidityPool.lpToken = lpToken;
         }
 
@@ -120,13 +120,21 @@ export class SundaeSwap extends BaseDex {
         return liquidityPool;
     }
 
+    estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
+        const [reserveOut, reserveIn]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
+
+        const receive: bigint = (reserveIn * reserveOut) / (reserveOut - swapOutAmount) - reserveIn;
+        const swapFee: bigint = ((receive * BigInt(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
+
+        return receive + swapFee;
+    }
+
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
         const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
-        const adjustedSwapInAmount: bigint = swapInAmount - swapFee;
 
-        return reserveOut - (reserveIn * reserveOut) / (reserveIn + adjustedSwapInAmount);
+        return reserveOut - (reserveIn * reserveOut) / (reserveIn + swapInAmount - swapFee);
     }
 
     priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
