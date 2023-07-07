@@ -22,6 +22,8 @@ export class FetchRequest {
      * Set the DEX(s) Dexter will fetch data on.
      */
     public onDexs(dexs: string | string[]): FetchRequest {
+        this._onDexs = [];
+
         (Array.isArray(dexs) ? dexs : [dexs]).forEach((dexName: string) => {
             if (! Object.keys(this._dexter.availableDexs).includes(dexName)) {
                 throw new Error(`DEX ${dexName} is not available.`);
