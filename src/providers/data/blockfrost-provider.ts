@@ -41,6 +41,7 @@ export class BlockfrostProvider extends BaseDataProvider {
             baseURL: (this._requestConfig.proxyUrl ?? '') + config.url,
             timeout: this._requestConfig.timeout,
             headers: {
+                'Content-Type': 'application/json',
                 project_id: config.projectId,
             },
         });

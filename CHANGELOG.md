@@ -15,3 +15,4 @@ All notable changes to Dexter will be documented in this file.
 - Update `FetchRequest.forDexs()` to `FetchRequest.onDexs()`.
 - Update `FetchRequest.forAllDexs()` to `FetchRequest.onAllDexs()`.
 - Add `FetchRequest.forTokens()` & `FetchRequest.forTokenPairs()` for filtering pools containing tokens/token pairs.
+- Fix for encrypted Minswap API responses (API still has hard call limits). 

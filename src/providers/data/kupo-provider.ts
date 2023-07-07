@@ -37,6 +37,9 @@ export class KupoProvider extends BaseDataProvider {
         this._kupoApi = axios.create({
             baseURL: this._requestConfig.proxyUrl + config.url,
             timeout: this._requestConfig.timeout,
+            headers: {
+                'Content-Type': 'application/json',
+            },
         });
     }
 

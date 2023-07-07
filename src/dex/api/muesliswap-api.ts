@@ -16,7 +16,10 @@ export class MuesliSwapApi extends BaseApi {
         this.dex = dex;
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: `${requestConfig.proxyUrl}https://api.muesliswap.com/`
+            baseURL: `${requestConfig.proxyUrl}https://api.muesliswap.com/`,
+            headers: {
+                'Content-Type': 'application/json',
+            }
         });
     }
 
