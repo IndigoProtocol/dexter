@@ -131,10 +131,10 @@ export class SwapRequest {
         const poolToCheck: LiquidityPool | undefined = liquidityPool ?? this._liquidityPool;
 
         if (! poolToCheck) {
-            throw new Error('Liquidity pool must be set before providing calculating the estimated receive.');
+            throw new Error('Liquidity pool must be set before calculating the estimated receive.');
         }
         if (! this._swapInToken) {
-            throw new Error('Swap in token must be set before providing calculating the estimated receive.');
+            throw new Error('Swap in token must be set before calculating the estimated receive.');
         }
 
         return this._dexter.availableDexs[this._liquidityPool.dex].estimatedReceive(
@@ -152,10 +152,10 @@ export class SwapRequest {
 
     public getPriceImpactPercent(): number {
         if (! this._liquidityPool) {
-            throw new Error('Liquidity pool must be set before providing calculating the price impact.');
+            throw new Error('Liquidity pool must be set before calculating the price impact.');
         }
         if (! this._swapInToken) {
-            throw new Error('Swap in token must be set before providing calculating the price impact.');
+            throw new Error('Swap in token must be set before calculating the price impact.');
         }
 
         return this._dexter.availableDexs[this._liquidityPool.dex].priceImpactPercent(

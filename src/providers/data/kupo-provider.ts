@@ -46,7 +46,7 @@ export class KupoProvider extends BaseDataProvider {
     public async utxos(address: string, asset?: Asset): Promise<UTxO[]> {
         const url: string = asset
             ? `/matches/${address}?policy_id=${asset.policyId}&asset_name=${asset.nameHex}&unspent`
-            : `/matches/${address}`;
+            : `/matches/${address}?unspent`;
 
         return this._kupoApi.get(url)
             .then((results: any) => {
