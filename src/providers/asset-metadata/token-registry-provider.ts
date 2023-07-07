@@ -32,7 +32,7 @@ export class TokenRegistryProvider extends BaseMetadataProvider {
             return {
                 policyId: entry.subject.slice(0, 56),
                 nameHex: entry.subject.slice(56),
-                decimals: Number(entry.decimals.value),
+                decimals: entry.decimals ? Number(entry.decimals.value) : 0,
             } as AssetMetadata;
         }));
     }
