@@ -2,7 +2,7 @@
 
 All notable changes to Dexter will be documented in this file.
 
-## [UNRELEASED]
+## [v2.0.0]
 
 - Adjust Kupo & Blockfrost data providers to accept an optional `RequestConfig`.
 - Cleanup around asset filtering when using `FetchRequest.getLiquidityPools()`.
