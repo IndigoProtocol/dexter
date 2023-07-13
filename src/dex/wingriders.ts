@@ -11,7 +11,7 @@ import {
 import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
-import { correspondingReserves } from '@app/utils';
+import { correspondingReserves, tokensMatch } from '@app/utils';
 import { AddressType, DatumParameterKey } from '@app/constants';
 import { DefinitionBuilder } from '@app/definition-builder';
 import order from '@dex/definitions/wingriders/order';
@@ -160,9 +160,12 @@ export class WingRiders extends BaseDex {
     priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
         const estimatedReceive: bigint = this.estimatedReceive(liquidityPool, swapInToken, swapInAmount);
         const swapPrice: number = Number(swapInAmount) / Number(estimatedReceive);
+        const poolPrice: number = tokensMatch(liquidityPool.assetA, swapInToken)
+            ? liquidityPool.price
+            : (1 / liquidityPool.price);
 
-        return Math.abs(swapPrice - liquidityPool.price)
-            / ((swapPrice + liquidityPool.price) / 2)
+        return Math.abs(swapPrice - poolPrice)
+            / ((swapPrice + poolPrice) / 2)
             * 100;
     }
 

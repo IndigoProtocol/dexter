@@ -2,6 +2,10 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [UNRELEASED]
+
+- Fix for WingRiders price impact calculation when using a non ADA swap in token.
+
 ## [v2.0.0]
 
 - Adjust Kupo & Blockfrost data providers to accept an optional `RequestConfig`.
