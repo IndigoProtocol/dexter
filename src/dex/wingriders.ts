@@ -2,7 +2,9 @@ import { BaseDex } from './base-dex';
 import {
     AssetAddress,
     AssetBalance,
-    DatumParameters, DefinitionConstr, DefinitionField,
+    DatumParameters,
+    DefinitionConstr,
+    DefinitionField,
     PayToAddress,
     RequestConfig,
     SwapFee,
