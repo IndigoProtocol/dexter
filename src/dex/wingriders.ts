@@ -2,7 +2,7 @@ import { BaseDex } from './base-dex';
 import {
     AssetAddress,
     AssetBalance,
-    DatumParameters,
+    DatumParameters, DefinitionConstr, DefinitionField,
     PayToAddress,
     RequestConfig,
     SwapFee,
@@ -17,6 +17,7 @@ import { DefinitionBuilder } from '@app/definition-builder';
 import order from '@dex/definitions/wingriders/order';
 import { BaseApi } from '@dex/api/base-api';
 import { WingRidersApi } from '@dex/api/wingriders-api';
+import pool from "@dex/definitions/wingriders/pool";
 
 /**
  * WingRiders constants.
@@ -129,6 +130,22 @@ export class WingRiders extends BaseDex {
             liquidityPool.totalLpTokens = MAX_INT - lpTokenBalance.quantity;
         }
         liquidityPool.poolFeePercent = 0.35;
+
+        try {
+            const builder: DefinitionBuilder = await (new DefinitionBuilder())
+                .loadDefinition(pool);
+            const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+            const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+
+            liquidityPool.reserveA = typeof parameters.PoolAssetATreasury === 'number'
+                ? (liquidityPool.reserveA - BigInt(parameters.PoolAssetATreasury))
+                : liquidityPool.reserveA;
+            liquidityPool.reserveB = typeof parameters.PoolAssetBTreasury === 'number'
+                ? (liquidityPool.reserveB - BigInt(parameters.PoolAssetBTreasury))
+                : liquidityPool.reserveB;
+        } catch (e) {
+            return liquidityPool;
+        }
 
         return liquidityPool;
     }
