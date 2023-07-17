@@ -40,7 +40,7 @@ export default {
           ]
         },
         {
-          int: DatumParameterKey.Expiration,
+          int: DatumParameterKey.LastInteraction,
         },
         {
           int: DatumParameterKey.PoolAssetATreasury,

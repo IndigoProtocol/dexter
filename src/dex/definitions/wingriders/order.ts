@@ -44,7 +44,7 @@ export default {
           bytes: DatumParameterKey.SenderPubKeyHash
         },
         {
-          int: DatumParameterKey.LastInteraction
+          int: DatumParameterKey.Expiration
         },
         {
           constructor: 0,
