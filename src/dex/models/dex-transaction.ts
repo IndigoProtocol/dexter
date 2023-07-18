@@ -12,8 +12,9 @@ export class DexTransaction {
     public error: DexTransactionError | undefined = undefined;
 
     private _hash: string;
-    private _walletProvider: BaseWalletProvider;
     private _isSigned: boolean = false;
+    private _payments: PayToAddress[] = [];
+    private _walletProvider: BaseWalletProvider;
     private _currentStatus: TransactionStatus = TransactionStatus.Building;
     private _listeners: TransactionCallback[] = [];
 
@@ -27,6 +28,10 @@ export class DexTransaction {
 
     get isSigned(): boolean {
         return this._isSigned;
+    }
+
+    get payments(): PayToAddress[] {
+        return this._payments;
     }
 
     get status(): TransactionStatus {
@@ -48,15 +53,7 @@ export class DexTransaction {
     public payToAddresses(payToAddresses: PayToAddress[]): Promise<DexTransaction> {
         return this._walletProvider.paymentsForTransaction(this, payToAddresses)
             .then(() => {
-                return this as DexTransaction;
-            })
-            .catch((error) => {
-                this.status = TransactionStatus.Errored;
-                this.error = {
-                    step: TransactionStatus.Building,
-                    reason: 'Failed to build transaction.',
-                    reasonRaw: error,
-                };
+                this._payments = payToAddresses;
 
                 return this as DexTransaction;
             });
@@ -70,16 +67,6 @@ export class DexTransaction {
         return this._walletProvider.signTransaction(this)
             .then(() => {
                 this._isSigned = true;
-
-                return this as DexTransaction;
-            })
-            .catch((error) => {
-                this.status = TransactionStatus.Errored;
-                this.error = {
-                    step: TransactionStatus.Signing,
-                    reason: 'Failed to sign transaction.',
-                    reasonRaw: error,
-                };
 
                 return this as DexTransaction;
             });
@@ -96,16 +83,6 @@ export class DexTransaction {
         return this._walletProvider.submitTransaction(this)
             .then((txHash: string) => {
                 this._hash = txHash;
-
-                return this as DexTransaction;
-            })
-            .catch((error) => {
-                this.status = TransactionStatus.Errored;
-                this.error = {
-                    step: TransactionStatus.Submitting,
-                    reason: 'Failed to submit transaction.',
-                    reasonRaw: error,
-                };
 
                 return this as DexTransaction;
             });
