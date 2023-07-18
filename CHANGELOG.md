@@ -2,7 +2,7 @@
 
 All notable changes to Dexter will be documented in this file.
 
-## [v3.0.0]
+## [v3.0.1]
 
 - Fix for WingRiders price impact calculation when using a non ADA swap in token.
 - Expose address payments in `DexTransaction` instance.
