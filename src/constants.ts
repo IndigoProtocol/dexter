@@ -45,11 +45,15 @@ export enum DatumParameterKey {
     LpFeeDenominator = 'LpFeeDenominator',
     PoolAssetAPolicyId = 'PoolAssetAPolicyId',
     PoolAssetAAssetName = 'PoolAssetAAssetName',
+    PoolAssetATreasury = 'PoolAssetATreasury',
     PoolAssetABarFee = 'PoolAssetABarFee',
-    PoolAssetBBarFee = 'PoolAssetBBarFee',
     PoolAssetBPolicyId = 'PoolAssetBPolicyId',
     PoolAssetBAssetName = 'PoolAssetBAssetName',
+    PoolAssetBTreasury = 'PoolAssetBTreasury',
+    PoolAssetBBarFee = 'PoolAssetBBarFee',
     RootKLast = 'RootKLast',
+    LastInteraction = 'LastInteraction',
+    RequestScriptHash = 'RequestScriptHash',
 }
 
 export enum TransactionStatus {
