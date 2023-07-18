@@ -49,16 +49,6 @@ export class DexTransaction {
         return this._walletProvider.paymentsForTransaction(this, payToAddresses)
             .then(() => {
                 return this as DexTransaction;
-            })
-            .catch((error) => {
-                this.status = TransactionStatus.Errored;
-                this.error = {
-                    step: TransactionStatus.Building,
-                    reason: 'Failed to build transaction.',
-                    reasonRaw: error,
-                };
-
-                return this as DexTransaction;
             });
     }
 
@@ -70,16 +60,6 @@ export class DexTransaction {
         return this._walletProvider.signTransaction(this)
             .then(() => {
                 this._isSigned = true;
-
-                return this as DexTransaction;
-            })
-            .catch((error) => {
-                this.status = TransactionStatus.Errored;
-                this.error = {
-                    step: TransactionStatus.Signing,
-                    reason: 'Failed to sign transaction.',
-                    reasonRaw: error,
-                };
 
                 return this as DexTransaction;
             });
@@ -96,16 +76,6 @@ export class DexTransaction {
         return this._walletProvider.submitTransaction(this)
             .then((txHash: string) => {
                 this._hash = txHash;
-
-                return this as DexTransaction;
-            })
-            .catch((error) => {
-                this.status = TransactionStatus.Errored;
-                this.error = {
-                    step: TransactionStatus.Submitting,
-                    reason: 'Failed to submit transaction.',
-                    reasonRaw: error,
-                };
 
                 return this as DexTransaction;
             });

@@ -78,6 +78,10 @@ export class FetchRequest {
      * Fetch latest state for a liquidity pool.
      */
     public getLiquidityPoolState(liquidityPool: LiquidityPool): Promise<LiquidityPool> {
+        if (! liquidityPool) {
+            return Promise.reject('Invalid liquidity pool provided.');
+        }
+
         const dexInstance: BaseDex | undefined = this._dexter.dexByName(liquidityPool.dex);
 
         if (! dexInstance) {
@@ -193,9 +197,7 @@ export class FetchRequest {
 
         return await Promise.all(liquidityPoolPromises)
             .then((liquidityPools: (LiquidityPool | undefined)[]) => {
-                return liquidityPools.filter((pool?: LiquidityPool) => {
-                    return pool !== undefined;
-                }) as LiquidityPool[];
+                return liquidityPools.filter((pool?: LiquidityPool) => pool !== undefined) as LiquidityPool[];
             });
     }
 
@@ -266,7 +268,11 @@ export class FetchRequest {
 
         return Promise.all(
             filterTokenPromises.concat(filterPairPromises).flat(),
-        ).then((allLiquidityPools: Awaited<LiquidityPool[]>[]) => allLiquidityPools.flat());
+        ).then((allLiquidityPools: Awaited<LiquidityPool[]>[]) => {
+            return allLiquidityPools
+                .flat()
+                .filter((pool?: LiquidityPool) => pool !== undefined) as LiquidityPool[];
+        });
     }
 
 }
