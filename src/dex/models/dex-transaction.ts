@@ -12,8 +12,9 @@ export class DexTransaction {
     public error: DexTransactionError | undefined = undefined;
 
     private _hash: string;
-    private _walletProvider: BaseWalletProvider;
     private _isSigned: boolean = false;
+    private _payments: PayToAddress[] = [];
+    private _walletProvider: BaseWalletProvider;
     private _currentStatus: TransactionStatus = TransactionStatus.Building;
     private _listeners: TransactionCallback[] = [];
 
@@ -27,6 +28,10 @@ export class DexTransaction {
 
     get isSigned(): boolean {
         return this._isSigned;
+    }
+
+    get payments(): PayToAddress[] {
+        return this._payments;
     }
 
     get status(): TransactionStatus {
@@ -48,6 +53,8 @@ export class DexTransaction {
     public payToAddresses(payToAddresses: PayToAddress[]): Promise<DexTransaction> {
         return this._walletProvider.paymentsForTransaction(this, payToAddresses)
             .then(() => {
+                this._payments = payToAddresses;
+
                 return this as DexTransaction;
             });
     }
