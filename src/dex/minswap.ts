@@ -117,9 +117,9 @@ export class Minswap extends BaseDex {
             liquidityPool.identifier = possibleLpTokens[0].policyId;
         }
 
-        try {
-            liquidityPool.poolFeePercent = 0.3;
+        liquidityPool.poolFeePercent = 0.3;
 
+        try {
             const builder: DefinitionBuilder = await (new DefinitionBuilder())
                 .loadDefinition(pool);
             const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
