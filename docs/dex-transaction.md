@@ -32,6 +32,18 @@ console.log(transaction.isSigned);
 <br>
 
 <details>
+<summary><code>payments(): PayToAddress[]</code> Get the address payments made for the Tx</summary>
+
+##### Using
+
+```js
+console.log(transaction.payments);
+```
+</details>
+
+<br>
+
+<details>
 <summary><code>status(): TransactionStatus</code> Get the current status of the transaction</summary>
 
 ##### Using
