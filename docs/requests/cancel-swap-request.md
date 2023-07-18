@@ -31,7 +31,7 @@ dexter.newCancelSwapRequest()
 
 ```js
 dexter.newCancelSwapRequest()
-    .forDex(VyFinance.name)
+    .forDex(VyFinance.identifier)
     ...
 ```
 </details>

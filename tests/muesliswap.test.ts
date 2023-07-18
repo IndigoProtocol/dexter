@@ -24,7 +24,7 @@ describe('MuesliSwap', () => {
     describe('Set Swap In', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            MuesliSwap.name,
+            MuesliSwap.identifier,
             'lovelace',
             asset,
             1386837721743n,
@@ -72,7 +72,7 @@ describe('MuesliSwap', () => {
 
     describe('Set Swap Out', () => {
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            MuesliSwap.name,
+            MuesliSwap.identifier,
             'lovelace',
             asset,
             67011967873n,

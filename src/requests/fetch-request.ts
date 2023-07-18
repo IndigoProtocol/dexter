@@ -29,9 +29,7 @@ export class FetchRequest {
                 throw new Error(`DEX ${dexName} is not available.`);
             }
 
-            this._onDexs = this._onDexs.filter((dex: BaseDex) => {
-                return dex.name !== dexName;
-            }).concat(this._dexter.availableDexs[dexName]);
+            this._onDexs.push(this._dexter.availableDexs[dexName]);
         });
 
         return this;

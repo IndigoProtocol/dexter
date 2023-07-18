@@ -24,7 +24,7 @@ describe('SundaeSwap', () => {
     describe('Set Swap In', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            SundaeSwap.name,
+            SundaeSwap.identifier,
             'lovelace',
             asset,
             3699642000000n,
@@ -75,7 +75,7 @@ describe('SundaeSwap', () => {
     describe('Set Swap Out', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            SundaeSwap.name,
+            SundaeSwap.identifier,
             'lovelace',
             asset,
             1032791394311n,

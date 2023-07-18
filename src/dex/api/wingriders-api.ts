@@ -67,7 +67,7 @@ export class WingRidersApi extends BaseApi {
                     : 'lovelace';
 
                 let liquidityPool: LiquidityPool = new LiquidityPool(
-                    this.dex.name,
+                    WingRiders.identifier,
                     tokenA,
                     tokenB,
                     BigInt(pool.treasuryA),

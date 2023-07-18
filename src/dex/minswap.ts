@@ -23,7 +23,7 @@ import { MinswapApi } from '@dex/api/minswap-api';
 
 export class Minswap extends BaseDex {
 
-    public readonly name: string = 'Minswap';
+    public static readonly identifier: string = 'Minswap';
     public readonly api: BaseApi;
 
     /**
@@ -95,7 +95,7 @@ export class Minswap extends BaseDex {
         const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            this.name,
+            Minswap.identifier,
             relevantAssets[assetAIndex].asset,
             relevantAssets[assetBIndex].asset,
             relevantAssets[assetAIndex].quantity,

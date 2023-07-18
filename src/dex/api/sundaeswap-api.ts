@@ -74,7 +74,7 @@ export class SundaeSwapApi extends BaseApi {
                 const pools = response.data.data.pools;
                 const liquidityPools = pools.map((pool: any) => {
                     let liquidityPool: LiquidityPool = new LiquidityPool(
-                        this.dex.name,
+                        SundaeSwap.identifier,
                         pool.assetA.assetId
                             ? Asset.fromId(pool.assetA.assetId, pool.assetA.decimals)
                             : 'lovelace',

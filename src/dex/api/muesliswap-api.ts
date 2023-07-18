@@ -36,7 +36,7 @@ export class MuesliSwapApi extends BaseApi {
             .then((response: any) => {
                 return response.data.map((pool: any) => {
                     let liquidityPool: LiquidityPool = new LiquidityPool(
-                        this.dex.name,
+                        MuesliSwap.identifier,
                         pool.tokenA.symbol !== 'ADA'
                             ? new Asset(pool.tokenA.address.policyId, pool.tokenA.address.name, pool.tokenA.decimalPlaces)
                             : 'lovelace',

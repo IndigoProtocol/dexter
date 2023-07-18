@@ -24,7 +24,7 @@ describe('WingRiders', () => {
     describe('Set Swap In', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            WingRiders.name,
+            WingRiders.identifier,
             'lovelace',
             asset,
             923224398616n,
@@ -72,7 +72,7 @@ describe('WingRiders', () => {
     describe('Set Swap Out', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            WingRiders.name,
+            WingRiders.identifier,
             'lovelace',
             asset,
             925723148616n,

@@ -23,7 +23,7 @@ import { MuesliSwapApi } from '@dex/api/muesliswap-api';
 
 export class MuesliSwap extends BaseDex {
 
-    public readonly name: string = 'MuesliSwap';
+    public static readonly identifier: string = 'MuesliSwap';
     public readonly api: BaseApi;
 
     /**
@@ -92,7 +92,7 @@ export class MuesliSwap extends BaseDex {
         const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            this.name,
+            MuesliSwap.identifier,
             relevantAssets[assetAIndex].asset,
             relevantAssets[assetBIndex].asset,
             relevantAssets[assetAIndex].quantity,

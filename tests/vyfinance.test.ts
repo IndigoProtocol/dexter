@@ -24,7 +24,7 @@ describe('VyFinance', () => {
     describe('Set Swap In', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            VyFinance.name,
+            VyFinance.identifier,
             'lovelace',
             asset,
             519219742499n,
@@ -74,7 +74,7 @@ describe('VyFinance', () => {
     describe('Set Swap Out', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            VyFinance.name,
+            VyFinance.identifier,
             'lovelace',
             asset,
             519179782499n,

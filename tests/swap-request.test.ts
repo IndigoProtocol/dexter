@@ -21,7 +21,7 @@ describe('SwapRequest', () => {
     describe('Parameter setting', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            WingRiders.name,
+            WingRiders.identifier,
             'lovelace',
             asset,
             1_000000n,
@@ -83,7 +83,7 @@ describe('SwapRequest', () => {
     describe('Alter Order', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            Minswap.name,
+            Minswap.identifier,
             'lovelace',
             asset,
             30817255371488n,

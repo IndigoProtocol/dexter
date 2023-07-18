@@ -159,7 +159,7 @@ export class MinswapApi extends BaseApi {
 
     private liquidityPoolFromResponse(poolData: any): LiquidityPool {
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            this.dex.name,
+            Minswap.identifier,
             poolData.assetA.currencySymbol !== ''
                 ? new Asset(poolData.assetA.currencySymbol, poolData.assetA.tokenName, poolData.assetA.metadata?.decimals ?? 0)
                 : 'lovelace',

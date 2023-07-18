@@ -53,11 +53,11 @@ export class Dexter {
 
         this.metadataProvider = new TokenRegistryProvider(this.requestConfig);
         this.availableDexs = {
-            [Minswap.name]: new Minswap(this.requestConfig),
-            [SundaeSwap.name]: new SundaeSwap(this.requestConfig),
-            [MuesliSwap.name]: new MuesliSwap(this.requestConfig),
-            [WingRiders.name]: new WingRiders(this.requestConfig),
-            [VyFinance.name]: new VyFinance(this.requestConfig),
+            [Minswap.identifier]: new Minswap(this.requestConfig),
+            [SundaeSwap.identifier]: new SundaeSwap(this.requestConfig),
+            [MuesliSwap.identifier]: new MuesliSwap(this.requestConfig),
+            [WingRiders.identifier]: new WingRiders(this.requestConfig),
+            [VyFinance.identifier]: new VyFinance(this.requestConfig),
         };
     }
 

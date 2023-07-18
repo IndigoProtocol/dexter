@@ -22,7 +22,7 @@ import { SundaeSwapApi } from '@dex/api/sundaeswap-api';
 
 export class SundaeSwap extends BaseDex {
 
-    public readonly name: string = 'SundaeSwap';
+    public static readonly identifier: string = 'SundaeSwap';
     public readonly api: BaseApi;
 
     /**
@@ -78,7 +78,7 @@ export class SundaeSwap extends BaseDex {
         const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            this.name,
+            SundaeSwap.identifier,
             relevantAssets[assetAIndex].asset,
             relevantAssets[assetBIndex].asset,
             relevantAssets[assetAIndex].quantity,

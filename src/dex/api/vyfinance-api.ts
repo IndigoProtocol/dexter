@@ -48,7 +48,7 @@ export class VyfinanceApi extends BaseApi {
                         : 'lovelace';
 
                     let liquidityPool: LiquidityPool = new LiquidityPool(
-                        this.dex.name,
+                        VyFinance.identifier,
                         tokenA,
                         tokenB,
                         BigInt(pool['tokenAQuantity']),

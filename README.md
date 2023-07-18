@@ -80,7 +80,7 @@ to Dexter with one of the methods below.
 ##### Using
 
 ```js
-dexter.dexByName(Minswap.name)
+dexter.dexByName(Minswap.identifier)
     ...
 ```
 </details>

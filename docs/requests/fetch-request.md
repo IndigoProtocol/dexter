@@ -21,13 +21,13 @@ when fetching pools.
 
 ```js
 dexter.newFetchRequest()
-    .onDexs(WingRiders.name)
+    .onDexs(WingRiders.identifier)
     ...
 ```
 or
 ```js
 dexter.newFetchRequest()
-    .onDexs([WingRiders.name, SundaeSwap.name])
+    .onDexs([WingRiders.identifier, SundaeSwap.identifier])
     ...
 ```
 </details>

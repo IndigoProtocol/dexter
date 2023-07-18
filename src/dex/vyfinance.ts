@@ -18,7 +18,7 @@ const SWAP_ACTION_EXPECT_ADA: number = 4;
 
 export class VyFinance extends BaseDex {
 
-    public readonly name: string = 'VyFinance';
+    public static readonly identifier: string = 'VyFinance';
     public readonly api: BaseApi;
 
     constructor(requestConfig: RequestConfig = {}) {

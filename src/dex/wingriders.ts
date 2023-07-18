@@ -26,7 +26,7 @@ const MAX_INT: bigint = 9_223_372_036_854_775_807n;
 
 export class WingRiders extends BaseDex {
 
-    public readonly name: string = 'WingRiders';
+    public static readonly identifier: string = 'WingRiders';
     public readonly api: BaseApi;
 
     /**
@@ -100,7 +100,7 @@ export class WingRiders extends BaseDex {
         const assetAQuantity: bigint = relevantAssets[assetAIndex].quantity;
         const assetBQuantity: bigint = relevantAssets[assetBIndex].quantity;
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            this.name,
+            WingRiders.identifier,
             relevantAssets[assetAIndex].asset,
             relevantAssets[assetBIndex].asset,
             relevantAssets[assetAIndex].asset === 'lovelace'

@@ -24,7 +24,7 @@ describe('Minswap', () => {
     describe('Set Swap In', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            Minswap.name,
+            Minswap.identifier,
             'lovelace',
             asset,
             30817255371488n,
@@ -72,7 +72,7 @@ describe('Minswap', () => {
 
     describe('Set Swap Out', () => {
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            Minswap.name,
+            Minswap.identifier,
             'lovelace',
             asset,
             5126788000507n,
