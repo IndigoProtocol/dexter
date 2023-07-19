@@ -64,6 +64,7 @@ describe('SundaeSwap', () => {
 
             return sundaeswap.buildSwapOrder(liquidityPool, defaultSwapParameters)
                 .then((payments: PayToAddress[]) => {
+                    expect(() => { sundaeswap.buildSwapOrder(liquidityPool, defaultSwapParameters); }).not.toThrowError();
                     expect(payments[0].addressType).toBe(AddressType.Contract);
                     expect(payments[0].assetBalances[0].quantity).toEqual(10004500000n);
                     expect(payments[0].datum).toBe('d8799f421234d8799fd8799fd8799fd8799f42ed56ffd8799fd8799fd8799f42bac6ffffffffd87a80ffd87a80ff1a002625a0d8799fd879801b00000002540be400d8799f1b000000309173774fffffff');

@@ -62,6 +62,7 @@ describe('MuesliSwap', () => {
 
             return muesliswap.buildSwapOrder(liquidityPool, defaultSwapParameters)
                 .then((payments: PayToAddress[]) => {
+                    expect(() => { muesliswap.buildSwapOrder(liquidityPool, defaultSwapParameters); }).not.toThrowError();
                     expect(payments[0].addressType).toBe(AddressType.Contract);
                     expect(payments[0].assetBalances[0].quantity).toEqual(100002650000n);
                     expect(payments[0].datum).toBe('d8799fd8799fd8799fd8799f42ed56ffd8799fd8799fd8799f42bac6ffffffff581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b6988044695553444040197b98d87a801a00286f90ffff');
