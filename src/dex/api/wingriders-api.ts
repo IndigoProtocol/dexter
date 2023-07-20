@@ -50,6 +50,9 @@ export class WingRidersApi extends BaseApi {
                     }
                     treasuryA
                     treasuryB
+                    _utxo {
+                        address
+                    }
                 }
             `,
             variables: {

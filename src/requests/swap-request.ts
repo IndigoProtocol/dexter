@@ -2,7 +2,7 @@ import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Token } from '@dex/models/asset';
 import { Dexter } from '@app/dexter';
 import { tokensMatch } from '@app/utils';
-import { DatumParameters, PayToAddress, SwapFee } from '@app/types';
+import { AssetBalance, DatumParameters, PayToAddress, SwapFee, UTxO } from '@app/types';
 import { DatumParameterKey, MetadataKey, TransactionStatus } from '@app/constants';
 import { DexTransaction } from '@dex/models/dex-transaction';
 
@@ -14,6 +14,7 @@ export class SwapRequest {
     private _swapOutToken: Token;
     private _swapInAmount: bigint = 0n;
     private _slippagePercent: number = 1.0;
+    private _withUtxos: UTxO[] = [];
 
     constructor(dexter: Dexter) {
         this._dexter = dexter;
@@ -127,6 +128,16 @@ export class SwapRequest {
         return this;
     }
 
+    public withUtxos(utxos: UTxO[]): SwapRequest {
+        if (utxos.length === 0) {
+            throw new Error('Must provide valid UTxOs to use in swap.');
+        }
+
+        this._withUtxos = utxos;
+
+        return this;
+    }
+
     public getEstimatedReceive(liquidityPool?: LiquidityPool): bigint {
         const poolToCheck: LiquidityPool | undefined = liquidityPool ?? this._liquidityPool;
 
@@ -207,7 +218,7 @@ export class SwapRequest {
             [DatumParameterKey.SwapOutTokenAssetName]: this._swapOutToken === 'lovelace' ? '' : this._swapOutToken.nameHex,
         };
 
-        this._dexter.availableDexs[this._liquidityPool.dex].buildSwapOrder(this._liquidityPool, defaultSwapParameters)
+        this._dexter.availableDexs[this._liquidityPool.dex].buildSwapOrder(this._liquidityPool, defaultSwapParameters, this._withUtxos)
             .then((payToAddresses: PayToAddress[]) => {
                 this.sendSwapOrder(swapTransaction, payToAddresses);
             });

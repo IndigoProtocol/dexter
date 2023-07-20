@@ -162,7 +162,7 @@ export class MuesliSwap extends BaseDex {
         return(swapPrice - oldPrice) / oldPrice * 100;
     }
 
-    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters): Promise<PayToAddress[]> {
+    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: UTxO[] = []): Promise<PayToAddress[]> {
         const matchMakerFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee): boolean => fee.id === 'matchmakerFee');
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee): boolean => fee.id === 'deposit');
 
@@ -200,6 +200,7 @@ export class MuesliSwap extends BaseDex {
                         },
                     ],
                     datum: datumBuilder.getCbor(),
+                    spendUtxos: spendUtxos,
                 }
             )
         ];

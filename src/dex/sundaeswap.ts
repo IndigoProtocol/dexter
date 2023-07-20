@@ -145,7 +145,7 @@ export class SundaeSwap extends BaseDex {
         return (1 - (Number(reserveIn) / Number(reserveIn + swapInAmount))) * 100;
     }
 
-    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters): Promise<PayToAddress[]> {
+    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: UTxO[] = []): Promise<PayToAddress[]> {
         const scooperFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'scooperFee');
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
 
@@ -184,6 +184,7 @@ export class SundaeSwap extends BaseDex {
                         },
                     ],
                     datum: datumBuilder.getCbor(),
+                    spendUtxos: spendUtxos,
                 }
             )
         ];

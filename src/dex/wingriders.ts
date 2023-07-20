@@ -188,7 +188,7 @@ export class WingRiders extends BaseDex {
             * 100;
     }
 
-    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters): Promise<PayToAddress[]> {
+    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: UTxO[] = []): Promise<PayToAddress[]> {
         const agentFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'agentFee');
         const oil: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'oil');
 
@@ -239,6 +239,7 @@ export class WingRiders extends BaseDex {
                         },
                     ],
                     datum: datumBuilder.getCbor(),
+                    spendUtxos: spendUtxos,
                 }
             )
         ];

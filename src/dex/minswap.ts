@@ -180,7 +180,7 @@ export class Minswap extends BaseDex {
         return Number(priceImpactNumerator * 100n) / Number(priceImpactDenominator);
     }
 
-    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters): Promise<PayToAddress[]> {
+    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: UTxO[] = []): Promise<PayToAddress[]> {
         const batcherFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'batcherFee');
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
 
@@ -213,6 +213,7 @@ export class Minswap extends BaseDex {
                         },
                     ],
                     datum: datumBuilder.getCbor(),
+                    spendUtxos: spendUtxos,
                 }
             )
         ];

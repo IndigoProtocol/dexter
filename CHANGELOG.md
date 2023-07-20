@@ -2,8 +2,9 @@
 
 All notable changes to Dexter will be documented in this file.
 
-## [UNRELEASED]
+## [v3.0.2]
 - Update DEX template definitions to use a copy of the template, rather than altering the original.
+- Fix for WingRiders API.
 
 ## [v3.0.1]
 
