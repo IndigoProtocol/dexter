@@ -10,7 +10,7 @@ export class DefinitionBuilder {
      * Load a DEX definition file as a template for this builder.
      */
     public async loadDefinition(definition: DefinitionConstr): Promise<DefinitionBuilder> {
-        this._definition = definition;
+        this._definition = structuredClone(definition);
 
         return this;
     }

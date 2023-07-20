@@ -62,6 +62,7 @@ describe('WingRiders', () => {
 
             return wingriders.buildSwapOrder(liquidityPool, defaultSwapParameters)
                 .then((payments: PayToAddress[]) => {
+                    expect(() => { wingriders.buildSwapOrder(liquidityPool, defaultSwapParameters); }).not.toThrowError();
                     expect(payments[0].addressType).toBe(AddressType.Contract);
                     expect(payments[0].assetBalances[0].quantity).toEqual(10004000000n);
                 });

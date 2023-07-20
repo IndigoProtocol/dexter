@@ -2,6 +2,9 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [UNRELEASED]
+- Update DEX template definitions to use a copy of the template, rather than altering the original.
+
 ## [v3.0.1]
 
 - Fix for WingRiders price impact calculation when using a non ADA swap in token.
