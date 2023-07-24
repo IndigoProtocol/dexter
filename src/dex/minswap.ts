@@ -141,8 +141,8 @@ export class Minswap extends BaseDex {
     }
 
     estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
-        const poolFeeMultiplier: bigint = 1000n;
-        const poolFeeModifier: bigint = poolFeeMultiplier - BigInt((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier));
+        const poolFeeMultiplier: bigint = 10000n;
+        const poolFeeModifier: bigint = poolFeeMultiplier - BigInt(Math.round((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier)));
 
         const [reserveOut, reserveIn]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
 
@@ -153,8 +153,8 @@ export class Minswap extends BaseDex {
     }
 
     public estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
-        const poolFeeMultiplier: bigint = 1000n;
-        const poolFeeModifier: bigint = poolFeeMultiplier - BigInt((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier));
+        const poolFeeMultiplier: bigint = 10000n;
+        const poolFeeModifier: bigint = poolFeeMultiplier - BigInt(Math.round((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier)));
 
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
@@ -165,8 +165,8 @@ export class Minswap extends BaseDex {
     }
 
     public priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
-        const poolFeeMultiplier: bigint = 1000n;
-        const poolFeeModifier: bigint = poolFeeMultiplier - BigInt((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier));
+        const poolFeeMultiplier: bigint = 10000n;
+        const poolFeeModifier: bigint = poolFeeMultiplier - BigInt(Math.round((liquidityPool.poolFeePercent / 100) * Number(poolFeeMultiplier)));
 
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
