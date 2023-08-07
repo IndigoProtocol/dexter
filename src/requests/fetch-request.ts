@@ -2,21 +2,21 @@ import { BaseDex } from '@dex/base-dex';
 import { Asset, Token } from '@dex/models/asset';
 import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Dexter } from '@app/dexter';
-import { AssetMetadata, Transaction, UTxO } from '@app/types';
+import { AssetMetadata, AvailableDexs, Transaction, UTxO } from '@app/types';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { tokensMatch } from "@app/utils";
 
 export class FetchRequest {
 
     private _dexter: Dexter;
-    private _onDexs: BaseDex[] = [];
+    private _onDexs: AvailableDexs;
     private _dexDataProviders: Map<string, BaseDataProvider>;
     private _filteredTokens: Token[] = [];
     private _filteredPairs: Array<Token[]> = [];
 
     constructor(dexter: Dexter) {
         this._dexter = dexter;
-        this._onDexs = Object.values(dexter.availableDexs);
+        this._onDexs = dexter.availableDexs;
 
         this._dexDataProviders = new Map<string, BaseDataProvider>();
         if (dexter.dataProvider) {
@@ -30,14 +30,14 @@ export class FetchRequest {
      * Set the DEX(s) Dexter will fetch data on.
      */
     public onDexs(dexs: string | string[]): FetchRequest {
-        this._onDexs = [];
+        this._onDexs = {};
 
         (Array.isArray(dexs) ? dexs : [dexs]).forEach((dexName: string) => {
             if (! Object.keys(this._dexter.availableDexs).includes(dexName)) {
                 throw new Error(`DEX ${dexName} is not available.`);
             }
 
-            this._onDexs.push(this._dexter.availableDexs[dexName]);
+            this._onDexs[dexName] = this._dexter.availableDexs[dexName];
         });
 
         return this;
@@ -47,7 +47,7 @@ export class FetchRequest {
      * Fetch data on all available DEXs.
      */
     public onAllDexs(): FetchRequest {
-        this._onDexs = Object.values(this._dexter.availableDexs);
+        this._onDexs = this._dexter.availableDexs;
 
         return this;
     }
@@ -160,18 +160,18 @@ export class FetchRequest {
      */
     public getLiquidityPools(): Promise<LiquidityPool[]> {
         const liquidityPoolPromises: Promise<LiquidityPool[]>[] =
-            this._onDexs.map((dex: BaseDex) => {
-                const dexDataProvider: BaseDataProvider | undefined = this._dexDataProviders.get(dex.constructor.name);
+            Object.entries(this._onDexs).map(([dexName, dexInstance]) => {
+                const dexDataProvider: BaseDataProvider | undefined = this._dexDataProviders.get(dexName);
 
                 if (! dexDataProvider) {
-                    return this.fetchPoolsFromApi(dex);
+                    return this.fetchPoolsFromApi(dexInstance);
                 }
 
-                return dex.liquidityPools(dexDataProvider)
+                return dexInstance.liquidityPools(dexDataProvider)
                     .catch(() => {
                         // Attempt fallback to API
                         return this._dexter.config.shouldFallbackToApi
-                            ? this.fetchPoolsFromApi(dex)
+                            ? this.fetchPoolsFromApi(dexInstance)
                             : [];
                     });
             });
