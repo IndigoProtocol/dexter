@@ -118,9 +118,6 @@ export class MuesliSwap extends BaseDex {
             const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
             const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
 
-            liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
-                ? BigInt(parameters.TotalLpTokens)
-                : 0n;
             liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number'
                 ? parameters.LpFee / 100
                 : 0;

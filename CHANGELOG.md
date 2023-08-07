@@ -2,6 +2,10 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [v4.0.0]
+- Remove total LP tokens from fetched data. This data is not needed for swapping, and wastes a lot of network requests.
+- Add `setProviderForDex()` to use different data providers for each DEX.
+
 ## [v3.0.3]
 - Fix for Minswap calculations with pool fee percents to round before casting.
 

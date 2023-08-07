@@ -107,9 +107,6 @@ export class SundaeSwap extends BaseDex {
             liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string'
                 ? parameters.PoolIdentifier
                 : '';
-            liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
-                ? BigInt(parameters.TotalLpTokens)
-                : 0n;
             liquidityPool.poolFeePercent = typeof parameters.LpFeeNumerator === 'number' && typeof parameters.LpFeeDenominator === 'number'
                 ? (parameters.LpFeeNumerator / parameters.LpFeeDenominator) * 100
                 : 0;

@@ -107,6 +107,8 @@ export class DefinitionBuilder {
 
             if (typeof templateDefinition.constructor !== 'number') {
                 foundParameters[templateDefinition.constructor] = definedDefinition.constructor;
+            } else if (templateDefinition.constructor !== definedDefinition.constructor) {
+                throw new Error("Template definition does not match with constructor value");
             }
 
             definedDefinition.fields.map((fieldParameter: DefinitionField, index: number) => {

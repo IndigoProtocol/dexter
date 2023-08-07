@@ -10,12 +10,20 @@ export class FetchRequest {
 
     private _dexter: Dexter;
     private _onDexs: BaseDex[] = [];
+    private _dexDataProviders: Map<string, BaseDataProvider>;
     private _filteredTokens: Token[] = [];
     private _filteredPairs: Array<Token[]> = [];
 
     constructor(dexter: Dexter) {
         this._dexter = dexter;
         this._onDexs = Object.values(dexter.availableDexs);
+
+        this._dexDataProviders = new Map<string, BaseDataProvider>();
+        if (dexter.dataProvider) {
+            Object.keys(dexter.availableDexs).forEach((dexName: string) => {
+                this._dexDataProviders.set(dexName, dexter.dataProvider as BaseDataProvider);
+            });
+        }
     }
 
     /**
@@ -40,6 +48,21 @@ export class FetchRequest {
      */
     public onAllDexs(): FetchRequest {
         this._onDexs = Object.values(this._dexter.availableDexs);
+
+        return this;
+    }
+
+    /**
+     * Force a data provider for a DEX.
+     */
+    public setDataProviderForDex(dexName: string, provider: BaseDataProvider | undefined): FetchRequest {
+        // Force API usage
+        if (! provider) {
+            this._dexDataProviders.delete(dexName);
+            return this;
+        }
+
+        this._dexDataProviders.set(dexName, provider);
 
         return this;
     }
@@ -87,8 +110,9 @@ export class FetchRequest {
         }
 
         let liquidityPoolPromises: Promise<LiquidityPool[]>;
+        const dexDataProvider: BaseDataProvider | undefined = this._dexDataProviders.get(liquidityPool.dex);
 
-        if (this._dexter.dataProvider) {
+        if (dexDataProvider) {
             if (! liquidityPool.address) {
                 return Promise.reject('Liquidity pool must have a set address.');
             }
@@ -97,11 +121,11 @@ export class FetchRequest {
                 ? liquidityPool.assetB as Asset
                 : liquidityPool.assetA as Asset;
 
-            liquidityPoolPromises = this._dexter.dataProvider.utxos(liquidityPool.address, filterableAsset)
+            liquidityPoolPromises = dexDataProvider.utxos(liquidityPool.address, filterableAsset)
                 .then(async (utxos: UTxO[]) => {
                     return await Promise.all(
                         utxos.map(async (utxo: UTxO) => {
-                            return await dexInstance.liquidityPoolFromUtxo(this._dexter.dataProvider as BaseDataProvider, utxo);
+                            return await dexInstance.liquidityPoolFromUtxo(dexDataProvider, utxo);
                         })
                     ).then((liquidityPools: (LiquidityPool | undefined)[]) => {
                         return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
@@ -137,11 +161,13 @@ export class FetchRequest {
     public getLiquidityPools(): Promise<LiquidityPool[]> {
         const liquidityPoolPromises: Promise<LiquidityPool[]>[] =
             this._onDexs.map((dex: BaseDex) => {
-                if (! this._dexter.dataProvider) {
+                const dexDataProvider: BaseDataProvider | undefined = this._dexDataProviders.get(dex.constructor.name);
+
+                if (! dexDataProvider) {
                     return this.fetchPoolsFromApi(dex);
                 }
 
-                return dex.liquidityPools(this._dexter.dataProvider as BaseDataProvider)
+                return dex.liquidityPools(dexDataProvider)
                     .catch(() => {
                         // Attempt fallback to API
                         return this._dexter.config.shouldFallbackToApi

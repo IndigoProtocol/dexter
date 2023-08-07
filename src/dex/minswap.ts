@@ -119,24 +119,6 @@ export class Minswap extends BaseDex {
 
         liquidityPool.poolFeePercent = 0.3;
 
-        try {
-            const builder: DefinitionBuilder = await (new DefinitionBuilder())
-                .loadDefinition(pool);
-            const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-            const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
-
-            // Ignore Zap orders
-            if (typeof parameters.PoolAssetBPolicyId === 'string' && parameters.PoolAssetBPolicyId === this.lpTokenPolicyId) {
-                return undefined;
-            }
-
-            liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
-                ? BigInt(parameters.TotalLpTokens)
-                : 0n;
-        } catch (e) {
-            return liquidityPool;
-        }
-
         return liquidityPool;
     }
 

@@ -1,6 +1,7 @@
 import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
 import { Token } from '@dex/models/asset';
 import { BaseDex } from '@dex/base-dex';
+import { BaseDataProvider } from '@providers/data/base-data-provider';
 
 export interface DexterConfig {
     shouldFetchMetadata?: boolean,
@@ -31,6 +32,10 @@ export interface KupmiosConfig {
 
 export type AvailableDexs = {
     [dex: string]: BaseDex,
+}
+
+export type DexWithProviders = {
+    [dex: string]: BaseDataProvider,
 }
 
 export type DatumParameters = {

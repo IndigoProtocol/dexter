@@ -49,6 +49,20 @@ dexter.newFetchRequest()
 <br>
 
 <details>
+<summary><code>setDataProviderForDex(string, BaseDataProvider): FetchRequest</code> Force a data provider for a DEX.</summary>
+
+##### Using
+
+```js
+dexter.newFetchRequest()
+    .onAllDexs()
+    ...
+```
+</details>
+
+<br>
+
+<details>
 <summary><code>forTokens(Token[]): FetchRequest</code> Set filtering tokens when fetching liquidity pools</summary>
 
 ##### Using
