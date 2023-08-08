@@ -55,7 +55,7 @@ export class KupoProvider extends BaseDataProvider {
     }
 
     public async transactionUtxos(txHash: string): Promise<UTxO[]> {
-        return this._kupoApi.get(`/matches/${txHash}`)
+        return this._kupoApi.get(`/matches/*@${txHash}`)
             .then((results: any) => {
                 return this.toUtxos(results.data);
             });
