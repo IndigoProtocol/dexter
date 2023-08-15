@@ -2,6 +2,9 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [v4.0.2]
+- Fix pool identifiers & LP token for Minswap.
+
 ## [v4.0.1]
 - Remove total LP tokens from fetched data. This data is not needed for swapping, and wastes a lot of network requests.
 - Add `setProviderForDex()` to use different data providers for each DEX.

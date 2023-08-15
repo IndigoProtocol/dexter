@@ -107,12 +107,12 @@ export class WingRiders extends BaseDex {
             relevantAssets[assetAIndex].asset,
             relevantAssets[assetBIndex].asset,
             relevantAssets[assetAIndex].asset === 'lovelace'
-                ? (assetAQuantity - MIN_POOL_ADA < 1_000_000)
+                ? (assetAQuantity - MIN_POOL_ADA < 1_000_000n)
                     ? assetAQuantity - MIN_POOL_ADA
                     : assetAQuantity
                 : assetAQuantity,
             relevantAssets[assetBIndex].asset === 'lovelace'
-                ? (assetBQuantity - MIN_POOL_ADA < 1_000_000)
+                ? (assetBQuantity - MIN_POOL_ADA < 1_000_000n)
                     ? assetBQuantity - MIN_POOL_ADA
                     : assetBQuantity
                 : assetBQuantity,

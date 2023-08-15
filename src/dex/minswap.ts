@@ -6,8 +6,6 @@ import {
     AssetAddress,
     AssetBalance,
     DatumParameters,
-    DefinitionConstr,
-    DefinitionField,
     PayToAddress,
     RequestConfig,
     SwapFee,
@@ -16,7 +14,6 @@ import {
 import { DefinitionBuilder } from '@app/definition-builder';
 import { correspondingReserves } from '@app/utils';
 import { AddressType, DatumParameterKey } from '@app/constants';
-import pool from '@dex/definitions/minswap/pool';
 import order from '@dex/definitions/minswap/order';
 import { BaseApi } from '@dex/api/base-api';
 import { MinswapApi } from '@dex/api/minswap-api';
@@ -106,16 +103,14 @@ export class Minswap extends BaseDex {
         );
 
         // Load additional pool information
-        const possibleLpTokens: Asset[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
-            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
-        }).map((assetBalance: AssetBalance) => assetBalance.asset as Asset);
+        const poolNft: Asset | undefined = utxo.assetBalances.find((assetBalance: AssetBalance) => {
+            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.poolNftPolicyId;
+        })?.asset as Asset;
 
-        if (possibleLpTokens.length > 1) {
-            return undefined;
-        } else if (possibleLpTokens.length === 1) {
-            liquidityPool.lpToken = possibleLpTokens[0];
-            liquidityPool.identifier = possibleLpTokens[0].policyId;
-        }
+        if (! poolNft) return undefined;
+
+        liquidityPool.lpToken = new Asset(this.lpTokenPolicyId, poolNft.nameHex);
+        liquidityPool.identifier = poolNft.nameHex;
 
         liquidityPool.poolFeePercent = 0.3;
 
