@@ -1,7 +1,6 @@
 import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Token } from '@dex/models/asset';
 import { Dexter } from '@app/dexter';
-import { tokensMatch } from '@app/utils';
 import { PayToAddress, SwapFee, SwapInAmountMapping, SwapOutAmountMapping, UTxO } from '@app/types';
 import { MetadataKey, TransactionStatus } from '@app/constants';
 import { DexTransaction } from '@dex/models/dex-transaction';
@@ -10,7 +9,7 @@ import { SwapRequest } from '@requests/swap-request';
 export class SplitSwapRequest {
 
     private _dexter: Dexter;
-    private _swapRequests: SwapRequest[];
+    private _swapRequests: SwapRequest[] = [];
     private _swapInToken: Token;
     private _swapOutToken: Token;
     private _slippagePercent: number = 1.0;
@@ -70,9 +69,9 @@ export class SplitSwapRequest {
             throw new Error('Swap-in token must be set before setting the pool mappings.');
         }
 
-        const mappingPools: LiquidityPool[] = mappings.map((mapping: SwapInAmountMapping) => mapping.liquidityPool);
-
-        this.isValidLiquidityPoolMappings(mappingPools);
+        this.isValidLiquidityPoolMappings(
+            mappings.map((mapping: SwapInAmountMapping) => mapping.liquidityPool)
+        );
 
         this._swapRequests = mappings.map((mapping: SwapInAmountMapping) => {
             return this._dexter.newSwapRequest()
@@ -90,9 +89,9 @@ export class SplitSwapRequest {
             throw new Error('Swap-out token must be set before setting the pool mappings.');
         }
 
-        const mappingPools: LiquidityPool[] = mappings.map((mapping: SwapOutAmountMapping) => mapping.liquidityPool);
-
-        this.isValidLiquidityPoolMappings(mappingPools);
+        this.isValidLiquidityPoolMappings(
+            mappings.map((mapping: SwapOutAmountMapping) => mapping.liquidityPool)
+        );
 
         this._swapRequests = mappings.map((mapping: SwapOutAmountMapping) => {
             return this._dexter.newSwapRequest()
@@ -110,9 +109,11 @@ export class SplitSwapRequest {
             throw new Error('Slippage percent must be zero or above.');
         }
 
-        this._swapRequests.forEach((swapRequest: SwapRequest) => {
-            swapRequest.withSlippagePercent(slippagePercent);
-        });
+        if (this._swapRequests.length > 0) {
+            this._swapRequests.forEach((swapRequest: SwapRequest) => {
+                swapRequest.withSlippagePercent(slippagePercent);
+            });
+        }
 
         this._slippagePercent = slippagePercent;
 
@@ -144,6 +145,8 @@ export class SplitSwapRequest {
     }
 
     public getAvgPriceImpactPercent(): number {
+        if (this._swapRequests.length === 0) return 0;
+
         const totalPriceImpactPercent: number = this._swapRequests.reduce((totalPriceImpactPercent: number, swapRequest: SwapRequest) => {
             return totalPriceImpactPercent + swapRequest.getPriceImpactPercent();
         }, 0);
@@ -165,6 +168,9 @@ export class SplitSwapRequest {
         }
         if (! this._dexter.walletProvider.isWalletLoaded) {
             throw new Error('Wallet must be loaded before submitting a swap order.');
+        }
+        if (this._swapRequests.length === 0) {
+            throw new Error('Swap requests were never initialized.');
         }
 
         const swapTransaction: DexTransaction = this._dexter.walletProvider.createTransaction();
