@@ -2,7 +2,7 @@ import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Token } from '@dex/models/asset';
 import { Dexter } from '@app/dexter';
 import { tokensMatch } from '@app/utils';
-import { AssetBalance, DatumParameters, PayToAddress, SwapFee, UTxO } from '@app/types';
+import { DatumParameters, PayToAddress, SwapFee, UTxO } from '@app/types';
 import { DatumParameterKey, MetadataKey, TransactionStatus } from '@app/constants';
 import { DexTransaction } from '@dex/models/dex-transaction';
 
@@ -180,7 +180,7 @@ export class SwapRequest {
         return this._dexter.availableDexs[this._liquidityPool.dex].swapOrderFees();
     }
 
-    public submit(): DexTransaction {
+    public getPaymentsToAddresses(): Promise<PayToAddress[]> {
         if (! this._dexter.walletProvider) {
             throw new Error('Wallet provider must be set before submitting a swap order.');
         }
@@ -195,12 +195,6 @@ export class SwapRequest {
         }
         if (this._swapInAmount <= 0n) {
             throw new Error('Swap in amount must be set before submitting a swap order.');
-        }
-
-        const swapTransaction: DexTransaction = this._dexter.walletProvider.createTransaction();
-
-        if (! this._dexter.config.shouldSubmitOrders) {
-            return swapTransaction;
         }
 
         // Standard parameters for a swap order
@@ -218,7 +212,25 @@ export class SwapRequest {
             [DatumParameterKey.SwapOutTokenAssetName]: this._swapOutToken === 'lovelace' ? '' : this._swapOutToken.nameHex,
         };
 
-        this._dexter.availableDexs[this._liquidityPool.dex].buildSwapOrder(this._liquidityPool, defaultSwapParameters, this._withUtxos)
+        return this._dexter.availableDexs[this._liquidityPool.dex]
+            .buildSwapOrder(this._liquidityPool, defaultSwapParameters, this._withUtxos);
+    }
+
+    public submit(): DexTransaction {
+        if (! this._dexter.walletProvider) {
+            throw new Error('Wallet provider must be set before submitting a swap order.');
+        }
+        if (! this._dexter.walletProvider.isWalletLoaded) {
+            throw new Error('Wallet must be loaded before submitting a swap order.');
+        }
+
+        const swapTransaction: DexTransaction = this._dexter.walletProvider.createTransaction();
+
+        if (! this._dexter.config.shouldSubmitOrders) {
+            return swapTransaction;
+        }
+
+        this.getPaymentsToAddresses()
             .then((payToAddresses: PayToAddress[]) => {
                 this.sendSwapOrder(swapTransaction, payToAddresses);
             });

@@ -2,6 +2,7 @@ import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
 import { Token } from '@dex/models/asset';
 import { BaseDex } from '@dex/base-dex';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
+import { LiquidityPool } from '@dex/models/liquidity-pool';
 
 export interface DexterConfig {
     shouldFetchMetadata?: boolean,
@@ -32,10 +33,6 @@ export interface KupmiosConfig {
 
 export type AvailableDexs = {
     [dex: string]: BaseDex,
-}
-
-export type DexWithProviders = {
-    [dex: string]: BaseDataProvider,
 }
 
 export type DatumParameters = {
@@ -101,6 +98,16 @@ export type SwapFee = {
     value: bigint,
     isReturned: boolean,
 };
+
+export type SwapInAmountMapping = {
+    swapInAmount: bigint,
+    liquidityPool: LiquidityPool,
+}
+
+export type SwapOutAmountMapping = {
+    swapOutAmount: bigint,
+    liquidityPool: LiquidityPool,
+}
 
 export type DexTransactionError = {
     step: TransactionStatus,
