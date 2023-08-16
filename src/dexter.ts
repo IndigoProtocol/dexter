@@ -14,6 +14,7 @@ import { CancelSwapRequest } from '@requests/cancel-swap-request';
 import { FetchRequest } from '@requests/fetch-request';
 import axios from "axios";
 import axiosRetry from "axios-retry";
+import { SplitSwapRequest } from '@requests/split-swap-request';
 
 export class Dexter {
 
@@ -107,6 +108,13 @@ export class Dexter {
      */
     public newSwapRequest(): SwapRequest {
         return new SwapRequest(this);
+    }
+
+    /**
+     * New request for a split swap order.
+     */
+    public newSplitSwapRequest(): SplitSwapRequest {
+        return new SplitSwapRequest(this);
     }
 
     /**
