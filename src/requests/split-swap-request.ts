@@ -2,8 +2,8 @@ import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Token } from '@dex/models/asset';
 import { Dexter } from '@app/dexter';
 import { tokensMatch } from '@app/utils';
-import { DatumParameters, PayToAddress, SwapFee, SwapInAmountMapping, SwapOutAmountMapping, UTxO } from '@app/types';
-import { DatumParameterKey, MetadataKey, TransactionStatus } from '@app/constants';
+import { PayToAddress, SwapFee, SwapInAmountMapping, SwapOutAmountMapping, UTxO } from '@app/types';
+import { MetadataKey, TransactionStatus } from '@app/constants';
 import { DexTransaction } from '@dex/models/dex-transaction';
 import { SwapRequest } from '@requests/swap-request';
 
@@ -13,9 +13,7 @@ export class SplitSwapRequest {
     private _swapRequests: SwapRequest[];
     private _swapInToken: Token;
     private _swapOutToken: Token;
-    private _swapInAmount: bigint = 0n;
     private _slippagePercent: number = 1.0;
-    private _withUtxos: UTxO[] = [];
 
     constructor(dexter: Dexter) {
         this._dexter = dexter;
@@ -68,35 +66,18 @@ export class SplitSwapRequest {
     }
 
     public withSwapInAmountMappings(mappings: SwapInAmountMapping[]): SplitSwapRequest {
-        if (! this._swapInToken || ! this._swapOutToken) {
-            throw new Error('Swap-in & swap-out tokens must be set before setting the pool mappings.');
+        if (! this._swapInToken) {
+            throw new Error('Swap-in token must be set before setting the pool mappings.');
         }
 
         const mappingPools: LiquidityPool[] = mappings.map((mapping: SwapInAmountMapping) => mapping.liquidityPool);
 
-        // Validate provided DEXs are available
-        mappingPools
-            .map((pool: LiquidityPool) => pool.dex)
-            .forEach((dex: string) => {
-                if (! Object.keys(this._dexter.availableDexs).includes(dex)) {
-                    throw new Error(`DEX ${dex} provided with the liquidity pool is not available.`);
-                }
-            });
-
-        // Validate tokens in pools match swap-in & swap-out token
-        mappingPools
-            .forEach((pool: LiquidityPool) => {
-                const poolMatches: boolean = (tokensMatch(this._swapInToken, pool.assetA) || tokensMatch(this._swapInToken, pool.assetB))
-                    && (tokensMatch(this._swapOutToken, pool.assetA) || tokensMatch(this._swapOutToken, pool.assetB));
-
-                if (! poolMatches) {
-                    throw new Error('Provided pool does not contain the provided swap-in or swap-out tokens.');
-                }
-            });
+        this.isValidLiquidityPoolMappings(mappingPools);
 
         this._swapRequests = mappings.map((mapping: SwapInAmountMapping) => {
             return this._dexter.newSwapRequest()
                 .forLiquidityPool(mapping.liquidityPool)
+                .withSwapInToken(this._swapInToken)
                 .withSlippagePercent(this._slippagePercent)
                 .withSwapInAmount(mapping.swapInAmount);
         });
@@ -105,31 +86,18 @@ export class SplitSwapRequest {
     }
 
     public withSwapOutAmountMappings(mappings: SwapOutAmountMapping[]): SplitSwapRequest {
+        if (! this._swapOutToken) {
+            throw new Error('Swap-out token must be set before setting the pool mappings.');
+        }
+
         const mappingPools: LiquidityPool[] = mappings.map((mapping: SwapOutAmountMapping) => mapping.liquidityPool);
 
-        // Validate provided DEXs are available
-        mappingPools
-            .map((pool: LiquidityPool) => pool.dex)
-            .forEach((dex: string) => {
-                if (! Object.keys(this._dexter.availableDexs).includes(dex)) {
-                    throw new Error(`DEX ${dex} provided with the liquidity pool is not available.`);
-                }
-            });
-
-        // Validate tokens in pools match swap-in & swap-out token
-        mappingPools
-            .forEach((pool: LiquidityPool) => {
-                const poolMatches: boolean = (tokensMatch(this._swapInToken, pool.assetA) || tokensMatch(this._swapInToken, pool.assetB))
-                    && (tokensMatch(this._swapOutToken, pool.assetA) || tokensMatch(this._swapOutToken, pool.assetB));
-
-                if (! poolMatches) {
-                    throw new Error('Provided pool does not contain the provided swap-in or swap-out tokens.');
-                }
-            });
+        this.isValidLiquidityPoolMappings(mappingPools);
 
         this._swapRequests = mappings.map((mapping: SwapOutAmountMapping) => {
             return this._dexter.newSwapRequest()
                 .forLiquidityPool(mapping.liquidityPool)
+                .withSwapInToken(this._swapOutToken)
                 .withSlippagePercent(this._slippagePercent)
                 .withSwapOutAmount(mapping.swapOutAmount);
         })
@@ -156,7 +124,9 @@ export class SplitSwapRequest {
             throw new Error('Must provide valid UTxOs to use in swap.');
         }
 
-        this._withUtxos = utxos;
+        this._swapRequests.forEach((swapRequest: SwapRequest) => {
+           swapRequest.withUtxos(utxos);
+        });
 
         return this;
     }
@@ -167,7 +137,7 @@ export class SplitSwapRequest {
         }, 0n);
     }
 
-    public getMinimumReceive(liquidityPool?: LiquidityPool): bigint {
+    public getMinimumReceive(): bigint {
         return this._swapRequests.reduce((totalMinimumReceive: bigint, swapRequest: SwapRequest) => {
             return totalMinimumReceive + swapRequest.getMinimumReceive();
         }, 0n);
@@ -258,6 +228,17 @@ export class SplitSwapRequest {
                     reason: 'Failed to build transaction.',
                     reasonRaw: error,
                 };
+            });
+    }
+
+    private isValidLiquidityPoolMappings(liquidityPools: LiquidityPool[]): void {
+        // Validate provided DEXs are available
+        liquidityPools
+            .map((pool: LiquidityPool) => pool.dex)
+            .forEach((dex: string) => {
+                if (! Object.keys(this._dexter.availableDexs).includes(dex)) {
+                    throw new Error(`DEX ${dex} provided with the liquidity pool is not available.`);
+                }
             });
     }
 
