@@ -2,8 +2,7 @@
   <h1 align="center">Split Swap Request</h1>
 </p>
 
-All calculations for your swap parameters are DEX specific. For example, the estimated receive might be different on one DEX
-vs another given the same values due to DEXs using different formulas for their calculations.
+Request a split order request in order to split your swap order into chunks on different DEXs.
 
 ### Obtaining
 ```js
