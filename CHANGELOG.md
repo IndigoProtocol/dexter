@@ -2,6 +2,9 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [v4.1.0]
+- Support for multi-dex swap requests.
+
 ## [v4.0.2]
 - Fix pool identifiers & LP token for Minswap.
 
