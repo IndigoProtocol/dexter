@@ -11,6 +11,7 @@
 ### What You Can Do
 - Pull Liquidity Pools from DEX APIs or On-chain using [Blockfrost](https://blockfrost.io/) / [Kupo](https://github.com/CardanoSolutions/kupo)
 - Submit and cancel swap orders
+- Submit split swap orders across multple DEXs
 - Build your own data, wallet, or asset metadata providers to plug into Dexter
 - Build swap datums given specific parameters using Dexters _Definition Builder_
 - Load wallets using a seedphrase or CIP-30 interface using [Lucid](https://github.com/spacebudz/lucid)
@@ -207,6 +208,7 @@ dexter.newCancelSwapRequest()
 - [Wallet Providers](https://github.com/IndigoProtocol/dexter/blob/master/docs/providers/wallet.md)
 - [Creating a Fetch Request](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/fetch-request.md)
 - [Creating a Swap Request](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/swap-request.md)
+- [Creating a Split Swap Request](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/split-swap-request.md)
 - [Creating a Cancel Swap Request](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/cancel-swap-request.md)
 - [Listening for transaction events](https://github.com/IndigoProtocol/dexter/blob/master/docs/dex-transaction.md)
 - [Commonly returned models](https://github.com/IndigoProtocol/dexter/blob/master/docs/models.md)
