@@ -83,7 +83,7 @@ export class Spectrum extends BaseDex {
     return liquidityPool;
   }
 
-  estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
+  public estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
     // TODO.
     return 0n;
   }
