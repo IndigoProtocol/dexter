@@ -2,12 +2,10 @@ import { LiquidityPool } from './models/liquidity-pool';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
-import { AssetAddress, AssetBalance, DatumParameters, DefinitionConstr, DefinitionField, PayToAddress, RequestConfig, SwapFee, UTxO } from '@app/types';
+import { DatumParameters, DefinitionConstr, DefinitionField, PayToAddress, RequestConfig, SwapFee, UTxO } from '@app/types';
 import { DefinitionBuilder } from '@app/definition-builder';
-import { correspondingReserves } from '@app/utils';
 import { AddressType, DatumParameterKey } from '@app/constants';
 import { BaseApi } from '@dex/api/base-api';
-import { Script } from 'lucid-cardano';
 import pool from './definitions/spectrum/pool';
 import order from './definitions/spectrum/order';
 import { all, bignumber, BigNumber, ConfigOptions, create, FormatOptions, MathJsStatic } from 'mathjs';
@@ -49,9 +47,8 @@ export class Spectrum extends BaseDex {
     }
 
     const relevantAssets = utxo.assetBalances.filter((assetBalance) => {
-      // const assetBalanceId = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
       const assetName = (assetBalance.asset as Asset).assetName;
-      return !assetName?.toLowerCase()?.endsWith('_nft') && !assetName?.toLowerCase()?.endsWith('_lq');
+      return !assetName?.toLowerCase()?.endsWith('_nft') && !assetName?.toLowerCase()?.endsWith('_lq'); // TODO Improve method of identification here to not rely solely on an assetName.
     });
 
     // Irrelevant UTxO
@@ -76,33 +73,29 @@ export class Spectrum extends BaseDex {
       liquidityPool.lpToken = lpToken;
     }
 
-    try {
-      const builder: DefinitionBuilder = await new DefinitionBuilder().loadDefinition(pool);
-      const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-      const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+    const builder: DefinitionBuilder = await new DefinitionBuilder().loadDefinition(pool);
+    const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+    const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
 
-      liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string' ? parameters.PoolIdentifier : '';
-      liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number' ? (1000 - parameters.LpFee) / 10 : 0.3;
-    } catch (e) {
-      return liquidityPool;
-    }
+    liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string' ? parameters.PoolIdentifier : '';
+    liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number' ? (1000 - parameters.LpFee) / 10 : 0.3;
+
     return liquidityPool;
   }
 
   estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
+    // TODO.
     return 0n;
   }
 
   public estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
+    // TODO.
     return 2n;
   }
 
   public priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
+    // TODO.
     return 0;
-  }
-
-  public buildCancelSwapOrder(): [redeemer: string] {
-    throw new Error('Method not implemented.');
   }
 
   public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: UTxO[] = []): Promise<PayToAddress[]> {
@@ -150,6 +143,10 @@ export class Spectrum extends BaseDex {
     ];
   }
 
+  public buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
+    throw new Error('Method not implemented.');
+  }
+
   public swapOrderFees(): SwapFee[] {
     const networkFee = 0.5; // 0.5 ADA
     const reward = 1; // 1 ADA.
@@ -168,13 +165,23 @@ export class Spectrum extends BaseDex {
         id: 'deposit',
         title: 'Deposit',
         description: 'This amount of ADA will be held as minimum UTxO ADA and will be returned when your order is processed or cancelled.',
-        value: 2_000000n,
+        value: 2_000000n, // Estimated amount & should be returned.
         isReturned: true,
       },
     ];
   }
 }
 
+// WIP I created this to remove the mathjs dependency & coupled configuration logic below (This is untested).
+function decimalToFractionalImproved(decimalValue: bigint | number): [bigint, bigint] {
+  const [whole, decimals = ''] = decimalValue.toString()?.split('.');
+  let truncatedDecimals = decimals.slice(0, 15);
+  const denominator = 10n ** BigInt(truncatedDecimals.length);
+  const numerator = BigInt(whole + truncatedDecimals);
+  return [numerator, denominator];
+}
+
+// I think we can remove the below directly ported from the SDK, in favour for the decimalToFractionalImproved method approach I've created above.
 const mathConf: ConfigOptions = {
   epsilon: 1e-24,
   matrix: 'Matrix',
@@ -198,14 +205,5 @@ function decimalToFractional(n: BigNumber | number): [bigint, bigint] {
   const numDecimals = decimals.length;
   const denominator = BigInt(evaluate(`10^${numDecimals}`));
   const numerator = BigInt(whole) * denominator + BigInt(decimals);
-  return [numerator, denominator];
-}
-
-// WIP to remove the mathjs dependency & configuration logic.
-function decimalToFractionalImproved(decimalValue: bigint | number): [bigint, bigint] {
-  const [whole, decimals = ''] = decimalValue.toString()?.split('.');
-  let truncatedDecimals = decimals.slice(0, 15);
-  const denominator = 10n ** BigInt(truncatedDecimals.length);
-  const numerator = BigInt(whole + truncatedDecimals);
   return [numerator, denominator];
 }
