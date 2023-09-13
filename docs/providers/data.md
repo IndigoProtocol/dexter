@@ -37,6 +37,7 @@ to resolve within Dexter :
 --match "026a18d04a0c642759bb3d83b12e3344894e5c1c7b2aeb1a2113a570.4c"
 --match "13aa2accf2e1561723aa26871e071fdf32c867cff7e7d50ad470d62f.4d494e53574150" 
 --match "addr1w9qzpelu9hn45pefc0xr4ac4kdxeswq7pndul2vuj59u8tqaxdznu"
+--match "{ Your Address }"
 ```
 
 An example of a full Kupo run command given these patterns :
@@ -54,4 +55,5 @@ kupo \
 --match "026a18d04a0c642759bb3d83b12e3344894e5c1c7b2aeb1a2113a570.4c" \
 --match "13aa2accf2e1561723aa26871e071fdf32c867cff7e7d50ad470d62f.4d494e53574150" \
 --match "addr1w9qzpelu9hn45pefc0xr4ac4kdxeswq7pndul2vuj59u8tqaxdznu"
+--match "{ Your Address }"
 ```

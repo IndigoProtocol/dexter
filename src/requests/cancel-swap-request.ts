@@ -80,30 +80,30 @@ export class CancelSwapRequest {
                                 cancelTransaction.status = TransactionStatus.Submitted;
                             })
                             .catch((error) => {
-                                cancelTransaction.status = TransactionStatus.Errored;
                                 cancelTransaction.error = {
                                     step: TransactionStatus.Submitting,
                                     reason: 'Failed submitting transaction.',
                                     reasonRaw: error,
                                 };
+                                cancelTransaction.status = TransactionStatus.Errored;
                             });
                     })
                     .catch((error) => {
-                        cancelTransaction.status = TransactionStatus.Errored;
                         cancelTransaction.error = {
                             step: TransactionStatus.Signing,
                             reason: 'Failed to sign transaction.',
                             reasonRaw: error,
                         };
+                        cancelTransaction.status = TransactionStatus.Errored;
                     });
             })
             .catch((error) => {
-                cancelTransaction.status = TransactionStatus.Errored;
                 cancelTransaction.error = {
                     step: TransactionStatus.Building,
                     reason: 'Failed to build transaction.',
                     reasonRaw: error,
                 };
+                cancelTransaction.status = TransactionStatus.Errored;
             });
     }
 
