@@ -1,3 +1,4 @@
+import { Agent } from "https";
 import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
 import { Token } from '@dex/models/asset';
 import { BaseDex } from '@dex/base-dex';
@@ -15,6 +16,7 @@ export interface RequestConfig {
     timeout?: number,
     proxyUrl?: string,
     retries?: number,
+    httpsAgent?: Agent
 }
 
 export interface BlockfrostConfig {

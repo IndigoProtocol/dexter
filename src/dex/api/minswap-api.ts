@@ -22,6 +22,7 @@ export class MinswapApi extends BaseApi {
         this.api = axios.create({
             timeout: requestConfig.timeout,
             baseURL: `${requestConfig.proxyUrl}https://monorepo-mainnet-prod.minswap.org/graphql`,
+            httpsAgent: requestConfig.httpsAgent,
             withCredentials: false,
         });
     }
