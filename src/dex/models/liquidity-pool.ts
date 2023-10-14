@@ -10,13 +10,12 @@ export class LiquidityPool {
     address: string;
     marketOrderAddress: string;
     limitOrderAddress: string;
-
     lpToken: Asset;
-    identifier: string = '';
-    poolFeePercent: number = 0;
-    extra: any = {};
+    identifier: string;
+    poolFeePercent: number;
+    extra: any;
 
-    constructor(dex: string, assetA: Token, assetB: Token, reserveA: bigint, reserveB: bigint, address: string, marketOrderAddress: string = '', limitOrderAddress: string = '') {
+    constructor(dex: string, assetA: Token, assetB: Token, reserveA: bigint, reserveB: bigint, address: string, marketOrderAddress: string = '', limitOrderAddress: string = '', identifier: string = '', poolFeePercent: number = 0, extra: any = {}, lpToken: Asset | undefined = undefined) {
         this.dex = dex;
         this.assetA = assetA;
         this.assetB = assetB;
@@ -25,6 +24,9 @@ export class LiquidityPool {
         this.address = address;
         this.marketOrderAddress = marketOrderAddress;
         this.limitOrderAddress = limitOrderAddress;
+        this.identifier = identifier;
+        this.poolFeePercent = poolFeePercent;
+        this.extra = extra;
     }
 
     get uuid(): string {
