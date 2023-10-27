@@ -16,7 +16,7 @@ export class LiquidityPool {
     poolFeePercent: number = 0;
     extra: any = {};
 
-    constructor(dex: string, assetA: Token, assetB: Token, reserveA: bigint, reserveB: bigint, address: string, marketOrderAddress: string = '', limitOrderAddress: string = '') {
+    constructor(dex: string, assetA: Token, assetB: Token, reserveA: bigint, reserveB: bigint, address: string, marketOrderAddress: string = '', limitOrderAddress: string = '', identifier: string = '') {
         this.dex = dex;
         this.assetA = assetA;
         this.assetB = assetB;
@@ -25,6 +25,7 @@ export class LiquidityPool {
         this.address = address;
         this.marketOrderAddress = marketOrderAddress;
         this.limitOrderAddress = limitOrderAddress;
+        this.identifier = identifier;
     }
 
     get uuid(): string {
