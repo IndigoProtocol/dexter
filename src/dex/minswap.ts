@@ -110,7 +110,7 @@ export class Minswap extends BaseDex {
         if (! poolNft) return undefined;
 
         liquidityPool.lpToken = new Asset(this.lpTokenPolicyId, poolNft.nameHex);
-        liquidityPool.identifier = poolNft.nameHex;
+        liquidityPool.identifier = liquidityPool.lpToken.identifier();
 
         liquidityPool.poolFeePercent = 0.3;
 

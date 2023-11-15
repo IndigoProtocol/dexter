@@ -177,6 +177,7 @@ export class MinswapApi extends BaseApi {
 
         liquidityPool.lpToken = new Asset(poolData.lpAsset.currencySymbol, poolData.lpAsset.tokenName);
         liquidityPool.poolFeePercent = 0.3;
+        liquidityPool.identifier = liquidityPool.lpToken.identifier();
 
         return liquidityPool;
     }

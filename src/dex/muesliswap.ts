@@ -110,6 +110,7 @@ export class MuesliSwap extends BaseDex {
         if (lpToken) {
             lpToken.policyId = this.lpTokenPolicyId;
             liquidityPool.lpToken = lpToken;
+            liquidityPool.identifier = lpToken.identifier();
         }
 
         try {

@@ -83,6 +83,7 @@ export class WingRidersApi extends BaseApi {
 
                 liquidityPool.lpToken = new Asset(pool.issuedShareToken.policyId, pool.issuedShareToken.assetName);
                 liquidityPool.poolFeePercent = 0.35;
+                liquidityPool.identifier = liquidityPool.lpToken.identifier();
 
                 return liquidityPool;
             }).filter((pool: LiquidityPool | undefined) => pool !== undefined);

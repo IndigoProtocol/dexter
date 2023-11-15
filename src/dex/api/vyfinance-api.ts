@@ -62,6 +62,7 @@ export class VyfinanceApi extends BaseApi {
                     const lpTokenDetails: string[] = pool['lpPolicyId-assetId'].split('-');
                     liquidityPool.lpToken = new Asset(lpTokenDetails[0], lpTokenDetails[1]);
                     liquidityPool.poolFeePercent = (poolDetails['feesSettings']['barFee'] + poolDetails['feesSettings']['liqFee']) / 100;
+                    liquidityPool.identifier = liquidityPool.lpToken.identifier();
 
                     return liquidityPool;
                 }).filter((pool: LiquidityPool | undefined) => pool !== undefined) as LiquidityPool[];
