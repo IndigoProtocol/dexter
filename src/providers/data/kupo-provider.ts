@@ -14,6 +14,7 @@ import {
 } from '@app/types';
 import axios, { AxiosInstance } from 'axios';
 import { Data } from 'lucid-cardano';
+import { appendSlash } from '@app/utils';
 
 export class KupoProvider extends BaseDataProvider {
 
@@ -35,7 +36,7 @@ export class KupoProvider extends BaseDataProvider {
 
         this._config = config;
         this._kupoApi = axios.create({
-            baseURL: this._requestConfig.proxyUrl + config.url,
+            baseURL: appendSlash(requestConfig.proxyUrl) + config.url,
             timeout: this._requestConfig.timeout,
             headers: {
                 'Content-Type': 'application/json',

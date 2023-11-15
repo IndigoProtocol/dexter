@@ -11,6 +11,7 @@ import {
 } from '@app/types';
 import { Asset } from '@dex/models/asset';
 import Bottleneck from 'bottleneck';
+import { appendSlash } from '@app/utils';
 
 const API_BURST_SIZE: number = 500;
 const API_COOLDOWN_SIZE: number = 10;
@@ -38,7 +39,7 @@ export class BlockfrostProvider extends BaseDataProvider {
         );
 
         this._api = axios.create({
-            baseURL: (this._requestConfig.proxyUrl ?? '') + config.url,
+            baseURL: (appendSlash(requestConfig.proxyUrl)) + config.url,
             timeout: this._requestConfig.timeout,
             headers: {
                 'Content-Type': 'application/json',
