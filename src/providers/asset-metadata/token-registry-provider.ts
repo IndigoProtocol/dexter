@@ -30,7 +30,7 @@ export class TokenRegistryProvider extends BaseMetadataProvider {
      */
     fetch(assets: Asset[]): Promise<AssetMetadata[]> {
         return this._api.post('/metadata/query', {
-            subjects: assets.map((asset: Asset) => asset.id()),
+            subjects: assets.map((asset: Asset) => asset.identifier()),
         }).then((response) => response.data.subjects.map((entry: any) => {
             return {
                 policyId: entry.subject.slice(0, 56),

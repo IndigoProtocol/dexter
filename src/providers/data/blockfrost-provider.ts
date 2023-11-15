@@ -60,7 +60,7 @@ export class BlockfrostProvider extends BaseDataProvider {
      * https://docs.blockfrost.io/#tag/Cardano-Addresses/paths/~1addresses~1%7Baddress%7D~1utxos~1%7Basset%7D/get
      */
     public async utxos(address: string, asset?: Asset): Promise<UTxO[]> {
-        return this.sendPaginatedRequest(`/addresses/${address}/utxos/${asset ? asset.id() : ''}`)
+        return this.sendPaginatedRequest(`/addresses/${address}/utxos/${asset ? asset.identifier() : ''}`)
             .then((results: any) => {
                 return results.map((utxo: any) => {
                     return {
@@ -70,7 +70,7 @@ export class BlockfrostProvider extends BaseDataProvider {
                         outputIndex: utxo.output_index,
                         assetBalances: utxo.amount.reduce((assets: AssetBalance[], amount: any) => {
                             assets.push({
-                                asset: amount.unit === 'lovelace' ? amount.unit : Asset.fromId(amount.unit),
+                                asset: amount.unit === 'lovelace' ? amount.unit : Asset.fromIdentifier(amount.unit),
                                 quantity: BigInt(amount.quantity),
                             })
                             return assets;
@@ -94,7 +94,7 @@ export class BlockfrostProvider extends BaseDataProvider {
                         outputIndex: utxo.output_index,
                         assetBalances: utxo.amount.reduce((assets: AssetBalance[], amount: any) => {
                             assets.push({
-                                asset: amount.unit === 'lovelace' ? amount.unit : Asset.fromId(amount.unit),
+                                asset: amount.unit === 'lovelace' ? amount.unit : Asset.fromIdentifier(amount.unit),
                                 quantity: BigInt(amount.quantity),
                             })
                             return assets;
@@ -108,7 +108,7 @@ export class BlockfrostProvider extends BaseDataProvider {
      * https://docs.blockfrost.io/#tag/Cardano-Assets/paths/~1assets~1%7Basset%7D~1transactions/get
      */
     public async assetTransactions(asset: Asset): Promise<Transaction[]> {
-        return this.sendPaginatedRequest(`/assets/${asset.id()}/transactions`)
+        return this.sendPaginatedRequest(`/assets/${asset.identifier()}/transactions`)
             .then((results: any) => {
                 return results.map((tx: any) => {
                     return {
@@ -122,7 +122,7 @@ export class BlockfrostProvider extends BaseDataProvider {
      * https://docs.blockfrost.io/#tag/Cardano-Assets/paths/~1assets~1%7Basset%7D~1transactions/get
      */
     public async assetAddresses(asset: Asset): Promise<AssetAddress[]> {
-        return this.sendPaginatedRequest(`/assets/${asset.id()}/addresses`)
+        return this.sendPaginatedRequest(`/assets/${asset.identifier()}/addresses`)
             .then((results: any) => {
                 return results.map((result: any) => {
                     return {

@@ -4,6 +4,7 @@ import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { RequestConfig } from '@app/types';
 import { WingRiders } from '@dex/wingriders';
+import { appendSlash } from '@app/utils';
 
 export class WingRidersApi extends BaseApi {
 
@@ -16,7 +17,7 @@ export class WingRidersApi extends BaseApi {
         this.dex = dex;
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: `${requestConfig.proxyUrl}https://api.mainnet.wingriders.com/graphql`,
+            baseURL: `${appendSlash(requestConfig.proxyUrl)}https://api.mainnet.wingriders.com/graphql`,
             headers: {
                 'Content-Type': 'application/json',
             }

@@ -73,7 +73,7 @@ export class KupoProvider extends BaseDataProvider {
     }
 
     public async assetTransactions(asset: Asset): Promise<Transaction[]> {
-        return this._kupoApi.get(`/matches/${asset.id('.')}`)
+        return this._kupoApi.get(`/matches/${asset.identifier('.')}`)
             .then((results: any) => {
                 return results.data.map((result: any) => {
                     return {
@@ -84,12 +84,12 @@ export class KupoProvider extends BaseDataProvider {
     }
 
     public async assetAddresses(asset: Asset): Promise<AssetAddress[]> {
-        return this._kupoApi.get(`/matches/${asset.id('.')}?unspent`)
+        return this._kupoApi.get(`/matches/${asset.identifier('.')}?unspent`)
             .then((results: any) => {
                 return results.data.map((result: any) => {
                     return {
                         address: result.address,
-                        quantity: BigInt(result.value.assets[asset.id('.')]),
+                        quantity: BigInt(result.value.assets[asset.identifier('.')]),
                     } as AssetAddress
                 }) as AssetAddress[];
             });
@@ -111,7 +111,7 @@ export class KupoProvider extends BaseDataProvider {
                     ];
                     Object.keys(utxo.value.assets).forEach((unit: string) => {
                         balances.push({
-                            asset: Asset.fromId(unit),
+                            asset: Asset.fromIdentifier(unit),
                             quantity: BigInt(utxo.value.assets[unit]),
                         });
                     });

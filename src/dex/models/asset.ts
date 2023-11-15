@@ -10,7 +10,7 @@ export class Asset {
         this.decimals = decimals;
     }
 
-    static fromId(id: string, decimals: number = 0): Asset {
+    static fromIdentifier(id: string, decimals: number = 0): Asset {
         id = id.replace('.', '');
 
         return new Asset(
@@ -20,7 +20,7 @@ export class Asset {
         );
     }
 
-    id(dilimeter: '' | '.' = ''): string {
+    identifier(dilimeter: '' | '.' = ''): string {
         return this.policyId + dilimeter + this.nameHex;
     }
 

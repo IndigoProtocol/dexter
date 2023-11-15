@@ -63,7 +63,7 @@ export class SundaeSwap extends BaseDex {
         }
 
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
-            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
+            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier();
 
             return ! assetBalanceId.startsWith(this.lpTokenPolicyId);
         });

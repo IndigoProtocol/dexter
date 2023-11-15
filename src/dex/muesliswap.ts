@@ -41,14 +41,14 @@ export class MuesliSwap extends BaseDex {
     }
 
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
-        const validityAsset: Asset = Asset.fromId(this.factoryToken);
+        const validityAsset: Asset = Asset.fromIdentifier(this.factoryToken);
         const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
 
         return Promise.resolve([...new Set(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address))]);
     }
 
     async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
-        const validityAsset: Asset = Asset.fromId(this.factoryToken);
+        const validityAsset: Asset = Asset.fromIdentifier(this.factoryToken);
         const poolAddresses: string[] = await this.liquidityPoolAddresses(provider);
 
         const addressPromises: Promise<LiquidityPool[]>[] = poolAddresses.map(async (address: string) => {
@@ -76,7 +76,7 @@ export class MuesliSwap extends BaseDex {
         }
 
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
-            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
+            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier();
 
             return ! assetBalanceId.startsWith(this.factoryToken.slice(0, 56))
                 && ! assetBalanceId.startsWith(this.poolNftPolicyId);

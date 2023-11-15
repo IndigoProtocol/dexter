@@ -39,14 +39,14 @@ export class Minswap extends BaseDex {
     }
 
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
-        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const validityAsset: Asset = Asset.fromIdentifier(this.poolValidityAsset);
         const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
 
         return Promise.resolve([...new Set(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address))]);
     }
 
     public async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
-        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const validityAsset: Asset = Asset.fromIdentifier(this.poolValidityAsset);
         const poolAddresses: string[] = await this.liquidityPoolAddresses(provider);
 
         const addressPromises: Promise<LiquidityPool[]>[] = poolAddresses.map(async (address: string) => {
@@ -75,7 +75,7 @@ export class Minswap extends BaseDex {
 
         const relevantAssets: AssetBalance[] = utxo.assetBalances
             .filter((assetBalance: AssetBalance) => {
-                const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
+                const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier();
 
                 return assetBalanceId !== this.poolValidityAsset
                     && ! assetBalanceId.startsWith(this.lpTokenPolicyId)

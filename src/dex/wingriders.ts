@@ -47,7 +47,7 @@ export class WingRiders extends BaseDex {
     }
 
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
-        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const validityAsset: Asset = Asset.fromIdentifier(this.poolValidityAsset);
         const assetAddresses: AssetAddress[] = this._assetAddresses.length > 0
             ? this._assetAddresses
             : await provider.assetAddresses(validityAsset);
@@ -56,7 +56,7 @@ export class WingRiders extends BaseDex {
     }
 
     async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
-        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const validityAsset: Asset = Asset.fromIdentifier(this.poolValidityAsset);
         const poolAddresses: string[] = await this.liquidityPoolAddresses(provider);
 
         const addressPromises: Promise<LiquidityPool[]>[] = poolAddresses.map(async (address: string) => {
@@ -83,10 +83,10 @@ export class WingRiders extends BaseDex {
             return Promise.resolve(undefined);
         }
 
-        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const validityAsset: Asset = Asset.fromIdentifier(this.poolValidityAsset);
 
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
-            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
+            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier();
 
             return ! assetBalanceId.startsWith(validityAsset.policyId);
         });
