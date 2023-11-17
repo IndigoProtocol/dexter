@@ -26,6 +26,7 @@ export * from './providers/asset-metadata/token-registry-provider';
  * Request exports.
  */
 export * from './requests/swap-request';
+export * from './requests/split-swap-request';
 export * from './requests/fetch-request';
 export * from './requests/cancel-swap-request';
 
