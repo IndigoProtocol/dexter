@@ -178,7 +178,8 @@ export class WingRiders extends BaseDex {
 
     priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
         const estimatedReceive: bigint = this.estimatedReceive(liquidityPool, swapInToken, swapInAmount);
-        const swapPrice: number = Number(swapInAmount) / Number(estimatedReceive);
+        const swapPrice: number = (Number(swapInAmount) / 10**(swapInToken === 'lovelace' ? 6 : swapInToken.decimals))
+            / Number(estimatedReceive);
         const poolPrice: number = tokensMatch(liquidityPool.assetA, swapInToken)
             ? liquidityPool.price
             : (1 / liquidityPool.price);
