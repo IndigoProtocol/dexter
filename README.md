@@ -6,6 +6,7 @@
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/muesliswap.png" width="30" />
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/wingriders.png" width="30" />
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/vyfinance.png" width="30" />
+    <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/teddyswap.png" width="30" />
 </div>
 
 ### What You Can Do
