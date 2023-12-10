@@ -265,30 +265,30 @@ export class SwapRequest {
                                 swapTransaction.status = TransactionStatus.Submitted;
                             })
                             .catch((error) => {
-                                swapTransaction.status = TransactionStatus.Errored;
                                 swapTransaction.error = {
                                     step: TransactionStatus.Submitting,
                                     reason: 'Failed submitting transaction.',
                                     reasonRaw: error,
                                 };
+                                swapTransaction.status = TransactionStatus.Errored;
                             });
                     })
                     .catch((error) => {
-                        swapTransaction.status = TransactionStatus.Errored;
                         swapTransaction.error = {
                             step: TransactionStatus.Signing,
                             reason: 'Failed to sign transaction.',
                             reasonRaw: error,
                         };
+                        swapTransaction.status = TransactionStatus.Errored;
                     });
             })
             .catch((error) => {
-                swapTransaction.status = TransactionStatus.Errored;
                 swapTransaction.error = {
                     step: TransactionStatus.Building,
                     reason: 'Failed to build transaction.',
                     reasonRaw: error,
                 };
+                swapTransaction.status = TransactionStatus.Errored;
             });
     }
 

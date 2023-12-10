@@ -39,7 +39,7 @@ describe('SwapRequest', () => {
             swapRequest.withSwapInToken('lovelace');
 
             expect(swapRequest.swapInToken).toBe('lovelace');
-            expect((swapRequest.swapOutToken as Asset).id()).toBe(asset.id());
+            expect((swapRequest.swapOutToken as Asset).identifier()).toBe(asset.identifier());
         });
 
         it('Fails on invalid swap in token', () => {
@@ -50,7 +50,7 @@ describe('SwapRequest', () => {
             swapRequest.withSwapInToken('lovelace')
                 .flip();
 
-            expect((swapRequest.swapInToken as Asset).id()).toBe(asset.id());
+            expect((swapRequest.swapInToken as Asset).identifier()).toBe(asset.identifier());
             expect(swapRequest.swapOutToken).toBe('lovelace');
         });
 

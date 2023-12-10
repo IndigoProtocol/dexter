@@ -210,30 +210,30 @@ export class SplitSwapRequest {
                                 splitSwapTransaction.status = TransactionStatus.Submitted;
                             })
                             .catch((error) => {
-                                splitSwapTransaction.status = TransactionStatus.Errored;
                                 splitSwapTransaction.error = {
                                     step: TransactionStatus.Submitting,
                                     reason: 'Failed submitting transaction.',
                                     reasonRaw: error,
                                 };
+                                splitSwapTransaction.status = TransactionStatus.Errored;
                             });
                     })
                     .catch((error) => {
-                        splitSwapTransaction.status = TransactionStatus.Errored;
                         splitSwapTransaction.error = {
                             step: TransactionStatus.Signing,
                             reason: 'Failed to sign transaction.',
                             reasonRaw: error,
                         };
+                        splitSwapTransaction.status = TransactionStatus.Errored;
                     });
             })
             .catch((error) => {
-                splitSwapTransaction.status = TransactionStatus.Errored;
                 splitSwapTransaction.error = {
                     step: TransactionStatus.Building,
                     reason: 'Failed to build transaction.',
                     reasonRaw: error,
                 };
+                splitSwapTransaction.status = TransactionStatus.Errored;
             });
     }
 

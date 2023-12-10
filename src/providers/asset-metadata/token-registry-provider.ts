@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import { AssetMetadata, RequestConfig } from '@app/types';
 import { Asset } from '@dex/models/asset';
 import { BaseMetadataProvider } from './base-metadata-provider';
+import { appendSlash } from '@app/utils';
 
 export class TokenRegistryProvider extends BaseMetadataProvider {
 
@@ -18,7 +19,7 @@ export class TokenRegistryProvider extends BaseMetadataProvider {
 
         this._api = axios.create({
             timeout: requestConfig.timeout ?? 5000,
-            baseURL: `${requestConfig.proxyUrl ?? ''}https://tokens.cardano.org/`,
+            baseURL: `${appendSlash(requestConfig.proxyUrl)}https://tokens.cardano.org/`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -30,7 +31,7 @@ export class TokenRegistryProvider extends BaseMetadataProvider {
      */
     fetch(assets: Asset[]): Promise<AssetMetadata[]> {
         return this._api.post('/metadata/query', {
-            subjects: assets.map((asset: Asset) => asset.id()),
+            subjects: assets.map((asset: Asset) => asset.identifier()),
         }).then((response) => response.data.subjects.map((entry: any) => {
             return {
                 policyId: entry.subject.slice(0, 56),

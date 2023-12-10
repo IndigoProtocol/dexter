@@ -230,10 +230,10 @@ export class FetchRequest {
      */
     private async fetchAssetMetadata(liquidityPools: LiquidityPool[]) {
         const assets: Asset[] = liquidityPools.reduce((results: Asset[], liquidityPool: LiquidityPool) => {
-            if (liquidityPool.assetA !== 'lovelace' && ! results.some((asset: Asset) => asset.id() === (liquidityPool.assetA as Asset).id())) {
+            if (liquidityPool.assetA !== 'lovelace' && ! results.some((asset: Asset) => asset.identifier() === (liquidityPool.assetA as Asset).identifier())) {
                 results.push(liquidityPool.assetA);
             }
-            if (liquidityPool.assetB !== 'lovelace' && ! results.some((asset: Asset) => asset.id() === (liquidityPool.assetB as Asset).id())) {
+            if (liquidityPool.assetB !== 'lovelace' && ! results.some((asset: Asset) => asset.identifier() === (liquidityPool.assetB as Asset).identifier())) {
                 results.push(liquidityPool.assetB);
             }
 

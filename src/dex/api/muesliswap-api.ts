@@ -4,6 +4,7 @@ import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { MuesliSwap } from '../muesliswap';
 import { RequestConfig } from '@app/types';
+import { appendSlash } from '@app/utils';
 
 export class MuesliSwapApi extends BaseApi {
 
@@ -16,7 +17,7 @@ export class MuesliSwapApi extends BaseApi {
         this.dex = dex;
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: `${requestConfig.proxyUrl}https://api.muesliswap.com/`,
+            baseURL: `${appendSlash(requestConfig.proxyUrl)}https://api.muesliswap.com/`,
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -27,9 +28,9 @@ export class MuesliSwapApi extends BaseApi {
         const providers: string[] = ['muesliswap', 'muesliswap_v2', 'muesliswap_clp'];
         const tokenA: string = (assetA === 'lovelace')
             ? '.'
-            : assetA.id('.');
+            : assetA.identifier('.');
         const tokenB: string = (assetB && assetB !== 'lovelace')
-            ? assetB.id('.')
+            ? assetB.identifier('.')
             : '';
 
         return this.api.get(`/liquidity/pools?providers=${providers.join(',')}&token-a=${tokenA}&token-b=${tokenB}`)
