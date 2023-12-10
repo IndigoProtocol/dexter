@@ -59,7 +59,7 @@ export class Dexter {
       [MuesliSwap.identifier]: new MuesliSwap(this.requestConfig),
       [WingRiders.identifier]: new WingRiders(this.requestConfig),
       [VyFinance.identifier]: new VyFinance(this.requestConfig),
-      [Spectrum.identifier]: new Spectrum(this.requestConfig),
+      //   [Spectrum.identifier]: new Spectrum(this.requestConfig),
     };
   }
 
