@@ -31,7 +31,8 @@ export class MuesliSwap extends BaseDex {
      */
     public readonly orderAddress: string = 'addr1zyq0kyrml023kwjk8zr86d5gaxrt5w8lxnah8r6m6s4jp4g3r6dxnzml343sx8jweqn4vn3fz2kj8kgu9czghx0jrsyqqktyhv';
     public readonly lpTokenPolicyId: string = 'af3d70acf4bd5b3abb319a7d75c89fb3e56eafcdd46b2e9b57a2557f';
-    public readonly poolNftPolicyId: string = '909133088303c49f3a30f1cc8ed553a73857a29779f6c6561cd8093f';
+    public readonly poolNftPolicyIdV1: string = '909133088303c49f3a30f1cc8ed553a73857a29779f6c6561cd8093f';
+    public readonly poolNftPolicyIdV2: string = '7a8041a0693e6605d010d5185b034d55c79eaf7ef878aae3bdcdbf67';
     public readonly factoryToken: string = 'de9b756719341e79785aa13c164e7fe68c189ed04d61c9876b2fe53f4d7565736c69537761705f414d4d';
 
     constructor(requestConfig: RequestConfig = {}) {
@@ -41,14 +42,14 @@ export class MuesliSwap extends BaseDex {
     }
 
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
-        const validityAsset: Asset = Asset.fromId(this.factoryToken);
+        const validityAsset: Asset = Asset.fromIdentifier(this.factoryToken);
         const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
 
         return Promise.resolve([...new Set(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address))]);
     }
 
     async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
-        const validityAsset: Asset = Asset.fromId(this.factoryToken);
+        const validityAsset: Asset = Asset.fromIdentifier(this.factoryToken);
         const poolAddresses: string[] = await this.liquidityPoolAddresses(provider);
 
         const addressPromises: Promise<LiquidityPool[]>[] = poolAddresses.map(async (address: string) => {
@@ -76,10 +77,10 @@ export class MuesliSwap extends BaseDex {
         }
 
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
-            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
+            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier();
 
             return ! assetBalanceId.startsWith(this.factoryToken.slice(0, 56))
-                && ! assetBalanceId.startsWith(this.poolNftPolicyId);
+                && ! [this.poolNftPolicyIdV1, this.poolNftPolicyIdV2].includes(assetBalanceId);
         });
 
         // Irrelevant UTxO
@@ -104,12 +105,13 @@ export class MuesliSwap extends BaseDex {
 
         // Load additional pool information
         const lpToken: Asset = utxo.assetBalances.find((assetBalance: AssetBalance) => {
-            return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.poolNftPolicyId;
+            return assetBalance.asset !== 'lovelace' && [this.poolNftPolicyIdV1, this.poolNftPolicyIdV2].includes(assetBalance.asset.policyId);
         })?.asset as Asset;
 
         if (lpToken) {
             lpToken.policyId = this.lpTokenPolicyId;
             liquidityPool.lpToken = lpToken;
+            liquidityPool.identifier = lpToken.identifier();
         }
 
         try {

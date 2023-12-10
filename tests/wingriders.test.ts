@@ -68,6 +68,27 @@ describe('WingRiders', () => {
                 });
         });
 
+        it('Can calculate price impact with 0 decimals', () => {
+            const hosky: Asset = new Asset('a0028f350aaabe0545fdcb56b039bfb08e4bb4d8c4d7c3c7d481c235', '484f534b59', 0);
+            const hoskyPool: LiquidityPool = new LiquidityPool(
+                WingRiders.identifier,
+                'lovelace',
+                hosky,
+                52428070796n,
+                1424861277563n,
+                'addr1',
+            );
+            hoskyPool.poolFeePercent = 0.35;
+
+            const swap: SwapRequest = dexter.newSwapRequest()
+                .forLiquidityPool(hoskyPool)
+                .withSwapInToken('lovelace')
+                .withSwapInAmount(1_000_000000n)
+                .withSlippagePercent(0.5);
+
+            expect(+swap.getPriceImpactPercent().toFixed(2)).toEqual(2.23);
+        });
+
     });
 
     describe('Set Swap Out', () => {

@@ -2,6 +2,13 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [UNRELEASED]
+- Fix WR price impact formula for 0 decimals
+- Rename Asset identifier function
+- Include '/' helper function for proxy URLs
+- Add export for SplitSwapRequest
+- Add tests for DexTransaction events
+
 ## [v4.1.0]
 - Support for multi-dex swap requests.
 

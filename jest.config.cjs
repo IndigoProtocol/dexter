@@ -6,12 +6,7 @@ module.exports = {
     '<rootDir>/node_modules/',
   ],
   transform: {
-    '^.+\\.tsx?$': [
-      'ts-jest',
-      {
-        useESM: true,
-      },
-    ],
+    "^.+\\.ts?$": "babel-jest",
   },
   roots: ['<rootDir>'],
   modulePaths: ['<rootDir>'],

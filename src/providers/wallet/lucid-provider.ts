@@ -155,7 +155,7 @@ export class LucidProvider extends BaseWalletProvider {
     private paymentFromAssets(assetBalances: AssetBalance[]): Assets {
         return assetBalances
             .reduce((payment: Record<Unit | 'lovelace', bigint>, assetBalance: AssetBalance) => {
-                payment[assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id()] = assetBalance.quantity;
+                payment[assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier()] = assetBalance.quantity;
 
                 return payment;
             }, {} as Assets);
