@@ -8,7 +8,7 @@ import { AddressType, DatumParameterKey } from '@app/constants';
 import { BaseApi } from '@dex/api/base-api';
 import pool from './definitions/spectrum/pool';
 import order from './definitions/spectrum/order';
-import { all, bignumber, BigNumber, ConfigOptions, create, FormatOptions, MathJsStatic } from 'mathjs';
+import { correspondingReserves, tokensMatch } from '..';
 
 export class Spectrum extends BaseDex {
   public static readonly identifier: string = 'Spectrum';
@@ -19,26 +19,32 @@ export class Spectrum extends BaseDex {
    */
   public readonly orderAddress: string = 'addr1wynp362vmvr8jtc946d3a3utqgclfdl5y9d3kn849e359hsskr20n';
   public readonly poolAddress: string = 'addr1x8nz307k3sr60gu0e47cmajssy4fmld7u493a4xztjrll0aj764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrswgxsta';
+  public readonly poolAddress2: string = 'addr1x94ec3t25egvhqy2n265xfhq882jxhkknurfe9ny4rl9k6dj764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrst84slu';
 
   constructor(requestConfig: RequestConfig = {}) {
     super();
   }
   public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
-    return Promise.resolve([this.poolAddress]);
+    return Promise.resolve([this.poolAddress, this.poolAddress2]);
   }
 
   async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
-    const utxos: UTxO[] = await provider.utxos(this.poolAddress);
+    const poolAddresses: string[] = await this.liquidityPoolAddresses(provider);
 
-    return await Promise.all(
-      utxos.map(async (utxo: UTxO) => {
-        return await this.liquidityPoolFromUtxo(provider, utxo);
-      })
-    ).then((liquidityPools: (LiquidityPool | undefined)[]) => {
-      return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
-        return liquidityPool !== undefined;
-      }) as LiquidityPool[];
+    const addressPromises: Promise<LiquidityPool[]>[] = poolAddresses.map(async (address: string) => {
+      const utxos: UTxO[] = await provider.utxos(address);
+
+      return await Promise.all(
+        utxos.map(async (utxo: UTxO) => {
+          return await this.liquidityPoolFromUtxo(provider, utxo);
+        })
+      ).then((liquidityPools: (LiquidityPool | undefined)[]) => {
+        return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
+          return liquidityPool !== undefined;
+        }) as LiquidityPool[];
+      });
     });
+    return Promise.all(addressPromises).then((liquidityPools: Awaited<LiquidityPool[]>[]) => liquidityPools.flat());
   }
 
   public async liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO): Promise<LiquidityPool | undefined> {
@@ -48,7 +54,7 @@ export class Spectrum extends BaseDex {
 
     const relevantAssets = utxo.assetBalances.filter((assetBalance) => {
       const assetName = (assetBalance.asset as Asset).assetName;
-      return !assetName?.toLowerCase()?.endsWith('_nft') && !assetName?.toLowerCase()?.endsWith('_lq'); // TODO Improve method of identification here to not rely solely on an assetName.
+      return !assetName?.toLowerCase()?.endsWith('_nft') && !assetName?.toLowerCase()?.endsWith('_lq');
     });
 
     // Irrelevant UTxO
@@ -77,25 +83,34 @@ export class Spectrum extends BaseDex {
     const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
     const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
 
-    liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string' ? parameters.PoolIdentifier : '';
     liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number' ? (1000 - parameters.LpFee) / 10 : 0.3;
-
     return liquidityPool;
   }
 
-  public estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
-    // TODO.
-    return 0n;
+  estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
+    const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
+
+    const swapFee: bigint = (swapOutAmount * BigInt(liquidityPool.poolFeePercent * 100) + BigInt(10000) - 1n) / 10000n;
+    const tradeSize: bigint = swapOutAmount - swapFee;
+    const estimatedGive: bigint = (reserveOut * tradeSize) / (reserveIn + tradeSize);
+
+    return estimatedGive;
   }
 
   public estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
-    // TODO.
-    return 2n;
+    const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
+
+    const swapFee: bigint = (swapInAmount * BigInt(liquidityPool.poolFeePercent * 100) + BigInt(10000) - 1n) / 10000n;
+    const tradeSize: bigint = swapInAmount - swapFee;
+    const estimatedReceive: bigint = (reserveOut * tradeSize) / (reserveIn + tradeSize);
+
+    return estimatedReceive;
   }
 
   public priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
-    // TODO.
-    return 0;
+    const reserveIn: bigint = tokensMatch(swapInToken, liquidityPool.assetA) ? liquidityPool.reserveA : liquidityPool.reserveB;
+
+    return (1 - Number(reserveIn) / Number(reserveIn + swapInAmount)) * 100;
   }
 
   public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: UTxO[] = []): Promise<PayToAddress[]> {
@@ -108,8 +123,7 @@ export class Spectrum extends BaseDex {
     }
 
     const batcherFeeForToken = Number(batcherFee.value) / Number(minReceive);
-    const number = bignumber(batcherFeeForToken.toString());
-    const [numerator, denominator] = decimalToFractional(number);
+    const [numerator, denominator] = decimalToFractionalImproved(batcherFeeForToken);
 
     const lpfee = 1000 - liquidityPool.poolFeePercent * 10;
 
@@ -165,45 +179,17 @@ export class Spectrum extends BaseDex {
         id: 'deposit',
         title: 'Deposit',
         description: 'This amount of ADA will be held as minimum UTxO ADA and will be returned when your order is processed or cancelled.',
-        value: 2_000000n, // Estimated amount & should be returned.
+        value: 2_000000n,
         isReturned: true,
       },
     ];
   }
 }
 
-// WIP I created this to remove the mathjs dependency & coupled configuration logic below (This is untested).
 function decimalToFractionalImproved(decimalValue: bigint | number): [bigint, bigint] {
   const [whole, decimals = ''] = decimalValue.toString()?.split('.');
   let truncatedDecimals = decimals.slice(0, 15);
   const denominator = 10n ** BigInt(truncatedDecimals.length);
   const numerator = BigInt(whole + truncatedDecimals);
-  return [numerator, denominator];
-}
-
-// I think we can remove the below directly ported from the SDK, in favour for the decimalToFractionalImproved method approach I've created above.
-const mathConf: ConfigOptions = {
-  epsilon: 1e-24,
-  matrix: 'Matrix',
-  number: 'BigNumber',
-  precision: 64,
-};
-
-const formatOptions: FormatOptions = {
-  notation: 'fixed',
-};
-
-export const math = create(all, mathConf) as Partial<MathJsStatic>;
-
-function evaluate(expr: string): string {
-  return math.format!(math.evaluate!(expr), formatOptions);
-}
-
-function decimalToFractional(n: BigNumber | number): [bigint, bigint] {
-  const fmtN = math.format!(n, formatOptions);
-  const [whole, decimals = ''] = String(fmtN).split('.');
-  const numDecimals = decimals.length;
-  const denominator = BigInt(evaluate(`10^${numDecimals}`));
-  const numerator = BigInt(whole) * denominator + BigInt(decimals);
   return [numerator, denominator];
 }
