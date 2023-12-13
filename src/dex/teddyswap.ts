@@ -8,7 +8,8 @@ import { AddressType, DatumParameterKey } from '@app/constants';
 import { BaseApi } from '@dex/api/base-api';
 import pool from './definitions/teddyswap/pool';
 import order from './definitions/teddyswap/order';
-import { correspondingReserves, tokensMatch } from '..';
+import { correspondingReserves, tokensMatch } from '@app/utils';
+import { TeddyswapApi } from '@dex/api/teddyswap-api';
 
 export class TeddySwap extends BaseDex {
 
@@ -21,9 +22,10 @@ export class TeddySwap extends BaseDex {
     public readonly orderAddress: string = 'addr1z99tz7hungv6furtdl3zn72sree86wtghlcr4jc637r2eadkp2avt5gp297dnxhxcmy6kkptepsr5pa409qa7gf8stzs0706a3';
     public readonly poolAddress: string = 'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8z9kp2avt5gp297dnxhxcmy6kkptepsr5pa409qa7gf8stzsxg8sx3';
 
-
     constructor(requestConfig: RequestConfig = {}) {
         super();
+
+        this.api = new TeddyswapApi(this, requestConfig);
     }
 
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
