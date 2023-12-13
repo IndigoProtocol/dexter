@@ -9,6 +9,8 @@ All notable changes to Dexter will be documented in this file.
 - Add export for SplitSwapRequest
 - Add tests for DexTransaction events
 - Fix `withSwapOutAmountMappings` for split swap requests
+- Allow non-existing staking key hash when constructing order
+- TeddySwap integration
 
 ## [v4.1.0]
 - Support for multi-dex swap requests.

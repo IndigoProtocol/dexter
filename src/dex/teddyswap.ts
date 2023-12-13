@@ -97,29 +97,28 @@ export class TeddySwap extends BaseDex {
     }
 
     estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
-        const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
+        const [reserveOut, reserveIn]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
 
-        const swapFee: bigint = (swapOutAmount * BigInt(liquidityPool.poolFeePercent * 100) + BigInt(10000) - 1n) / 10000n;
+        const receive: bigint = (reserveIn * reserveOut) / (reserveOut - swapOutAmount) - reserveIn;
+        const swapFee: bigint = ((receive * BigInt(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
 
-        const tradeSize: bigint = swapOutAmount - swapFee;
-
-        return (reserveOut * tradeSize) / (reserveIn + tradeSize);
+        return receive + swapFee;
     }
 
-    public estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
+    estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
-        const swapFee: bigint = (swapInAmount * BigInt(liquidityPool.poolFeePercent * 100) + BigInt(10000) - 1n) / 10000n;
+        const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
 
-        const tradeSize: bigint = swapInAmount - swapFee;
-
-        return (reserveOut * tradeSize) / (reserveIn + tradeSize);
+        return reserveOut - (reserveIn * reserveOut) / (reserveIn + swapInAmount - swapFee);
     }
 
-    public priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
-        const reserveIn: bigint = tokensMatch(swapInToken, liquidityPool.assetA) ? liquidityPool.reserveA : liquidityPool.reserveB;
+    priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
+        const reserveIn: bigint = tokensMatch(swapInToken, liquidityPool.assetA)
+            ? liquidityPool.reserveA
+            : liquidityPool.reserveB;
 
-        return (1 - Number(reserveIn) / Number(reserveIn + swapInAmount)) * 100;
+        return (1 - (Number(reserveIn) / Number(reserveIn + swapInAmount))) * 100;
     }
 
     public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: UTxO[] = []): Promise<PayToAddress[]> {
@@ -153,7 +152,6 @@ export class TeddySwap extends BaseDex {
 
         return [
             this.buildSwapOrderPayment(swapParameters, {
-                dexName: TeddySwap.identifier,
                 address: this.orderAddress,
                 addressType: AddressType.Contract,
                 assetBalances: [
@@ -173,11 +171,12 @@ export class TeddySwap extends BaseDex {
     }
 
     public swapOrderFees(): SwapFee[] {
-        const networkFee = 0.5; // 0.5 ADA
-        const reward = 1; // 1 ADA.
-        const minNitro = 1.2;
-        const batcherFee = (reward + networkFee) * minNitro;
-        const batcherFeeInAda = BigInt(Math.round(batcherFee * 10 ** 6));
+        const networkFee: number = 0.5;
+        const reward: number = 1;
+        const minNitro: number = 1.2;
+        const batcherFee: number = (reward + networkFee) * minNitro;
+        const batcherFeeInAda: bigint = BigInt(Math.round(batcherFee * 10 ** 6));
+
         return [
             {
                 id: 'batcherFee',
@@ -196,32 +195,6 @@ export class TeddySwap extends BaseDex {
         ];
     }
 }
-
-// const mathConf: ConfigOptions = {
-//   epsilon: 1e-24,
-//   matrix: 'Matrix',
-//   number: 'BigNumber',
-//   precision: 64,
-// };
-
-// const formatOptions: FormatOptions = {
-//   notation: 'fixed',
-// };
-
-// export const math = create(all, mathConf) as Partial<MathJsStatic>;
-
-// function evaluate(expr: string): string {
-//   return math.format!(math.evaluate!(expr), formatOptions);
-// }
-
-// function decimalToFractional(n: BigNumber | number): [bigint, bigint] {
-//   const fmtN = math.format!(n, formatOptions);
-//   const [whole, decimals = ''] = String(fmtN).split('.');
-//   const numDecimals = decimals.length;
-//   const denominator = BigInt(evaluate(`10^${numDecimals}`));
-//   const numerator = BigInt(whole) * denominator + BigInt(decimals);
-//   return [numerator, denominator];
-// }
 
 // WIP to remove the mathjs dependency & configuration logic. (TEST)
 function decimalToFractionalImproved(decimalValue: bigint | number): [bigint, bigint] {

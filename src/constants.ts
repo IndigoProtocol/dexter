@@ -40,6 +40,8 @@ export enum DatumParameterKey {
      */
     PoolIdentifier = 'PoolIdentifier',
     TotalLpTokens = 'TotalLpTokens',
+    LpTokenPolicyId = 'LpTokenPolicyId',
+    LpTokenAssetName = 'LpTokenAssetName',
     LpFee = 'LpFee',
     LpFeeNumerator = 'LpFeeNumerator',
     LpFeeDenominator = 'LpFeeDenominator',
@@ -54,6 +56,8 @@ export enum DatumParameterKey {
     RootKLast = 'RootKLast',
     LastInteraction = 'LastInteraction',
     RequestScriptHash = 'RequestScriptHash',
+    StakeAdminPolicy = 'StakeAdminPolicy',
+    LqBound = 'LqBound',
 }
 
 export enum TransactionStatus {
