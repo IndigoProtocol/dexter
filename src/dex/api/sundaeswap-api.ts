@@ -92,6 +92,7 @@ export class SundaeSwapApi extends BaseApi {
                     liquidityPool.identifier = pool.ident;
                     liquidityPool.lpToken = Asset.fromIdentifier(pool.assetLP.assetId);
                     liquidityPool.poolFeePercent = Number(pool.fee);
+                    liquidityPool.totalLpTokens = BigInt(pool.quantityLP);
 
                     return liquidityPool;
                 });

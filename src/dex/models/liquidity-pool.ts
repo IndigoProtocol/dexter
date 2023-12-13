@@ -14,6 +14,7 @@ export class LiquidityPool {
     lpToken: Asset;
     identifier: string = '';
     poolFeePercent: number = 0;
+    totalLpTokens: bigint = 0n;
     extra: any = {};
 
     constructor(dex: string, assetA: Token, assetB: Token, reserveA: bigint, reserveB: bigint, address: string, marketOrderAddress: string = '', limitOrderAddress: string = '') {

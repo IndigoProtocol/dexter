@@ -130,6 +130,7 @@ export class WingRiders extends BaseDex {
         if (lpTokenBalance) {
             liquidityPool.lpToken = lpTokenBalance.asset as Asset;
             liquidityPool.identifier = liquidityPool.lpToken.identifier();
+            liquidityPool.totalLpTokens = MAX_INT - lpTokenBalance.quantity;
         }
         liquidityPool.poolFeePercent = 0.35;
 

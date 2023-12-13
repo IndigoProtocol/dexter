@@ -5,7 +5,7 @@ import { BaseDex } from './base-dex';
 import {
     AssetAddress,
     AssetBalance,
-    DatumParameters,
+    DatumParameters, DefinitionConstr, DefinitionField,
     PayToAddress,
     RequestConfig,
     SwapFee,
@@ -17,6 +17,7 @@ import { AddressType, DatumParameterKey } from '@app/constants';
 import order from '@dex/definitions/minswap/order';
 import { BaseApi } from '@dex/api/base-api';
 import { MinswapApi } from '@dex/api/minswap-api';
+import pool from '@dex/definitions/minswap/pool';
 
 export class Minswap extends BaseDex {
 
@@ -111,8 +112,27 @@ export class Minswap extends BaseDex {
 
         liquidityPool.lpToken = new Asset(this.lpTokenPolicyId, poolNft.nameHex);
         liquidityPool.identifier = liquidityPool.lpToken.identifier();
-
         liquidityPool.poolFeePercent = 0.3;
+
+        try {
+            liquidityPool.poolFeePercent = 0.3;
+
+            const builder: DefinitionBuilder = await (new DefinitionBuilder())
+                .loadDefinition(pool);
+            const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+            const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+
+            // Ignore Zap orders
+            if (typeof parameters.PoolAssetBPolicyId === 'string' && parameters.PoolAssetBPolicyId === this.lpTokenPolicyId) {
+                return undefined;
+            }
+
+            liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
+                ? BigInt(parameters.TotalLpTokens)
+                : 0n;
+        } catch (e) {
+            return liquidityPool;
+        }
 
         return liquidityPool;
     }
