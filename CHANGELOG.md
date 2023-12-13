@@ -2,7 +2,7 @@
 
 All notable changes to Dexter will be documented in this file.
 
-## [UNRELEASED]
+## [v4.2.0]
 - Fix WR price impact formula for 0 decimals
 - Rename Asset identifier function
 - Include '/' helper function for proxy URLs
