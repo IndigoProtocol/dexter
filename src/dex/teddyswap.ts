@@ -2,7 +2,16 @@ import { LiquidityPool } from './models/liquidity-pool';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
-import { DatumParameters, DefinitionConstr, DefinitionField, PayToAddress, RequestConfig, SwapFee, UTxO } from '@app/types';
+import {
+    AssetBalance,
+    DatumParameters,
+    DefinitionConstr,
+    DefinitionField,
+    PayToAddress,
+    RequestConfig,
+    SwapFee,
+    UTxO
+} from '@app/types';
 import { DefinitionBuilder } from '@app/definition-builder';
 import { AddressType, DatumParameterKey } from '@app/constants';
 import { BaseApi } from '@dex/api/base-api';
@@ -20,7 +29,6 @@ export class TeddySwap extends BaseDex {
      * On-Chain constants.
      */
     public readonly orderAddress: string = 'addr1z99tz7hungv6furtdl3zn72sree86wtghlcr4jc637r2eadkp2avt5gp297dnxhxcmy6kkptepsr5pa409qa7gf8stzs0706a3';
-    public readonly poolAddress: string = 'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8z9kp2avt5gp297dnxhxcmy6kkptepsr5pa409qa7gf8stzsxg8sx3';
 
     constructor(requestConfig: RequestConfig = {}) {
         super();
@@ -29,7 +37,21 @@ export class TeddySwap extends BaseDex {
     }
 
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
-        return Promise.resolve([this.poolAddress]);
+        return Promise.resolve([
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zp5hu6t748dfdd6cxlxxssyqez4wqwcrq44crfgkltqh2cqcwcjyr',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zqgdzhkv23nm3v7tanurzu8v5vll365n7hq8f26937hatlqnv5cpz',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8z8rxrld450e6c360mu72ru7u8zz0602px3esxykcx87f9ns2tytsd',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zz6mve63ntrqp7yxgkk395rngtzdmzdjzzuzdkdks0afwqsmdsegq',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zr0vp2360e2j2gve54sxsheawjd6s6we2d25xl96a3r0jdqzvyqkl',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zzlsgmhduch9juwcjf6vjqeht0jv2g2mlz86wqh42h8akdqglnguu',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zxk96389hhwyhv0t07gh89wqnaqg9cqkwsz4esd9sm562rs55tl66',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8z9re630pc4dzmhtku8276tyq0glgn53h93vw5rl9e6w4g8su86xvk',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zpczswng09euafg44jclrg5tm7xg260qzyavu9dysz8g3js7pzqla',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8z92v2k4gz85r5rq035n2llzemqvcz70h7hdr3njur05y6nsmrsjpe',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zxn5qy8sn2d7wtdtvjcsv7v0h7u9zsleljxv3nschr5sj3sla73t7',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zzw03em2wpuy6t66rx4hqmggelr8r2whwru8uuptxzwdlfsss26rc',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zphr7r6v67asj5jc5w5uapfapv0u9433m3v9aag9w46spaqc60ygw',
+        ]);
     }
 
     async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
@@ -58,8 +80,8 @@ export class TeddySwap extends BaseDex {
             return Promise.resolve(undefined);
         }
 
-        const relevantAssets = utxo.assetBalances.filter((assetBalance) => {
-            const assetName = (assetBalance.asset as Asset).assetName;
+        const relevantAssets = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
+            const assetName = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.assetName;
             return !assetName?.toLowerCase()?.endsWith('_nft') && !assetName?.toLowerCase()?.endsWith('_identity');
         });
 
@@ -69,8 +91,8 @@ export class TeddySwap extends BaseDex {
         }
 
         // Could be ADA/X or X/X pool
-        const assetAIndex: number = relevantAssets.length === 3 ? 0 : 1;
-        const assetBIndex: number = relevantAssets.length === 3 ? 2 : 3;
+        const assetAIndex: number = relevantAssets.length === 2 ? 0 : 1;
+        const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
 
         const liquidityPool: LiquidityPool = new LiquidityPool(TeddySwap.identifier, relevantAssets[assetAIndex].asset, relevantAssets[assetBIndex].asset, relevantAssets[assetAIndex].quantity, relevantAssets[assetBIndex].quantity, utxo.address, this.orderAddress, this.orderAddress);
 
@@ -132,11 +154,17 @@ export class TeddySwap extends BaseDex {
             return Promise.reject('Parameters for datum are not set.');
         }
 
-        const batcherFeeForToken = Number(batcherFee.value) / Number(minReceive);
-        // const number = bignumber(batcherFeeForToken.toString());
-        const [numerator, denominator] = decimalToFractionalImproved(batcherFeeForToken); // We need to test this new method.
+        const decimalToFractionalImproved = (decimalValue: bigint | number): [bigint, bigint] => {
+            const [whole, decimals = ''] = decimalValue.toString()?.split('.');
+            let truncatedDecimals = decimals.slice(0, 15);
+            const denominator = 10n ** BigInt(truncatedDecimals.length);
+            const numerator = BigInt(whole + truncatedDecimals);
+            return [numerator, denominator];
+        }
 
-        const lpfee = 1000 - liquidityPool.poolFeePercent * 10;
+        const batcherFeeForToken = Number(batcherFee.value) / Number(minReceive);
+        const [numerator, denominator] = decimalToFractionalImproved(batcherFeeForToken);
+        const lpfee: number = 1000 - liquidityPool.poolFeePercent * 10;
 
         swapParameters = {
             ...swapParameters,
@@ -196,13 +224,4 @@ export class TeddySwap extends BaseDex {
             },
         ];
     }
-}
-
-// WIP to remove the mathjs dependency & configuration logic. (TEST)
-function decimalToFractionalImproved(decimalValue: bigint | number): [bigint, bigint] {
-    const [whole, decimals = ''] = decimalValue.toString()?.split('.');
-    let truncatedDecimals = decimals.slice(0, 15);
-    const denominator = 10n ** BigInt(truncatedDecimals.length);
-    const numerator = BigInt(whole + truncatedDecimals);
-    return [numerator, denominator];
 }

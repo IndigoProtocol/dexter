@@ -50,7 +50,7 @@ export class TeddyswapApi extends BaseApi {
                 );
 
                 liquidityPool.lpToken = new Asset(poolResponse.lockedLQ.asset.currencySymbol, Buffer.from(poolResponse.lockedLQ.asset.tokenName, 'utf8').toString('hex'));
-                liquidityPool.poolFeePercent = (1 - (poolResponse.poolFeeNum / poolResponse.poolFeeDenum)) * 100;
+                liquidityPool.poolFeePercent = (1 - (poolResponse.poolFeeNum / poolResponse.poolFeeDenum)) * 10;
                 liquidityPool.identifier = poolResponse.id;
 
                 return liquidityPool;
