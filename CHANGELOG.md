@@ -12,7 +12,6 @@ All notable changes to Dexter will be documented in this file.
 - Add export for SplitSwapRequest
 - Add tests for DexTransaction events
 - Fix `withSwapOutAmountMappings` for split swap requests
-- Allow non-existing staking key hash when constructing order
 - Add fetching for total LP tokens for liquidity pools
 
 ## [v4.1.0]

@@ -37,7 +37,7 @@ export class TeddyswapApi extends BaseApi {
                 if (! tokensMatch(tokenA, assetA) || (assetB && ! tokensMatch(tokenB, assetB))) {
                     return undefined;
                 }
-
+                console.log(tokenA, tokenB, assetA, assetB)
                 let liquidityPool: LiquidityPool = new LiquidityPool(
                     TeddySwap.identifier,
                     tokenA,
@@ -51,7 +51,7 @@ export class TeddyswapApi extends BaseApi {
 
                 liquidityPool.lpToken = new Asset(poolResponse.lockedLQ.asset.currencySymbol, Buffer.from(poolResponse.lockedLQ.asset.tokenName, 'utf8').toString('hex'));
                 liquidityPool.poolFeePercent = (1 - (poolResponse.poolFeeNum / poolResponse.poolFeeDenum)) * 10;
-                liquidityPool.identifier = poolResponse.id;
+                liquidityPool.identifier = liquidityPool.lpToken.identifier();
 
                 return liquidityPool;
             }).filter((pool: LiquidityPool | undefined) => pool !== undefined) as LiquidityPool[];

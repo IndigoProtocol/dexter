@@ -53,6 +53,7 @@ export class TeddySwap extends BaseDex {
             'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zxn5qy8sn2d7wtdtvjcsv7v0h7u9zsleljxv3nschr5sj3sla73t7',
             'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zzw03em2wpuy6t66rx4hqmggelr8r2whwru8uuptxzwdlfsss26rc',
             'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zphr7r6v67asj5jc5w5uapfapv0u9433m3v9aag9w46spaqc60ygw',
+            'addr1zy5th50h46anh3v7zdvh7ve6amac7k4h3mdfvt0p6czm8zrlxa5g3cwp6thfvzwhd9s4vcjjdwttsss65l09dum7g9rs0mr8px',
         ]);
     }
 
@@ -84,7 +85,9 @@ export class TeddySwap extends BaseDex {
 
         const relevantAssets = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
             const assetName = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.assetName;
-            return !assetName?.toLowerCase()?.endsWith('_nft') && !assetName?.toLowerCase()?.endsWith('_identity');
+            return !assetName?.toLowerCase()?.endsWith('_nft')
+                && !assetName?.toLowerCase()?.endsWith('_identity')
+                && !assetName?.toLowerCase()?.endsWith('_lp');
         });
 
         // Irrelevant UTxO
@@ -112,9 +115,6 @@ export class TeddySwap extends BaseDex {
             const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
             const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
 
-            liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string' ? parameters.PoolIdentifier : '';
-            liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number' ? (1000 - parameters.LpFee) / 10 : 0.3;
-
             const [lpTokenPolicyId, lpTokenAssetName] = typeof parameters.LpTokenPolicyId === 'string' && typeof parameters.LpTokenAssetName === 'string'
                 ? [parameters.LpTokenPolicyId, parameters.LpTokenAssetName]
                 : [null, null];
@@ -130,7 +130,8 @@ export class TeddySwap extends BaseDex {
 
             liquidityPool.lpToken = lpTokenBalance.asset as Asset;
             liquidityPool.totalLpTokens = MAX_INT - lpTokenBalance.quantity;
-
+            liquidityPool.identifier = liquidityPool.lpToken.identifier();
+            liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number' ? (1000 - parameters.LpFee) / 10 : 0.3;
         } catch (e) {
             return liquidityPool;
         }
@@ -142,7 +143,7 @@ export class TeddySwap extends BaseDex {
         const [reserveOut, reserveIn]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
 
         const receive: bigint = (reserveIn * reserveOut) / (reserveOut - swapOutAmount) - reserveIn;
-        const swapFee: bigint = ((receive * BigInt(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
+        const swapFee: bigint = ((receive * BigInt(Math.floor(liquidityPool.poolFeePercent * 100))) + BigInt(10000) - 1n) / 10000n;
 
         return receive + swapFee;
     }
@@ -150,7 +151,7 @@ export class TeddySwap extends BaseDex {
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
-        const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
+        const swapFee: bigint = ((swapInAmount * BigInt(Math.floor(liquidityPool.poolFeePercent * 100))) + BigInt(10000) - 1n) / 10000n;
 
         return reserveOut - (reserveIn * reserveOut) / (reserveIn + swapInAmount - swapFee);
     }
