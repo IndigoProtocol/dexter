@@ -88,6 +88,7 @@ export type PayToAddress = {
     assetBalances: AssetBalance[],
     spendUtxos?: UTxO[],
     datum?: string,
+    isInlineDatum: boolean,
 };
 
 export type SwapFee = {
