@@ -12,6 +12,7 @@ export class LiquidityPool {
     limitOrderAddress: string;
 
     lpToken: Asset;
+    poolNft: Asset;
     identifier: string = '';
     poolFeePercent: number = 0;
     totalLpTokens: bigint = 0n;
