@@ -1,0 +1,100 @@
+import {
+    Asset,
+    Dexter,
+    LiquidityPool,
+    MockDataProvider,
+    SwapRequest,
+    MockWalletProvider,
+    DatumParameters,
+    DatumParameterKey,
+    PayToAddress,
+    AddressType,
+} from '../src';
+import { Spectrum } from '../src/dex/spectrum';
+
+describe('Spectrum', () => {
+
+    const walletProvider: MockWalletProvider = new MockWalletProvider();
+    walletProvider.loadWalletFromSeedPhrase(['']);
+    const dexter: Dexter = (new Dexter())
+        .withDataProvider(new MockDataProvider())
+        .withWalletProvider(walletProvider);
+    const asset: Asset = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344', 6);
+
+    describe('Set Swap In', () => {
+
+        const liquidityPool: LiquidityPool = new LiquidityPool(
+            Spectrum.identifier,
+            'lovelace',
+            asset,
+            15853604203n,
+            2999947840n,
+            'addr1',
+        );
+        liquidityPool.poolFeePercent = 0.3;
+        liquidityPool.lpToken = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344');
+
+        const swapRequest: SwapRequest = dexter.newSwapRequest()
+            .forLiquidityPool(liquidityPool)
+            .withSwapInToken('lovelace')
+            .withSwapInAmount(10_000_000000n)
+            .withSlippagePercent(1.0);
+
+        it('Can calculate swap parameters', () => {
+            expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(38.68);
+            expect(swapRequest.getEstimatedReceive()).toEqual(1158222522n);
+            expect(swapRequest.getMinimumReceive()).toEqual(1146754972n);
+        });
+
+        it('Can build swap order', () => {
+            const spectrum: Spectrum = new Spectrum();
+            const defaultSwapParameters: DatumParameters = {
+                [DatumParameterKey.PoolIdentifier]: '1234',
+                [DatumParameterKey.SenderPubKeyHash]: walletProvider.publicKeyHash(),
+                [DatumParameterKey.SenderStakingKeyHash]: walletProvider.stakingKeyHash(),
+                [DatumParameterKey.ReceiverPubKeyHash]: walletProvider.publicKeyHash(),
+                [DatumParameterKey.ReceiverStakingKeyHash]: walletProvider.stakingKeyHash(),
+                [DatumParameterKey.SwapInAmount]: swapRequest.swapInAmount,
+                [DatumParameterKey.MinReceive]: swapRequest.getMinimumReceive(),
+                [DatumParameterKey.SwapInTokenPolicyId]: '',
+                [DatumParameterKey.SwapInTokenAssetName]: '',
+                [DatumParameterKey.SwapOutTokenPolicyId]: asset.policyId,
+                [DatumParameterKey.SwapOutTokenAssetName]: asset.nameHex,
+            };
+
+            return spectrum.buildSwapOrder(liquidityPool, defaultSwapParameters)
+                .then((payments: PayToAddress[]) => {
+                    expect(() => { spectrum.buildSwapOrder(liquidityPool, defaultSwapParameters); }).not.toThrowError();
+                    expect(payments[0].addressType).toBe(AddressType.Contract);
+                    expect(payments[0].assetBalances[0].quantity).toEqual(10003800000n);
+                    expect(payments[0].datum).toBe('d8799fd8799f4040ffd8799f581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b698804469555344ffd8799f581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b698804469555344ff1903e51b0000016d7639cd581b00038d7ea4c6800042ed56d8799f42bac6ff1b00000002540be4001a445a179cff');
+                });
+        });
+
+    });
+
+    describe('Set Swap Out', () => {
+
+        const liquidityPool: LiquidityPool = new LiquidityPool(
+            Spectrum.identifier,
+            'lovelace',
+            asset,
+            15853604203n,
+            2999947840n,
+            'addr1',
+        );
+        liquidityPool.poolFeePercent = 0.3;
+
+        const swapRequest: SwapRequest = dexter.newSwapRequest()
+            .forLiquidityPool(liquidityPool)
+            .withSwapInToken('lovelace')
+            .withSwapOutAmount(1_000_000000n)
+            .withSlippagePercent(1.0);
+
+        it('Can calculate swap parameters', () => {
+            expect(swapRequest.swapInAmount).toEqual(7950789864n);
+        });
+
+    });
+
+});
