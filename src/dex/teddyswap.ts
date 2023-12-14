@@ -124,10 +124,13 @@ export class TeddySwap extends BaseDex {
                     && assetBalance.asset.nameHex === lpTokenAssetName;
             });
 
-            if (lpTokenBalance) {
-                liquidityPool.lpToken = lpTokenBalance.asset as Asset;
-                liquidityPool.totalLpTokens = Number(MAX_INT - lpTokenBalance.quantity);
+            if (! lpTokenBalance) {
+                return Promise.resolve(undefined);
             }
+
+            liquidityPool.lpToken = lpTokenBalance.asset as Asset;
+            liquidityPool.totalLpTokens = MAX_INT - lpTokenBalance.quantity;
+
         } catch (e) {
             return liquidityPool;
         }

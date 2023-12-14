@@ -54,6 +54,7 @@ export class MuesliSwapApi extends BaseApi {
                     liquidityPool.identifier = pool.poolId;
                     liquidityPool.lpToken = new Asset(pool.lpToken.address.policyId, pool.lpToken.address.name);
                     liquidityPool.poolFeePercent = Number(pool.poolFee);
+                    liquidityPool.totalLpTokens = BigInt(pool.lpToken.amount);
 
                     return liquidityPool;
                 });

@@ -3,6 +3,9 @@
 All notable changes to Dexter will be documented in this file.
 
 ## [UNRELEASED]
+- TeddySwap integration
+
+## [v4.2.0]
 - Fix WR price impact formula for 0 decimals
 - Rename Asset identifier function
 - Include '/' helper function for proxy URLs
@@ -10,7 +13,7 @@ All notable changes to Dexter will be documented in this file.
 - Add tests for DexTransaction events
 - Fix `withSwapOutAmountMappings` for split swap requests
 - Allow non-existing staking key hash when constructing order
-- TeddySwap integration
+- Add fetching for total LP tokens for liquidity pools
 
 ## [v4.1.0]
 - Support for multi-dex swap requests.
