@@ -123,7 +123,7 @@ export class TeddySwap extends BaseDex {
                     && assetBalance.asset.policyId === lpTokenPolicyId
                     && assetBalance.asset.nameHex === lpTokenAssetName;
             });const nftToken: Asset | undefined = utxo.assetBalances.find((assetBalance) => {
-                return (assetBalance.asset as Asset).assetName?.toLowerCase()?.endsWith('_nft');
+                return (assetBalance.asset as Asset).assetName?.toLowerCase()?.endsWith('_identity');
             })?.asset as Asset | undefined;
 
             if (! lpTokenBalance || ! nftToken) {
