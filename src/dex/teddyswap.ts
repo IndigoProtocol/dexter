@@ -189,7 +189,7 @@ export class TeddySwap extends BaseDex {
 
         const batcherFeeForToken = Number(batcherFee.value) / Number(minReceive);
         const [numerator, denominator] = decimalToFractionalImproved(batcherFeeForToken);
-        const lpfee: number = 1000 - liquidityPool.poolFeePercent * 10;
+        const lpfee: bigint = BigInt(1000 - Math.floor(liquidityPool.poolFeePercent * 10));
 
         swapParameters = {
             ...swapParameters,
