@@ -37,7 +37,7 @@ export class TeddyswapApi extends BaseApi {
                 if (! tokensMatch(tokenA, assetA) || (assetB && ! tokensMatch(tokenB, assetB))) {
                     return undefined;
                 }
-                console.log(tokenA, tokenB, assetA, assetB)
+
                 let liquidityPool: LiquidityPool = new LiquidityPool(
                     TeddySwap.identifier,
                     tokenA,

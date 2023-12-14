@@ -210,6 +210,7 @@ export class TeddySwap extends BaseDex {
                     },
                 ],
                 datum: datumBuilder.getCbor(),
+                isInlineDatum: true,
                 spendUtxos: spendUtxos,
             }),
         ];
