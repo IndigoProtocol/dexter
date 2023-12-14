@@ -120,7 +120,6 @@ export class Spectrum extends BaseDex {
             liquidityPool.totalLpTokens = MAX_INT - lpTokenBalance.quantity;
             liquidityPool.identifier = liquidityPool.lpToken.identifier();
             liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number' ? (1000 - parameters.LpFee) / 10 : 0.3;
-            console.log(liquidityPool)
         } catch (e) {
             return liquidityPool;
         }
@@ -199,6 +198,7 @@ export class Spectrum extends BaseDex {
                     },
                 ],
                 datum: datumBuilder.getCbor(),
+                isInlineDatum: false,
                 spendUtxos: spendUtxos,
             }),
         ];
