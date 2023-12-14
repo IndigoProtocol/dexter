@@ -198,7 +198,7 @@ export class Spectrum extends BaseDex {
                     },
                 ],
                 datum: datumBuilder.getCbor(),
-                isInlineDatum: false,
+                isInlineDatum: true,
                 spendUtxos: spendUtxos,
             }),
         ];
