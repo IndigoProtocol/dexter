@@ -20,6 +20,8 @@ import order from './definitions/teddyswap/order';
 import { correspondingReserves, tokensMatch } from '@app/utils';
 import { TeddyswapApi } from '@dex/api/teddyswap-api';
 
+const MAX_INT: bigint = 9_223_372_036_854_775_807n;
+
 export class TeddySwap extends BaseDex {
 
     public static readonly identifier: string = 'TeddySwap';
@@ -94,17 +96,16 @@ export class TeddySwap extends BaseDex {
         const assetAIndex: number = relevantAssets.length === 2 ? 0 : 1;
         const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
 
-        const liquidityPool: LiquidityPool = new LiquidityPool(TeddySwap.identifier, relevantAssets[assetAIndex].asset, relevantAssets[assetBIndex].asset, relevantAssets[assetAIndex].quantity, relevantAssets[assetBIndex].quantity, utxo.address, this.orderAddress, this.orderAddress);
-
-        // Load additional pool information
-        const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
-            const assetName = (assetBalance.asset as Asset).assetName;
-            return assetName?.toLowerCase()?.endsWith('_lp');
-        })?.asset as Asset;
-
-        if (lpToken) {
-            liquidityPool.lpToken = lpToken;
-        }
+        const liquidityPool: LiquidityPool = new LiquidityPool(
+            TeddySwap.identifier,
+            relevantAssets[assetAIndex].asset,
+            relevantAssets[assetBIndex].asset,
+            relevantAssets[assetAIndex].quantity,
+            relevantAssets[assetBIndex].quantity,
+            utxo.address,
+            this.orderAddress,
+            this.orderAddress
+        );
 
         try {
             const builder: DefinitionBuilder = await new DefinitionBuilder().loadDefinition(pool);
@@ -113,6 +114,20 @@ export class TeddySwap extends BaseDex {
 
             liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string' ? parameters.PoolIdentifier : '';
             liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number' ? (1000 - parameters.LpFee) / 10 : 0.3;
+
+            const [lpTokenPolicyId, lpTokenAssetName] = typeof parameters.LpTokenPolicyId === 'string' && typeof parameters.LpTokenAssetName === 'string'
+                ? [parameters.LpTokenPolicyId, parameters.LpTokenAssetName]
+                : [null, null];
+            const lpTokenBalance: AssetBalance | undefined = utxo.assetBalances.find((assetBalance: AssetBalance) => {
+                return assetBalance.asset !== 'lovelace'
+                    && assetBalance.asset.policyId === lpTokenPolicyId
+                    && assetBalance.asset.nameHex === lpTokenAssetName;
+            });
+
+            if (lpTokenBalance) {
+                liquidityPool.lpToken = lpTokenBalance.asset as Asset;
+                liquidityPool.totalLpTokens = Number(MAX_INT - lpTokenBalance.quantity);
+            }
         } catch (e) {
             return liquidityPool;
         }
