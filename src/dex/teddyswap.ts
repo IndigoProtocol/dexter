@@ -122,12 +122,15 @@ export class TeddySwap extends BaseDex {
                 return assetBalance.asset !== 'lovelace'
                     && assetBalance.asset.policyId === lpTokenPolicyId
                     && assetBalance.asset.nameHex === lpTokenAssetName;
-            });
+            });const nftToken: Asset | undefined = utxo.assetBalances.find((assetBalance) => {
+                return (assetBalance.asset as Asset).assetName?.toLowerCase()?.endsWith('_nft');
+            })?.asset as Asset | undefined;
 
-            if (! lpTokenBalance) {
+            if (! lpTokenBalance || ! nftToken) {
                 return Promise.resolve(undefined);
             }
 
+            liquidityPool.poolNft = nftToken;
             liquidityPool.lpToken = lpTokenBalance.asset as Asset;
             liquidityPool.totalLpTokens = MAX_INT - lpTokenBalance.quantity;
             liquidityPool.identifier = liquidityPool.lpToken.identifier();
@@ -172,12 +175,15 @@ export class TeddySwap extends BaseDex {
         if (!batcherFee || !deposit || !minReceive) {
             return Promise.reject('Parameters for datum are not set.');
         }
+        if (! liquidityPool.poolNft) {
+            return Promise.reject('Pool NFT is required.');
+        }
 
         const decimalToFractionalImproved = (decimalValue: bigint | number): [bigint, bigint] => {
             const [whole, decimals = ''] = decimalValue.toString()?.split('.');
             let truncatedDecimals = decimals.slice(0, 15);
-            const denominator = 10n ** BigInt(truncatedDecimals.length);
-            const numerator = BigInt(whole + truncatedDecimals);
+            const denominator: bigint = BigInt(10 ** truncatedDecimals.length);
+            const numerator = BigInt(whole) * denominator + BigInt(decimals);
             return [numerator, denominator];
         }
 
@@ -187,8 +193,8 @@ export class TeddySwap extends BaseDex {
 
         swapParameters = {
             ...swapParameters,
-            [DatumParameterKey.TokenPolicyId]: liquidityPool.lpToken.policyId,
-            [DatumParameterKey.TokenAssetName]: liquidityPool.lpToken.nameHex,
+            [DatumParameterKey.TokenPolicyId]: liquidityPool.poolNft.policyId,
+            [DatumParameterKey.TokenAssetName]: liquidityPool.poolNft.nameHex,
             [DatumParameterKey.LpFee]: lpfee,
             [DatumParameterKey.LpFeeNumerator]: numerator,
             [DatumParameterKey.LpFeeDenominator]: denominator,
