@@ -48,7 +48,8 @@ export class TeddyswapApi extends BaseApi {
                     this.dex.orderAddress,
                     this.dex.orderAddress,
                 );
-
+                const [poolNftPolicyId, poolNftName] = poolResponse.id.split('.');
+                liquidityPool.poolNft = new Asset(poolNftPolicyId, Buffer.from(poolNftName, 'utf8').toString('hex'));
                 liquidityPool.lpToken = new Asset(poolResponse.lockedLQ.asset.currencySymbol, Buffer.from(poolResponse.lockedLQ.asset.tokenName, 'utf8').toString('hex'));
                 liquidityPool.poolFeePercent = (1 - (poolResponse.poolFeeNum / poolResponse.poolFeeDenum)) * 10;
                 liquidityPool.identifier = liquidityPool.lpToken.identifier();
