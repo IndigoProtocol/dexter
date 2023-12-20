@@ -103,6 +103,7 @@ export class VyFinance extends BaseDex {
                         },
                     ],
                     datum: datumBuilder.getCbor(),
+                    isInlineDatum: false,
                     spendUtxos: spendUtxos,
                 }
             )
@@ -123,6 +124,7 @@ export class VyFinance extends BaseDex {
                 address: returnAddress,
                 addressType: AddressType.Base,
                 assetBalances: relevantUtxo.assetBalances,
+                isInlineDatum: false,
                 spendUtxos: [relevantUtxo],
             }
         ];

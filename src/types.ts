@@ -70,7 +70,7 @@ export type DefinitionInt = {
     int: number | DatumParameterKey,
 }
 
-export type DefinitionField = DefinitionConstr | DefinitionBytes | DefinitionInt
+export type DefinitionField = DefinitionConstr | DefinitionBytes | DefinitionInt | DefinitionField[] | Function
 
 export type DefinitionConstr = {
     constructor: number | DatumParameterKey,
@@ -88,6 +88,7 @@ export type PayToAddress = {
     assetBalances: AssetBalance[],
     spendUtxos?: UTxO[],
     datum?: string,
+    isInlineDatum: boolean,
 };
 
 export type SwapFee = {
