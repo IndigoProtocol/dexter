@@ -33,6 +33,7 @@ describe('Spectrum', () => {
         );
         liquidityPool.poolFeePercent = 0.3;
         liquidityPool.lpToken = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344');
+        liquidityPool.poolNft = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344');
 
         const swapRequest: SwapRequest = dexter.newSwapRequest()
             .forLiquidityPool(liquidityPool)
@@ -67,7 +68,7 @@ describe('Spectrum', () => {
                     expect(() => { spectrum.buildSwapOrder(liquidityPool, defaultSwapParameters); }).not.toThrowError();
                     expect(payments[0].addressType).toBe(AddressType.Contract);
                     expect(payments[0].assetBalances[0].quantity).toEqual(10003800000n);
-                    expect(payments[0].datum).toBe('d8799fd8799f4040ffd8799f581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b698804469555344ffd8799f581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b698804469555344ff1903e51b0000016d7639cd581b00038d7ea4c6800042ed56d8799f42bac6ff1b00000002540be4001a445a179cff');
+                    expect(payments[0].datum).toBe('d8799fd8799f4040ffd8799f581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b698804469555344ffd8799f581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b698804469555344ff1903e51b0037c3da31e5553c1b00038d7ea4c6800042ed56d8799f42bac6ff1b00000002540be4001a445a179cff');
                 });
         });
 
