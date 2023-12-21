@@ -2,7 +2,7 @@
 
 All notable changes to Dexter will be documented in this file.
 
-## [UNRELEASED]
+## [v5.0.0]
 - TeddySwap integration
 - Spectrum integration
 
