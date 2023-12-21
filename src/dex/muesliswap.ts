@@ -139,7 +139,7 @@ export class MuesliSwap extends BaseDex {
 
         const receive: number = (Number(reserveIn) * Number(reserveOut)) / (Number(reserveOut) - Number(swapOutAmount)) - Number(reserveIn);
 
-        return BigInt(Math.floor(Number(receive) * (1 + Math.floor(liquidityPool.poolFeePercent / 100))));
+        return BigInt(Math.floor(Number(receive) * (1 + liquidityPool.poolFeePercent / 100)));
     }
 
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
