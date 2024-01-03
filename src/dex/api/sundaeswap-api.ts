@@ -4,6 +4,7 @@ import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { SundaeSwap } from '../sundaeswap';
 import { RequestConfig } from '@app/types';
+import { appendSlash } from '@app/utils';
 
 export class SundaeSwapApi extends BaseApi {
 
@@ -16,7 +17,7 @@ export class SundaeSwapApi extends BaseApi {
         this.dex = dex;
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: `${requestConfig.proxyUrl}https://stats.sundaeswap.finance/graphql`,
+            baseURL: `${appendSlash(requestConfig.proxyUrl)}https://stats.sundaeswap.finance/graphql`,
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -28,9 +29,9 @@ export class SundaeSwapApi extends BaseApi {
 
         const assetAId: string = (assetA === 'lovelace')
             ? ''
-            : assetA.id('.');
+            : assetA.identifier('.');
         let assetBId: string = (assetB && assetB !== 'lovelace')
-            ? assetB.id('.')
+            ? assetB.identifier('.')
             : '';
 
         const getPaginatedResponse = (page: number): Promise<LiquidityPool[]> => {
@@ -76,10 +77,10 @@ export class SundaeSwapApi extends BaseApi {
                     let liquidityPool: LiquidityPool = new LiquidityPool(
                         SundaeSwap.identifier,
                         pool.assetA.assetId
-                            ? Asset.fromId(pool.assetA.assetId, pool.assetA.decimals)
+                            ? Asset.fromIdentifier(pool.assetA.assetId, pool.assetA.decimals)
                             : 'lovelace',
                         pool.assetB.assetId
-                            ? Asset.fromId(pool.assetB.assetId, pool.assetB.decimals)
+                            ? Asset.fromIdentifier(pool.assetB.assetId, pool.assetB.decimals)
                             : 'lovelace',
                         BigInt(pool.quantityA),
                         BigInt(pool.quantityB),
@@ -89,8 +90,9 @@ export class SundaeSwapApi extends BaseApi {
                     );
 
                     liquidityPool.identifier = pool.ident;
-                    liquidityPool.lpToken = Asset.fromId(pool.assetLP.assetId);
+                    liquidityPool.lpToken = Asset.fromIdentifier(pool.assetLP.assetId);
                     liquidityPool.poolFeePercent = Number(pool.fee);
+                    liquidityPool.totalLpTokens = BigInt(pool.quantityLP);
 
                     return liquidityPool;
                 });

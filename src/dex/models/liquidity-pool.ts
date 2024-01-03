@@ -11,9 +11,11 @@ export class LiquidityPool {
     marketOrderAddress: string;
     limitOrderAddress: string;
     lpToken: Asset;
-    identifier: string;
-    poolFeePercent: number;
-    extra: any;
+    poolNft: Asset;
+    identifier: string = '';
+    poolFeePercent: number = 0;
+    totalLpTokens: bigint = 0n;
+    extra: any = {};
 
     constructor(dex: string, assetA: Token, assetB: Token, reserveA: bigint, reserveB: bigint, address: string, marketOrderAddress: string = '', limitOrderAddress: string = '', identifier: string = '', poolFeePercent: number = 0, extra: any = {}, lpToken: Asset | undefined = undefined) {
         this.dex = dex;

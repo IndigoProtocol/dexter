@@ -6,6 +6,7 @@ import { Minswap } from '../minswap';
 import { RequestConfig } from '@app/types';
 import AES from 'crypto-js/aes';
 import Utf8 from 'crypto-js/enc-utf8';
+import { appendSlash } from '@app/utils';
 
 const AES_KEY: string = '22eaca439bfd89cf125827a7a33fe3970d735dbfd5d84f19dd95820781fc47be';
 
@@ -21,7 +22,7 @@ export class MinswapApi extends BaseApi {
 
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: `${requestConfig.proxyUrl}https://monorepo-mainnet-prod.minswap.org/graphql`,
+            baseURL: `${appendSlash(requestConfig.proxyUrl)}https://monorepo-mainnet-prod.minswap.org/graphql`,
             httpsAgent: requestConfig.httpsAgent,
             withCredentials: false,
         });
@@ -176,7 +177,9 @@ export class MinswapApi extends BaseApi {
         );
 
         liquidityPool.lpToken = new Asset(poolData.lpAsset.currencySymbol, poolData.lpAsset.tokenName);
+        liquidityPool.totalLpTokens = BigInt(poolData.totalLiquidity);
         liquidityPool.poolFeePercent = 0.3;
+        liquidityPool.identifier = liquidityPool.lpToken.identifier();
 
         return liquidityPool;
     }

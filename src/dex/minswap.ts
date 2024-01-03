@@ -5,7 +5,7 @@ import { BaseDex } from './base-dex';
 import {
     AssetAddress,
     AssetBalance,
-    DatumParameters,
+    DatumParameters, DefinitionConstr, DefinitionField,
     PayToAddress,
     RequestConfig,
     SwapFee,
@@ -17,6 +17,7 @@ import { AddressType, DatumParameterKey } from '@app/constants';
 import order from '@dex/definitions/minswap/order';
 import { BaseApi } from '@dex/api/base-api';
 import { MinswapApi } from '@dex/api/minswap-api';
+import pool from '@dex/definitions/minswap/pool';
 
 export class Minswap extends BaseDex {
 
@@ -39,14 +40,14 @@ export class Minswap extends BaseDex {
     }
 
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
-        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const validityAsset: Asset = Asset.fromIdentifier(this.poolValidityAsset);
         const assetAddresses: AssetAddress[] = await provider.assetAddresses(validityAsset);
 
         return Promise.resolve([...new Set(assetAddresses.map((assetAddress: AssetAddress) => assetAddress.address))]);
     }
 
     public async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
-        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const validityAsset: Asset = Asset.fromIdentifier(this.poolValidityAsset);
         const poolAddresses: string[] = await this.liquidityPoolAddresses(provider);
 
         const addressPromises: Promise<LiquidityPool[]>[] = poolAddresses.map(async (address: string) => {
@@ -75,7 +76,7 @@ export class Minswap extends BaseDex {
 
         const relevantAssets: AssetBalance[] = utxo.assetBalances
             .filter((assetBalance: AssetBalance) => {
-                const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
+                const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier();
 
                 return assetBalanceId !== this.poolValidityAsset
                     && ! assetBalanceId.startsWith(this.lpTokenPolicyId)
@@ -110,9 +111,28 @@ export class Minswap extends BaseDex {
         if (! poolNft) return undefined;
 
         liquidityPool.lpToken = new Asset(this.lpTokenPolicyId, poolNft.nameHex);
-        liquidityPool.identifier = poolNft.nameHex;
-
+        liquidityPool.identifier = liquidityPool.lpToken.identifier();
         liquidityPool.poolFeePercent = 0.3;
+
+        try {
+            liquidityPool.poolFeePercent = 0.3;
+
+            const builder: DefinitionBuilder = await (new DefinitionBuilder())
+                .loadDefinition(pool);
+            const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+            const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+
+            // Ignore Zap orders
+            if (typeof parameters.PoolAssetBPolicyId === 'string' && parameters.PoolAssetBPolicyId === this.lpTokenPolicyId) {
+                return undefined;
+            }
+
+            liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
+                ? BigInt(parameters.TotalLpTokens)
+                : 0n;
+        } catch (e) {
+            return liquidityPool;
+        }
 
         return liquidityPool;
     }
@@ -190,6 +210,7 @@ export class Minswap extends BaseDex {
                         },
                     ],
                     datum: datumBuilder.getCbor(),
+                    isInlineDatum: false,
                     spendUtxos: spendUtxos,
                 }
             )
@@ -210,6 +231,7 @@ export class Minswap extends BaseDex {
                 address: returnAddress,
                 addressType: AddressType.Base,
                 assetBalances: relevantUtxo.assetBalances,
+                isInlineDatum: false,
                 spendUtxos: [relevantUtxo],
             }
         ];

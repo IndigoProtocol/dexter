@@ -63,7 +63,7 @@ export class SundaeSwap extends BaseDex {
         }
 
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
-            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
+            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier();
 
             return ! assetBalanceId.startsWith(this.lpTokenPolicyId);
         });
@@ -96,6 +96,7 @@ export class SundaeSwap extends BaseDex {
         if (lpToken) {
             lpToken.nameHex = '6c' + lpToken.nameHex;
             liquidityPool.lpToken = lpToken;
+            liquidityPool.identifier = lpToken.identifier();
         }
 
         try {
@@ -110,6 +111,9 @@ export class SundaeSwap extends BaseDex {
             liquidityPool.poolFeePercent = typeof parameters.LpFeeNumerator === 'number' && typeof parameters.LpFeeDenominator === 'number'
                 ? (parameters.LpFeeNumerator / parameters.LpFeeDenominator) * 100
                 : 0;
+            liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
+                ? BigInt(parameters.TotalLpTokens)
+                : 0n;
         } catch (e) {
             return liquidityPool;
         }
@@ -121,7 +125,7 @@ export class SundaeSwap extends BaseDex {
         const [reserveOut, reserveIn]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
 
         const receive: bigint = (reserveIn * reserveOut) / (reserveOut - swapOutAmount) - reserveIn;
-        const swapFee: bigint = ((receive * BigInt(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
+        const swapFee: bigint = ((receive * BigInt(Math.floor(liquidityPool.poolFeePercent * 100))) + BigInt(10000) - 1n) / 10000n;
 
         return receive + swapFee;
     }
@@ -129,7 +133,7 @@ export class SundaeSwap extends BaseDex {
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
-        const swapFee: bigint = ((swapInAmount * BigInt(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
+        const swapFee: bigint = ((swapInAmount * BigInt(Math.floor(liquidityPool.poolFeePercent * 100))) + BigInt(10000) - 1n) / 10000n;
 
         return reserveOut - (reserveIn * reserveOut) / (reserveIn + swapInAmount - swapFee);
     }
@@ -181,6 +185,7 @@ export class SundaeSwap extends BaseDex {
                         },
                     ],
                     datum: datumBuilder.getCbor(),
+                    isInlineDatum: false,
                     spendUtxos: spendUtxos,
                 }
             )
@@ -201,6 +206,7 @@ export class SundaeSwap extends BaseDex {
                 address: returnAddress,
                 addressType: AddressType.Base,
                 assetBalances: relevantUtxo.assetBalances,
+                isInlineDatum: false,
                 spendUtxos: [relevantUtxo],
             }
         ];

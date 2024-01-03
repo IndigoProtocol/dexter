@@ -4,6 +4,7 @@ import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { VyFinance } from '../vyfinance';
 import { RequestConfig } from '@app/types';
+import { appendSlash } from '@app/utils';
 
 export class VyfinanceApi extends BaseApi {
 
@@ -16,7 +17,7 @@ export class VyfinanceApi extends BaseApi {
         this.dex = dex;
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: `${requestConfig.proxyUrl}https://api.vyfi.io`,
+            baseURL: `${appendSlash(requestConfig.proxyUrl)}https://api.vyfi.io`,
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -26,9 +27,9 @@ export class VyfinanceApi extends BaseApi {
     liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const assetAId: string = (assetA === 'lovelace')
             ? 'lovelace'
-            : assetA.id();
+            : assetA.identifier();
         let assetBId: string = (assetB && assetB !== 'lovelace')
-            ? assetB.id()
+            ? assetB.identifier()
             : 'lovelace';
 
         const url: string = assetB
@@ -61,6 +62,7 @@ export class VyfinanceApi extends BaseApi {
                     const lpTokenDetails: string[] = pool['lpPolicyId-assetId'].split('-');
                     liquidityPool.lpToken = new Asset(lpTokenDetails[0], lpTokenDetails[1]);
                     liquidityPool.poolFeePercent = (poolDetails['feesSettings']['barFee'] + poolDetails['feesSettings']['liqFee']) / 100;
+                    liquidityPool.identifier = liquidityPool.lpToken.identifier();
 
                     return liquidityPool;
                 }).filter((pool: LiquidityPool | undefined) => pool !== undefined) as LiquidityPool[];

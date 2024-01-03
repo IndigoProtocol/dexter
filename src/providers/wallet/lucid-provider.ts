@@ -7,7 +7,7 @@ import {
     Assets,
     Blockfrost,
     Datum, Kupmios,
-    Lucid,
+    Lucid, OutputData,
     TxComplete,
     TxHash,
     TxSigned,
@@ -108,7 +108,11 @@ export class LucidProvider extends BaseWalletProvider {
                 case AddressType.Contract:
                     transaction.providerData.tx.payToContract(
                         payToAddress.address,
-                        payToAddress.datum as Datum,
+                        payToAddress.isInlineDatum
+                            ? {
+                                inline: payToAddress.datum as Datum,
+                            }
+                            : payToAddress.datum as Datum,
                         payment,
                     );
                     break;
@@ -155,7 +159,7 @@ export class LucidProvider extends BaseWalletProvider {
     private paymentFromAssets(assetBalances: AssetBalance[]): Assets {
         return assetBalances
             .reduce((payment: Record<Unit | 'lovelace', bigint>, assetBalance: AssetBalance) => {
-                payment[assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id()] = assetBalance.quantity;
+                payment[assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier()] = assetBalance.quantity;
 
                 return payment;
             }, {} as Assets);

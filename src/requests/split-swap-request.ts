@@ -96,7 +96,7 @@ export class SplitSwapRequest {
         this._swapRequests = mappings.map((mapping: SwapOutAmountMapping) => {
             return this._dexter.newSwapRequest()
                 .forLiquidityPool(mapping.liquidityPool)
-                .withSwapInToken(this._swapOutToken)
+                .withSwapOutToken(this._swapOutToken)
                 .withSlippagePercent(this._slippagePercent)
                 .withSwapOutAmount(mapping.swapOutAmount);
         })

@@ -15,6 +15,8 @@ import { FetchRequest } from '@requests/fetch-request';
 import axios from "axios";
 import axiosRetry from "axios-retry";
 import { SplitSwapRequest } from '@requests/split-swap-request';
+import { TeddySwap } from '@dex/teddyswap';
+import { Spectrum } from '@dex/spectrum';
 
 export class Dexter {
 
@@ -59,6 +61,8 @@ export class Dexter {
             [MuesliSwap.identifier]: new MuesliSwap(this.requestConfig),
             [WingRiders.identifier]: new WingRiders(this.requestConfig),
             [VyFinance.identifier]: new VyFinance(this.requestConfig),
+            [TeddySwap.identifier]: new TeddySwap(this.requestConfig),
+            [Spectrum.identifier]: new Spectrum(this.requestConfig),
         };
     }
 

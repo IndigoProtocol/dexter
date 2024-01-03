@@ -26,6 +26,7 @@ export * from './providers/asset-metadata/token-registry-provider';
  * Request exports.
  */
 export * from './requests/swap-request';
+export * from './requests/split-swap-request';
 export * from './requests/fetch-request';
 export * from './requests/cancel-swap-request';
 
@@ -42,3 +43,5 @@ export * from './dex/sundaeswap';
 export * from './dex/muesliswap';
 export * from './dex/wingriders';
 export * from './dex/vyfinance';
+export * from './dex/teddyswap';
+export * from './dex/spectrum';

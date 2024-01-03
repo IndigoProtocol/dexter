@@ -6,6 +6,8 @@
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/muesliswap.png" width="30" />
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/wingriders.png" width="30" />
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/vyfinance.png" width="30" />
+    <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/teddyswap.png" width="30" />
+    <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/spectrum.png" width="30" />
 </div>
 
 ### What You Can Do
@@ -17,6 +19,7 @@
 - Load wallets using a seedphrase or CIP-30 interface using [Lucid](https://github.com/spacebudz/lucid)
 
 ### Notes
+- You may need to use the flag `--experimental-specifier-resolution=node` when building your project to correctly import Dexter
 - All figures/parameters represented as a bigint are denominated in lovelaces
 
 ### Install
@@ -182,6 +185,22 @@ For available methods on the `SwapRequest` instance, please see those specific
 
 ```js
 dexter.newSwapRequest()
+    ...
+```
+</details>
+
+<br>
+
+<details>
+<summary><code>newSplitSwapRequest(): SplitSwapRequest</code> Create new request for a split swap order.</summary>
+
+For available methods on the `SplitSwapRequest` instance, please see those specific
+[docs](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/split-swap-request.md).
+
+##### Using
+
+```js
+dexter.newSplitSwapRequest()
     ...
 ```
 </details>

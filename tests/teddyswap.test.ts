@@ -1,18 +1,18 @@
 import {
+    Asset,
     Dexter,
     LiquidityPool,
-    WingRiders,
     MockDataProvider,
     SwapRequest,
-    Asset,
     MockWalletProvider,
     DatumParameters,
     DatumParameterKey,
     PayToAddress,
     AddressType,
+    TeddySwap,
 } from '../src';
 
-describe('WingRiders', () => {
+describe('TeddySwap', () => {
 
     const walletProvider: MockWalletProvider = new MockWalletProvider();
     walletProvider.loadWalletFromSeedPhrase(['']);
@@ -24,30 +24,33 @@ describe('WingRiders', () => {
     describe('Set Swap In', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            WingRiders.identifier,
+            TeddySwap.identifier,
             'lovelace',
             asset,
-            923224398616n,
-            7942169n,
+            15853604203n,
+            2999947840n,
             'addr1',
         );
-        liquidityPool.poolFeePercent = 0.35;
+        liquidityPool.poolFeePercent = 0.3;
+        liquidityPool.lpToken = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344');
+        liquidityPool.poolNft = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344');
 
         const swapRequest: SwapRequest = dexter.newSwapRequest()
             .forLiquidityPool(liquidityPool)
             .withSwapInToken('lovelace')
             .withSwapInAmount(10_000_000000n)
-            .withSlippagePercent(0.5);
+            .withSlippagePercent(1.0);
 
         it('Can calculate swap parameters', () => {
-            expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(1.43);
-            expect(swapRequest.getEstimatedReceive()).toEqual(84809n);
-            expect(swapRequest.getMinimumReceive()).toEqual(84387n);
+            expect(+swapRequest.getPriceImpactPercent().toFixed(2)).toEqual(38.68);
+            expect(swapRequest.getEstimatedReceive()).toEqual(1158222522n);
+            expect(swapRequest.getMinimumReceive()).toEqual(1146754972n);
         });
 
         it('Can build swap order', () => {
-            const wingriders: WingRiders = new WingRiders();
+            const teddyswap: TeddySwap = new TeddySwap();
             const defaultSwapParameters: DatumParameters = {
+                [DatumParameterKey.PoolIdentifier]: '1234',
                 [DatumParameterKey.SenderPubKeyHash]: walletProvider.publicKeyHash(),
                 [DatumParameterKey.SenderStakingKeyHash]: walletProvider.stakingKeyHash(),
                 [DatumParameterKey.ReceiverPubKeyHash]: walletProvider.publicKeyHash(),
@@ -60,33 +63,13 @@ describe('WingRiders', () => {
                 [DatumParameterKey.SwapOutTokenAssetName]: asset.nameHex,
             };
 
-            return wingriders.buildSwapOrder(liquidityPool, defaultSwapParameters)
+            return teddyswap.buildSwapOrder(liquidityPool, defaultSwapParameters)
                 .then((payments: PayToAddress[]) => {
-                    expect(() => { wingriders.buildSwapOrder(liquidityPool, defaultSwapParameters); }).not.toThrowError();
+                    expect(() => { teddyswap.buildSwapOrder(liquidityPool, defaultSwapParameters); }).not.toThrowError();
                     expect(payments[0].addressType).toBe(AddressType.Contract);
-                    expect(payments[0].assetBalances[0].quantity).toEqual(10004000000n);
+                    expect(payments[0].assetBalances[0].quantity).toEqual(10003800000n);
+                    expect(payments[0].datum).toBe('d8799fd8799f4040ffd8799f581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b698804469555344ffd8799f581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b698804469555344ff1903e51b0037c3da31e5553c1b00038d7ea4c6800042ed56d8799f42bac6ff1b00000002540be4001a445a179cff');
                 });
-        });
-
-        it('Can calculate price impact with 0 decimals', () => {
-            const hosky: Asset = new Asset('a0028f350aaabe0545fdcb56b039bfb08e4bb4d8c4d7c3c7d481c235', '484f534b59', 0);
-            const hoskyPool: LiquidityPool = new LiquidityPool(
-                WingRiders.identifier,
-                'lovelace',
-                hosky,
-                52428070796n,
-                1424861277563n,
-                'addr1',
-            );
-            hoskyPool.poolFeePercent = 0.35;
-
-            const swap: SwapRequest = dexter.newSwapRequest()
-                .forLiquidityPool(hoskyPool)
-                .withSwapInToken('lovelace')
-                .withSwapInAmount(1_000_000000n)
-                .withSlippagePercent(0.5);
-
-            expect(+swap.getPriceImpactPercent().toFixed(2)).toEqual(2.23);
         });
 
     });
@@ -94,23 +77,23 @@ describe('WingRiders', () => {
     describe('Set Swap Out', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            WingRiders.identifier,
+            TeddySwap.identifier,
             'lovelace',
             asset,
-            925723148616n,
-            7920796n,
+            15853604203n,
+            2999947840n,
             'addr1',
         );
-        liquidityPool.poolFeePercent = 0.35;
+        liquidityPool.poolFeePercent = 0.3;
 
         const swapRequest: SwapRequest = dexter.newSwapRequest()
             .forLiquidityPool(liquidityPool)
             .withSwapInToken('lovelace')
-            .withSwapOutAmount(1_000000n)
-            .withSlippagePercent(0.5);
+            .withSwapOutAmount(1_000_000000n)
+            .withSlippagePercent(1.0);
 
         it('Can calculate swap parameters', () => {
-            expect(swapRequest.swapInAmount).toEqual(134229438286n);
+            expect(swapRequest.swapInAmount).toEqual(7950789864n);
         });
 
     });

@@ -47,7 +47,7 @@ export class WingRiders extends BaseDex {
     }
 
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
-        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const validityAsset: Asset = Asset.fromIdentifier(this.poolValidityAsset);
         const assetAddresses: AssetAddress[] = this._assetAddresses.length > 0
             ? this._assetAddresses
             : await provider.assetAddresses(validityAsset);
@@ -56,7 +56,7 @@ export class WingRiders extends BaseDex {
     }
 
     async liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]> {
-        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const validityAsset: Asset = Asset.fromIdentifier(this.poolValidityAsset);
         const poolAddresses: string[] = await this.liquidityPoolAddresses(provider);
 
         const addressPromises: Promise<LiquidityPool[]>[] = poolAddresses.map(async (address: string) => {
@@ -83,10 +83,10 @@ export class WingRiders extends BaseDex {
             return Promise.resolve(undefined);
         }
 
-        const validityAsset: Asset = Asset.fromId(this.poolValidityAsset);
+        const validityAsset: Asset = Asset.fromIdentifier(this.poolValidityAsset);
 
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
-            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.id();
+            const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier();
 
             return ! assetBalanceId.startsWith(validityAsset.policyId);
         });
@@ -129,6 +129,8 @@ export class WingRiders extends BaseDex {
 
         if (lpTokenBalance) {
             liquidityPool.lpToken = lpTokenBalance.asset as Asset;
+            liquidityPool.identifier = liquidityPool.lpToken.identifier();
+            liquidityPool.totalLpTokens = MAX_INT - lpTokenBalance.quantity;
         }
         liquidityPool.poolFeePercent = 0.35;
 
@@ -176,8 +178,13 @@ export class WingRiders extends BaseDex {
     }
 
     priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
+        const swapOutTokenDecimals: number = tokensMatch(liquidityPool.assetA, swapInToken)
+            ? (liquidityPool.assetB === 'lovelace' ? 6 : liquidityPool.assetB.decimals)
+            : (liquidityPool.assetA === 'lovelace' ? 6 : liquidityPool.assetA.decimals)
+
         const estimatedReceive: bigint = this.estimatedReceive(liquidityPool, swapInToken, swapInAmount);
-        const swapPrice: number = Number(swapInAmount) / Number(estimatedReceive);
+        const swapPrice: number = (Number(swapInAmount) / 10**(swapInToken === 'lovelace' ? 6 : swapInToken.decimals))
+            / (Number(estimatedReceive) / 10**swapOutTokenDecimals);
         const poolPrice: number = tokensMatch(liquidityPool.assetA, swapInToken)
             ? liquidityPool.price
             : (1 / liquidityPool.price);
@@ -238,6 +245,7 @@ export class WingRiders extends BaseDex {
                         },
                     ],
                     datum: datumBuilder.getCbor(),
+                    isInlineDatum: false,
                     spendUtxos: spendUtxos,
                 }
             )
@@ -258,6 +266,7 @@ export class WingRiders extends BaseDex {
                 address: returnAddress,
                 addressType: AddressType.Base,
                 assetBalances: relevantUtxo.assetBalances,
+                isInlineDatum: false,
                 spendUtxos: [relevantUtxo],
             }
         ];

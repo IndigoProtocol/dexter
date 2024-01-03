@@ -2,6 +2,19 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [v5.0.0]
+- TeddySwap integration
+- Spectrum integration
+
+## [v4.2.0]
+- Fix WR price impact formula for 0 decimals
+- Rename Asset identifier function
+- Include '/' helper function for proxy URLs
+- Add export for SplitSwapRequest
+- Add tests for DexTransaction events
+- Fix `withSwapOutAmountMappings` for split swap requests
+- Add fetching for total LP tokens for liquidity pools
+
 ## [v4.1.0]
 - Support for multi-dex swap requests.
 

@@ -2,7 +2,6 @@ import { Agent } from "https";
 import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
 import { Token } from '@dex/models/asset';
 import { BaseDex } from '@dex/base-dex';
-import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { LiquidityPool } from '@dex/models/liquidity-pool';
 
 export interface DexterConfig {
@@ -73,7 +72,7 @@ export type DefinitionInt = {
     int: number | DatumParameterKey,
 }
 
-export type DefinitionField = DefinitionConstr | DefinitionBytes | DefinitionInt
+export type DefinitionField = DefinitionConstr | DefinitionBytes | DefinitionInt | DefinitionField[] | Function
 
 export type DefinitionConstr = {
     constructor: number | DatumParameterKey,
@@ -91,6 +90,7 @@ export type PayToAddress = {
     assetBalances: AssetBalance[],
     spendUtxos?: UTxO[],
     datum?: string,
+    isInlineDatum: boolean,
 };
 
 export type SwapFee = {
