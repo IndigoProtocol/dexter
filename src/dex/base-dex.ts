@@ -1,7 +1,7 @@
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { Asset, Token } from './models/asset';
-import { AssetBalance, DatumParameters, PayToAddress, SwapFee, UTxO } from '@app/types';
+import { AssetBalance, DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO } from '@app/types';
 import { DatumParameterKey } from '@app/constants';
 import { tokensMatch } from '@app/utils';
 import { BaseApi } from '@dex/api/base-api';
@@ -46,7 +46,7 @@ export abstract class BaseDex {
     /**
      * Craft a swap order for this DEX.
      */
-    abstract buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos?: UTxO[]): Promise<PayToAddress[]>;
+    abstract buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos?: SpendUTxO[]): Promise<PayToAddress[]>;
 
     /**
      * Craft a swap order cancellation for this DEX.

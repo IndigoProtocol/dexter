@@ -1,4 +1,12 @@
-import { AssetBalance, BlockfrostConfig, Cip30Api, KupmiosConfig, PayToAddress, UTxO, WalletOptions } from '@app/types';
+import {
+    AssetBalance,
+    BlockfrostConfig,
+    Cip30Api,
+    KupmiosConfig,
+    PayToAddress,
+    SpendUTxO,
+    WalletOptions
+} from '@app/types';
 import { DexTransaction } from '@dex/models/dex-transaction';
 import { BaseWalletProvider } from './base-wallet-provider';
 import {
@@ -7,7 +15,7 @@ import {
     Assets,
     Blockfrost,
     Datum, Kupmios,
-    Lucid, OutputData,
+    Lucid,
     TxComplete,
     TxHash,
     TxSigned,
@@ -91,17 +99,25 @@ export class LucidProvider extends BaseWalletProvider {
 
             // Include UTxOs to spend
             if (payToAddress.spendUtxos && payToAddress.spendUtxos.length > 0) {
-                transaction.providerData.tx.collectFrom(
-                    payToAddress.spendUtxos.map((utxo: UTxO) => {
-                        return {
-                            txHash: utxo.txHash,
-                            outputIndex: utxo.outputIndex,
-                            address: utxo.address,
-                            datumHash: utxo.datumHash,
-                            assets: this.paymentFromAssets(utxo.assetBalances)
-                        };
-                    })
-                );
+                payToAddress.spendUtxos.forEach((spendUtxo: SpendUTxO) => {
+                    transaction.providerData.tx.collectFrom([
+                        {
+                            txHash: spendUtxo.utxo.txHash,
+                            outputIndex: spendUtxo.utxo.outputIndex,
+                            address: spendUtxo.utxo.address,
+                            datumHash: spendUtxo.utxo.datumHash,
+                            assets: this.paymentFromAssets(spendUtxo.utxo.assetBalances)
+                        }
+                    ], spendUtxo.redeemer);
+
+                    if (spendUtxo.validator) {
+                        transaction.providerData.tx.attachSpendingValidator(spendUtxo.validator);
+                    }
+
+                    if (spendUtxo.signer) {
+                        transaction.providerData.tx.addSigner(spendUtxo.signer);
+                    }
+                });
             }
 
             switch (payToAddress.addressType) {
