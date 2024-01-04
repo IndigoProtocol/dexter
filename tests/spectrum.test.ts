@@ -10,7 +10,7 @@ import {
     PayToAddress,
     AddressType,
 } from '../src';
-import { Spectrum } from '../src/dex/spectrum';
+import { Spectrum } from '../src';
 
 describe('Spectrum', () => {
 
