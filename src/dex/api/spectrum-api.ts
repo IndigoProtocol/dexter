@@ -4,15 +4,14 @@ import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
 import { RequestConfig } from '@app/types';
 import { appendSlash, tokensMatch } from '@app/utils';
-import { TeddySwap } from '@dex/teddyswap';
 import { Spectrum } from '@dex/spectrum';
 
 export class SpectrumApi extends BaseApi {
 
     protected readonly api: AxiosInstance;
-    protected readonly dex: TeddySwap;
+    protected readonly dex: Spectrum;
 
-    constructor(dex: TeddySwap, requestConfig: RequestConfig) {
+    constructor(dex: Spectrum, requestConfig: RequestConfig) {
         super();
 
         this.dex = dex;
