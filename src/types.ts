@@ -48,6 +48,7 @@ export type UTxO = {
     txHash: string,
     address: string,
     datumHash: string,
+    datum?: string,
     outputIndex: number,
     assetBalances: AssetBalance[],
 };

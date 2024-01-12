@@ -105,8 +105,9 @@ export class LucidProvider extends BaseWalletProvider {
                             txHash: spendUtxo.utxo.txHash,
                             outputIndex: spendUtxo.utxo.outputIndex,
                             address: spendUtxo.utxo.address,
-                            datumHash: spendUtxo.utxo.datumHash,
-                            assets: this.paymentFromAssets(spendUtxo.utxo.assetBalances)
+                            datumHash: spendUtxo.utxo.datum ? null : spendUtxo.utxo.datumHash,
+                            datum: spendUtxo.utxo.datum,
+                            assets: this.paymentFromAssets(spendUtxo.utxo.assetBalances),
                         }
                     ], spendUtxo.redeemer);
 

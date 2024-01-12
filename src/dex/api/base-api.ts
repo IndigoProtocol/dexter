@@ -11,6 +11,6 @@ export abstract class BaseApi {
     /**
      * Fetch all liquidity pools matching assetA & assetB.
      */
-    abstract liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]>;
+    abstract liquidityPools(assetA?: Token, assetB?: Token): Promise<LiquidityPool[]>;
 
 }
