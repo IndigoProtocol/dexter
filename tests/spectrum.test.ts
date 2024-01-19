@@ -8,7 +8,7 @@ import {
     DatumParameters,
     DatumParameterKey,
     PayToAddress,
-    AddressType, MuesliSwap, UTxO,
+    AddressType, UTxO,
 } from '../src';
 import { Spectrum } from '../src';
 
