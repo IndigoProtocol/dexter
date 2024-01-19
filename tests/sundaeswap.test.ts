@@ -10,6 +10,7 @@ import {
     DatumParameterKey,
     PayToAddress,
     AddressType,
+    UTxO,
 } from '../src';
 
 describe('SundaeSwap', () => {
@@ -93,6 +94,54 @@ describe('SundaeSwap', () => {
 
         it('Can calculate swap parameters', () => {
             expect(swapRequest.swapInAmount).toEqual(1384410858n);
+        });
+
+    });
+
+    describe('SundaeSwap Cancel Order', () => {
+        let sundaeswap: SundaeSwap;
+        const returnAddress = 'addr1';
+        beforeEach(() => {
+            sundaeswap = new SundaeSwap();
+        });
+
+        it('should successfully cancel an order', async () => {
+            let marketOrderAddress = sundaeswap.orderAddress;
+            const txOutputs: UTxO[] = [
+                {
+                    txHash: 'mockTxHash123',
+                    address: marketOrderAddress,
+                    datumHash: 'mockDatumHash123',
+                    outputIndex: 0,
+                    assetBalances: [{ asset: 'lovelace', quantity: 1000000000000n }]
+                }
+            ];
+
+            const result = await sundaeswap.buildCancelSwapOrder(txOutputs, returnAddress);
+
+            expect(result).toBeDefined();
+            expect(result[0].address).toBe(returnAddress);
+        });
+
+        it('should fail to cancel an order with invalid UTxO', async () => {
+            const invalidTxOutputs: UTxO[] = [
+                {
+                    txHash: 'invalidTxHash',
+                    address: 'invalidAddress',
+                    datumHash: 'invalidDatumHash',
+                    outputIndex: 0,
+                    assetBalances: [{ asset: 'lovelace', quantity: 1000000000000n }]
+                }
+            ];
+            try {
+                await sundaeswap.buildCancelSwapOrder(invalidTxOutputs, returnAddress);
+                fail('Expected buildCancelSwapOrder to throw an error');
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    expect(error.message).toContain('Unable to find relevant UTxO for cancelling the swap order.');
+                }
+            }
+
         });
 
     });

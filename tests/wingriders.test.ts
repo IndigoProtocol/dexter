@@ -9,7 +9,7 @@ import {
     DatumParameters,
     DatumParameterKey,
     PayToAddress,
-    AddressType,
+    AddressType, UTxO,
 } from '../src';
 
 describe('WingRiders', () => {
@@ -111,6 +111,54 @@ describe('WingRiders', () => {
 
         it('Can calculate swap parameters', () => {
             expect(swapRequest.swapInAmount).toEqual(134229438286n);
+        });
+
+    });
+
+    describe('Wingriders Cancel Order', () => {
+        let wingRiders: WingRiders;
+        const returnAddress = 'addr1';
+        beforeEach(() => {
+            wingRiders = new WingRiders();
+        });
+
+        it('should successfully cancel an order', async () => {
+            let marketOrderAddress = wingRiders.orderAddress;
+            const txOutputs: UTxO[] = [
+                {
+                    txHash: 'mockTxHash123',
+                    address: marketOrderAddress,
+                    datumHash: 'mockDatumHash123',
+                    outputIndex: 0,
+                    assetBalances: [{ asset: 'lovelace', quantity: 1000000000000n }]
+                }
+            ];
+
+            const result = await wingRiders.buildCancelSwapOrder(txOutputs, returnAddress);
+
+            expect(result).toBeDefined();
+            expect(result[0].address).toBe(returnAddress);
+        });
+
+        it('should fail to cancel an order with invalid UTxO', async () => {
+            const invalidTxOutputs: UTxO[] = [
+                {
+                    txHash: 'invalidTxHash',
+                    address: 'invalidAddress',
+                    datumHash: 'invalidDatumHash',
+                    outputIndex: 0,
+                    assetBalances: [{ asset: 'lovelace', quantity: 1000000000000n }]
+                }
+            ];
+            try {
+                await wingRiders.buildCancelSwapOrder(invalidTxOutputs, returnAddress);
+                fail('Expected buildCancelSwapOrder to throw an error');
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    expect(error.message).toContain('Unable to find relevant UTxO for cancelling the swap order.');
+                }
+            }
+
         });
 
     });

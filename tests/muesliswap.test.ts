@@ -10,8 +10,8 @@ import {
     DatumParameterKey,
     PayToAddress,
     AddressType,
+    UTxO
 } from '../src';
-import {UTxO} from "@app/types";
 
 describe('MuesliSwap', () => {
 

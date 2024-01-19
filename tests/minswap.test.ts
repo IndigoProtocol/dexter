@@ -9,11 +9,10 @@ import {
     DatumParameters,
     DatumParameterKey,
     PayToAddress,
-    AddressType
-} from '../src';
-import {
+    AddressType,
     UTxO
-} from '@app/types';
+} from '../src';
+
 describe('Minswap', () => {
     let minswap: Minswap;
     const returnAddress = 'mockBlockchainAddress123';

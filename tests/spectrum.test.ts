@@ -8,9 +8,10 @@ import {
     DatumParameters,
     DatumParameterKey,
     PayToAddress,
-    AddressType, UTxO,
+    AddressType,
+    UTxO,
+    Spectrum
 } from '../src';
-import { Spectrum } from '../src';
 
 describe('Spectrum', () => {
 
