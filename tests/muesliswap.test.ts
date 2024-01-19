@@ -95,7 +95,7 @@ describe('MuesliSwap', () => {
 
     });
 
-    describe('Muesliswap Cancel Order FLow', () => {
+    describe('Muesliswap Cancel Order', () => {
         let muesliswap: MuesliSwap;
         const returnAddress = 'mockBlockchainAddress123';
 

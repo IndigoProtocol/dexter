@@ -102,7 +102,7 @@ describe('Minswap', () => {
 
     });
 
-    describe('Minswap Cancel Order Flow', () => {
+    describe('Minswap Cancel Order', () => {
 
         it('should successfully cancel an order', async () => {
             let marketOrderAddress = minswap.marketOrderAddress;
