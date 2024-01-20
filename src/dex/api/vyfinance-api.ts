@@ -24,15 +24,15 @@ export class VyfinanceApi extends BaseApi {
         });
     }
 
-    liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const assetAId: string = (assetA === 'lovelace')
-            ? 'lovelace'
-            : assetA.identifier();
+    liquidityPools(assetA?: Token, assetB?: Token): Promise<LiquidityPool[]> {
+        const assetAId: string = (assetA && assetA !== 'lovelace')
+            ? assetA.identifier()
+            : 'lovelace';
         let assetBId: string = (assetB && assetB !== 'lovelace')
             ? assetB.identifier()
             : 'lovelace';
 
-        const url: string = assetB
+        const url: string = assetA && assetB
             ? `/lp?networkId=1&v2=true&tokenAUnit=${assetAId}&tokenBUnit=${assetBId}`
             : '/lp?networkId=1&v2=true';
 
@@ -48,12 +48,13 @@ export class VyfinanceApi extends BaseApi {
                         ? new Asset(poolDetails['bAsset']['currencySymbol'], Buffer.from(poolDetails['bAsset']['tokenName']).toString('hex'))
                         : 'lovelace';
 
+
                     let liquidityPool: LiquidityPool = new LiquidityPool(
                         VyFinance.identifier,
                         tokenA,
                         tokenB,
-                        BigInt(pool['tokenAQuantity']),
-                        BigInt(pool['tokenBQuantity']),
+                        BigInt(pool['tokenAQuantity'] ?? 0),
+                        BigInt(pool['tokenBQuantity'] ?? 0),
                         pool['poolValidatorUtxoAddress'],
                         pool['orderValidatorUtxoAddress'],
                         pool['orderValidatorUtxoAddress'],
@@ -63,10 +64,12 @@ export class VyfinanceApi extends BaseApi {
                     liquidityPool.lpToken = new Asset(lpTokenDetails[0], lpTokenDetails[1]);
                     liquidityPool.poolFeePercent = (poolDetails['feesSettings']['barFee'] + poolDetails['feesSettings']['liqFee']) / 100;
                     liquidityPool.identifier = liquidityPool.lpToken.identifier();
+                    liquidityPool.extra.nft = new Asset(poolDetails['mainNFT']['currencySymbol'], poolDetails['mainNFT']['tokenName']);
 
                     return liquidityPool;
                 }).filter((pool: LiquidityPool | undefined) => pool !== undefined) as LiquidityPool[];
-            }).catch(() => {
+            }).catch((e) => {
+                console.error(e)
                 return [];
             });
     }

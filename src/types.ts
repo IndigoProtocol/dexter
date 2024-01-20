@@ -2,6 +2,7 @@ import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
 import { Token } from '@dex/models/asset';
 import { BaseDex } from '@dex/base-dex';
 import { LiquidityPool } from '@dex/models/liquidity-pool';
+import { Script } from 'lucid-cardano';
 
 export interface DexterConfig {
     shouldFetchMetadata?: boolean,
@@ -47,6 +48,7 @@ export type UTxO = {
     txHash: string,
     address: string,
     datumHash: string,
+    datum?: string,
     outputIndex: number,
     assetBalances: AssetBalance[],
 };
@@ -82,11 +84,18 @@ export type WalletOptions = {
     accountIndex?: number,
 }
 
+export type SpendUTxO = {
+    utxo: UTxO,
+    redeemer?: string,
+    validator?: Script,
+    signer?: string,
+};
+
 export type PayToAddress = {
     address: string,
     addressType: AddressType,
     assetBalances: AssetBalance[],
-    spendUtxos?: UTxO[],
+    spendUtxos?: SpendUTxO[],
     datum?: string,
     isInlineDatum: boolean,
 };

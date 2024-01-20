@@ -2,7 +2,7 @@ import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Token } from '@dex/models/asset';
 import { Dexter } from '@app/dexter';
 import { tokensMatch } from '@app/utils';
-import { DatumParameters, PayToAddress, SwapFee, UTxO } from '@app/types';
+import { DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO } from '@app/types';
 import { DatumParameterKey, MetadataKey, TransactionStatus } from '@app/constants';
 import { DexTransaction } from '@dex/models/dex-transaction';
 
@@ -213,7 +213,15 @@ export class SwapRequest {
         };
 
         return this._dexter.availableDexs[this._liquidityPool.dex]
-            .buildSwapOrder(this._liquidityPool, defaultSwapParameters, this._withUtxos);
+            .buildSwapOrder(
+                this._liquidityPool,
+                defaultSwapParameters,
+                this._withUtxos.map((utxo: UTxO) => {
+                    return {
+                        utxo,
+                    }
+                }) as SpendUTxO[]
+            );
     }
 
     public submit(): DexTransaction {

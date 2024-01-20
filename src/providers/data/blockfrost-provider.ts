@@ -92,6 +92,7 @@ export class BlockfrostProvider extends BaseDataProvider {
                         txHash: response.data.hash,
                         address: utxo.address,
                         datumHash: utxo.data_hash,
+                        datum: utxo.inline_datum,
                         outputIndex: utxo.output_index,
                         assetBalances: utxo.amount.reduce((assets: AssetBalance[], amount: any) => {
                             assets.push({

@@ -61,7 +61,9 @@ export class CancelSwapRequest {
         cancelTransaction.status = TransactionStatus.Building;
 
         cancelTransaction.attachMetadata(MetadataKey.Message, {
-            msg: `[${this._dexter.config.metadataMsgBranding}] ${this._dexName} Cancel Swap`
+            msg: [
+                `[${this._dexter.config.metadataMsgBranding}] ${this._dexName} Cancel Swap`
+            ]
         });
 
         // Build transaction

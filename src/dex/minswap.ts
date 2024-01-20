@@ -7,7 +7,7 @@ import {
     AssetBalance,
     DatumParameters, DefinitionConstr, DefinitionField,
     PayToAddress,
-    RequestConfig,
+    RequestConfig, SpendUTxO,
     SwapFee,
     UTxO
 } from '@app/types';
@@ -18,6 +18,7 @@ import order from '@dex/definitions/minswap/order';
 import { BaseApi } from '@dex/api/base-api';
 import { MinswapApi } from '@dex/api/minswap-api';
 import pool from '@dex/definitions/minswap/pool';
+import { Script } from 'lucid-cardano';
 
 export class Minswap extends BaseDex {
 
@@ -32,6 +33,11 @@ export class Minswap extends BaseDex {
     public readonly lpTokenPolicyId: string = 'e4214b7cce62ac6fbba385d164df48e157eae5863521b4b67ca71d86';
     public readonly poolNftPolicyId: string = '0be55d262b29f564998ff81efe21bdc0022621c12f15af08d0f2ddb1';
     public readonly poolValidityAsset: string = '13aa2accf2e1561723aa26871e071fdf32c867cff7e7d50ad470d62f4d494e53574150';
+    public readonly cancelDatum: string = 'd87a80';
+    public readonly orderScript: Script = {
+        type: 'PlutusV1',
+        script: '59014f59014c01000032323232323232322223232325333009300e30070021323233533300b3370e9000180480109118011bae30100031225001232533300d3300e22533301300114a02a66601e66ebcc04800400c5288980118070009bac3010300c300c300c300c300c300c300c007149858dd48008b18060009baa300c300b3754601860166ea80184ccccc0288894ccc04000440084c8c94ccc038cd4ccc038c04cc030008488c008dd718098018912800919b8f0014891ce1317b152faac13426e6a83e06ff88a4d62cce3c1634ab0a5ec133090014a0266008444a00226600a446004602600a601a00626600a008601a006601e0026ea8c03cc038dd5180798071baa300f300b300e3754601e00244a0026eb0c03000c92616300a001375400660106ea8c024c020dd5000aab9d5744ae688c8c0088cc0080080048c0088cc00800800555cf2ba15573e6e1d200201',
+    };
 
     constructor(requestConfig: RequestConfig = {}) {
         super();
@@ -177,7 +183,7 @@ export class Minswap extends BaseDex {
         return Number(priceImpactNumerator * 100n) / Number(priceImpactDenominator);
     }
 
-    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: UTxO[] = []): Promise<PayToAddress[]> {
+    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: SpendUTxO[] = []): Promise<PayToAddress[]> {
         const batcherFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'batcherFee');
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
 
@@ -232,7 +238,12 @@ export class Minswap extends BaseDex {
                 addressType: AddressType.Base,
                 assetBalances: relevantUtxo.assetBalances,
                 isInlineDatum: false,
-                spendUtxos: [relevantUtxo],
+                spendUtxos: [{
+                    utxo: relevantUtxo,
+                    redeemer: this.cancelDatum,
+                    validator: this.orderScript,
+                    signer: returnAddress,
+                }],
             }
         ];
     }
