@@ -9,17 +9,24 @@ import {
     DatumParameters,
     DatumParameterKey,
     PayToAddress,
-    AddressType
+    AddressType,
+    UTxO
 } from '../src';
 
 describe('Minswap', () => {
+    let minswap: Minswap;
+    const returnAddress = 'mockBlockchainAddress123';
 
+    beforeEach(() => {
+        minswap = new Minswap();
+    });
     const walletProvider: MockWalletProvider = new MockWalletProvider();
     walletProvider.loadWalletFromSeedPhrase(['']);
     const dexter: Dexter = (new Dexter())
         .withDataProvider(new MockDataProvider())
         .withWalletProvider(walletProvider);
     const asset: Asset = new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344', 6);
+
 
     describe('Set Swap In', () => {
 
@@ -92,6 +99,49 @@ describe('Minswap', () => {
             expect(swapRequest.swapInAmount).toEqual(365844367n);
         });
 
+    });
+
+    describe('Minswap Cancel Order', () => {
+
+        it('should successfully cancel an order', async () => {
+            let marketOrderAddress = minswap.marketOrderAddress;
+            const txOutputs: UTxO[] = [
+                {
+                    txHash: 'mockTxHash123',
+                    address: marketOrderAddress,
+                    datumHash: 'mockDatumHash123',
+                    outputIndex: 0,
+                    assetBalances: [{ asset: 'lovelace', quantity: 1000000000000n }]
+                }
+            ];
+
+            const result = await minswap.buildCancelSwapOrder(txOutputs, returnAddress);
+
+            expect(result).toBeDefined();
+            expect(result[0].address).toBe(returnAddress);
+        });
+
+        it('should fail to cancel an order with invalid UTxO', async () => {
+            const invalidTxOutputs: UTxO[] = [
+                {
+                    txHash: 'invalidTxHash',
+                    address: 'invalidAddress',
+                    datumHash: 'invalidDatumHash',
+                    outputIndex: 0,
+                    assetBalances: [{ asset: 'lovelace', quantity: 1000n }]
+                }
+            ];
+
+
+            try {
+                await minswap.buildCancelSwapOrder(invalidTxOutputs, returnAddress);
+                fail('Expected buildCancelSwapOrder to throw an error');
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    expect(error.message).toContain('Unable to find relevant UTxO for cancelling the swap order.');
+                }
+            }
+        });
     });
 
 });

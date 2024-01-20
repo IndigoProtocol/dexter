@@ -9,8 +9,9 @@ import {
     DatumParameterKey,
     PayToAddress,
     AddressType,
+    UTxO,
+    Spectrum
 } from '../src';
-import { Spectrum } from '../src';
 
 describe('Spectrum', () => {
 
@@ -94,6 +95,55 @@ describe('Spectrum', () => {
 
         it('Can calculate swap parameters', () => {
             expect(swapRequest.swapInAmount).toEqual(7950789864n);
+        });
+
+    });
+
+    describe('Spectrum Cancel Order', () => {
+        let spectrum: Spectrum;
+        const returnAddress = 'mockBlockchainAddress123';
+
+        beforeEach(() => {
+            spectrum = new Spectrum();
+        });
+
+        it('should successfully cancel an order', async () => {
+            let orderAddress = spectrum.orderAddress;
+            const txOutputs: UTxO[] = [
+                {
+                    txHash: 'mockTxHash123',
+                    address: orderAddress,
+                    datumHash: 'mockDatumHash123',
+                    outputIndex: 0,
+                    assetBalances: [{ asset: 'lovelace', quantity: 10000n }]
+                }
+            ];
+
+            const result = await spectrum.buildCancelSwapOrder(txOutputs, returnAddress);
+
+            expect(result).toBeDefined();
+            expect(result[0].address).toBe(returnAddress);
+        });
+
+        it('should fail to cancel an order with invalid UTxO', async () => {
+            const invalidTxOutputs: UTxO[] = [
+                {
+                    txHash: 'invalidTxHash',
+                    address: 'invalidAddress',
+                    datumHash: 'invalidDatumHash',
+                    outputIndex: 0,
+                    assetBalances: [{ asset: 'lovelace', quantity: 10000n }]
+                }
+            ];
+
+            try {
+                await spectrum.buildCancelSwapOrder(invalidTxOutputs, returnAddress);
+                fail('Expected buildCancelSwapOrder to throw an error');
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    expect(error.message).toContain('Unable to find relevant UTxO for cancelling the swap order.');
+                }
+            }
         });
 
     });

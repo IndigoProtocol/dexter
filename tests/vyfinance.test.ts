@@ -1,14 +1,15 @@
 import {
+    AddressType,
+    Asset,
+    DatumParameterKey,
+    DatumParameters,
     Dexter,
     LiquidityPool,
     MockDataProvider,
-    SwapRequest,
-    Asset,
     MockWalletProvider,
-    DatumParameters,
-    DatumParameterKey,
     PayToAddress,
-    AddressType,
+    SwapRequest,
+    UTxO,
     VyFinance,
 } from '../src';
 
@@ -92,6 +93,91 @@ describe('VyFinance', () => {
 
         it('Can calculate swap parameters', () => {
             expect(swapRequest.swapInAmount).toEqual(13482992348n);
+        });
+
+    });
+
+    describe('VyFinance Cancel Order', () => {
+        let vyFinance: VyFinance;
+        const returnAddress = 'addr1';
+        beforeEach(() => {
+            vyFinance = new VyFinance();
+            vyFinance.api.liquidityPools = async () => {
+                const liquidityPool = new LiquidityPool(
+                    VyFinance.identifier,
+                    'lovelace',
+                    new Asset('f66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880', '69555344'),
+                    519219742499n,
+                    39619096012n,
+                    'mockPoolAddress',
+                    'mockMarketOrderAddress',
+                    'mockLimitOrderAddress',
+                );
+                liquidityPool.extra = {
+                    nft: {
+                        policyId: 'mockNftPolicyId'
+                    }
+                };
+
+                return [liquidityPool];
+            };
+        });
+
+        it('should successfully cancel an order', async () => {
+            const MockUTxO: UTxO[] = [{
+                txHash: 'mockTxHash',
+                address: 'mockMarketOrderAddress',
+                datumHash: 'mockDatumHash',
+                outputIndex: 0,
+                assetBalances: [{asset: 'lovelace', quantity: 1000000000000n}]
+            }];
+
+            const cancelOrder = await vyFinance.buildCancelSwapOrder(MockUTxO, returnAddress);
+            expect(cancelOrder).toBeDefined();
+            expect(cancelOrder[0].address).toBe('addr1');
+            expect(cancelOrder[0].assetBalances[0].quantity).toBe(1000000000000n);
+        });
+
+        it('should fail to cancel an order when the liquidity pool is not found', async () => {
+            const mockUTxO: UTxO[] = [{
+                txHash: 'mockTxHash',
+                address: 'mockAddress',
+                datumHash: 'mockDatumHash',
+                outputIndex: 0,
+                assetBalances: [{asset: 'lovelace', quantity: 1000000000000n}]
+            }];
+
+            try {
+                await vyFinance.buildCancelSwapOrder(mockUTxO, returnAddress);
+                fail('Expected buildCancelSwapOrder to throw an error');
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    expect(error.message).toContain('Unable to find relevant liquidity pool for cancelling the swap order.');
+                }
+            }
+
+        });
+
+        it('should fail to cancel an order with invalid UTxO', async () => {
+            const invalidTxOutputs: UTxO[] = [
+                {
+                    txHash: 'invalidTxHash',
+                    address: 'invalidAddress',
+                    datumHash: 'invalidDatumHash',
+                    outputIndex: 0,
+                    assetBalances: [{ asset: 'lovelace', quantity: 1000000000000n }]
+                }
+            ];
+
+            try {
+                await vyFinance.buildCancelSwapOrder(invalidTxOutputs, returnAddress);
+                fail('Expected buildCancelSwapOrder to throw an error');
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    expect(error.message).toContain('Unable to find relevant UTxO for cancelling the swap order.');
+                }
+            }
+
         });
 
     });
