@@ -2,6 +2,10 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [v5.1.0]
+- Fix cancelling orders for each DEX
+- Add new split cancel order request
+
 ## [v5.0.0]
 - TeddySwap integration
 - Spectrum integration
