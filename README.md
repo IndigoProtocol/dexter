@@ -221,6 +221,22 @@ dexter.newCancelSwapRequest()
 ```
 </details>
 
+<br>
+
+<details>
+<summary><code>newSplitCancelSwapRequest(): SplitCancelSwapRequest</code> Create new request for cancelling multiple swap orders.</summary>
+
+For available methods on the `SplitCancelSwapRequest` instance, please see those specific
+[docs](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/split-cancel-swap-request.md).
+
+##### Using
+
+```js
+dexter.newSplitCancelSwapRequest()
+    ...
+```
+</details>
+
 ### More Docs
 
 - [Data Providers](https://github.com/IndigoProtocol/dexter/blob/master/docs/providers/data.md)
@@ -229,5 +245,6 @@ dexter.newCancelSwapRequest()
 - [Creating a Swap Request](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/swap-request.md)
 - [Creating a Split Swap Request](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/split-swap-request.md)
 - [Creating a Cancel Swap Request](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/cancel-swap-request.md)
+- [Creating a Split Cancel Swap Request](https://github.com/IndigoProtocol/dexter/blob/master/docs/requests/split-cancel-swap-request.md)
 - [Listening for transaction events](https://github.com/IndigoProtocol/dexter/blob/master/docs/dex-transaction.md)
 - [Commonly returned models](https://github.com/IndigoProtocol/dexter/blob/master/docs/models.md)

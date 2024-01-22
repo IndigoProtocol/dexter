@@ -17,6 +17,7 @@ import axiosRetry from "axios-retry";
 import { SplitSwapRequest } from '@requests/split-swap-request';
 import { TeddySwap } from '@dex/teddyswap';
 import { Spectrum } from '@dex/spectrum';
+import { SplitCancelSwapRequest } from '@requests/split-cancel-swap-request';
 
 export class Dexter {
 
@@ -133,6 +134,20 @@ export class Dexter {
         }
 
         return new CancelSwapRequest(this);
+    }
+
+    /**
+     * New request for a split cancel swap order.
+     */
+    public newSplitCancelSwapRequest(): SplitCancelSwapRequest {
+        if (! this.walletProvider) {
+            throw new Error('Wallet provider must be set before requesting a split cancel order.');
+        }
+        if (! this.walletProvider.isWalletLoaded) {
+            throw new Error('Wallet must be loaded before requesting a split cancel order.');
+        }
+
+        return new SplitCancelSwapRequest(this);
     }
 
 }

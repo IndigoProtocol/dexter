@@ -1,78 +1,55 @@
 import { Dexter } from '@app/dexter';
+import { CancelSwapRequest } from '@requests/cancel-swap-request';
+import { PayToAddress, SplitCancelSwapMapping } from '@app/types';
 import { DexTransaction } from '@dex/models/dex-transaction';
-import { PayToAddress, UTxO } from '@app/types';
 import { MetadataKey, TransactionStatus } from '@app/constants';
-import { BaseDataProvider } from '@providers/data/base-data-provider';
 
-export class CancelSwapRequest {
+export class SplitCancelSwapRequest {
 
     private _dexter: Dexter;
-    private _txHash: string;
-    private _dexName: string;
+    private _cancelRequests: CancelSwapRequest[] = [];
 
     constructor(dexter: Dexter) {
         this._dexter = dexter;
     }
 
-    public forTransaction(txHash: string): CancelSwapRequest {
-        this._txHash = txHash;
+    public forTransactions(mappings: SplitCancelSwapMapping[]): SplitCancelSwapRequest {
+        this._cancelRequests = mappings.map((mapping: SplitCancelSwapMapping) => {
+           return this._dexter.newCancelSwapRequest()
+               .forTransaction(mapping.txHash)
+               .forDex(mapping.dex);
+        });
 
         return this;
     }
 
-    public forDex(name: string): CancelSwapRequest {
-        this._dexName = name;
-
-        return this;
-    }
-
-
-    public getPaymentsToAddresses(): Promise<PayToAddress[]> {
+    public submit(): DexTransaction {
         if (! this._dexter.walletProvider) {
-            throw new Error('Wallet provider must be set before submitting a swap order.');
+            throw new Error('Wallet provider must be set before submitting a cancel swap order.');
         }
-
-        const returnAddress: string = this._dexter.walletProvider.address();
-
-        return (this._dexter.dataProvider as BaseDataProvider).transactionUtxos(this._txHash)
-            .then((utxos: UTxO[]) => {
-                return this._dexter.availableDexs[this._dexName].buildCancelSwapOrder(utxos, returnAddress);
-            })
-            .catch(() => {
-                throw new Error('Unable to grab UTxOs for the provided Tx hash. Ensure the one provided is a valid Tx hash.')
-            });
-    }
-
-    public cancel(): DexTransaction {
-        if (! this._dexter.walletProvider) {
-            throw new Error('Wallet provider must be set before submitting a swap order.');
+        if (! this._dexter.walletProvider.isWalletLoaded) {
+            throw new Error('Wallet must be loaded before submitting a cancel swap order.');
         }
-        if (! this._txHash) {
-            throw new Error('Tx hash must be provided before cancelling a swap order.');
-        }
-        if (! this._dexName) {
-            throw new Error('DEX must be provided before cancelling a swap order.');
+        if (this._cancelRequests.length === 0) {
+            throw new Error('Cancel requests were never initialized.');
         }
 
         const cancelTransaction: DexTransaction = this._dexter.walletProvider.createTransaction();
 
-        this.getPaymentsToAddresses()
-            .then((payToAddresses: PayToAddress[]) => {
-                this.sendCancelOrder(cancelTransaction, payToAddresses);
-            })
-            .catch((error) => {
-                throw new Error(`Unable to cancel swap order. ${error}`)
+        Promise.all(this._cancelRequests.map((cancelRequest: CancelSwapRequest) => cancelRequest.getPaymentsToAddresses()))
+            .then((payToAddresses: PayToAddress[][]) => {
+                this.sendSplitCancelSwapOrder(cancelTransaction, payToAddresses.flat());
             });
 
         return cancelTransaction;
     }
 
-    private sendCancelOrder(cancelTransaction: DexTransaction, payToAddresses: PayToAddress[]) {
+    private sendSplitCancelSwapOrder(cancelTransaction: DexTransaction, payToAddresses: PayToAddress[]) {
         cancelTransaction.status = TransactionStatus.Building;
 
         cancelTransaction.attachMetadata(MetadataKey.Message, {
             msg: [
-                `[${this._dexter.config.metadataMsgBranding}] ${this._dexName} Cancel Swap`
+                `[${this._dexter.config.metadataMsgBranding}] Split Cancel Swap`
             ]
         });
 

@@ -118,6 +118,11 @@ export type SwapOutAmountMapping = {
     liquidityPool: LiquidityPool,
 }
 
+export type SplitCancelSwapMapping = {
+    txHash: string,
+    dex: string,
+}
+
 export type DexTransactionError = {
     step: TransactionStatus,
     reason: string,
