@@ -118,6 +118,25 @@ export class SwapRequest {
         return this;
     }
 
+    public withMinimumReceive(minReceive: bigint): SwapRequest {
+        if (minReceive <= 0n) {
+            this._swapInAmount = 0n;
+        }
+        if (! this._liquidityPool) {
+            throw new Error('Liquidity pool must be set before setting a swap out amount.');
+        }
+
+        this._swapInAmount = this._dexter.availableDexs[this._liquidityPool.dex].estimatedGive(
+            this._liquidityPool,
+            this._swapOutToken,
+            BigInt(
+                Math.ceil(Number(minReceive) * (1 + (this._slippagePercent / 100)))
+            ),
+        );
+
+        return this;
+    }
+
     public withSlippagePercent(slippagePercent: number): SwapRequest {
         if (slippagePercent < 0) {
             throw new Error('Slippage percent must be zero or above.');

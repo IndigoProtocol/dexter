@@ -84,15 +84,13 @@ dexter.newSwapRequest()
 <br>
 
 <details>
-<summary><code>flip(): SwapRequest</code> Flip your swap in and swap out token.</summary>
-
-Flipping will only affect the swap in & swap out token if the swap in token was set beforehand.
+<summary><code>withMinimumReceive(bigint): SwapRequest</code> Set the minimum you want to receive.</summary>
 
 ##### Using
 
 ```js
 dexter.newSwapRequest()
-    .flip()
+    .withMinimumReceive(10_000000n)
     ...
 ```
 </details>
@@ -107,6 +105,22 @@ dexter.newSwapRequest()
 ```js
 dexter.newSwapRequest()
     .withSlippagePercent(0.5)
+    ...
+```
+</details>
+
+<br>
+
+<details>
+<summary><code>flip(): SwapRequest</code> Flip your swap in and swap out token.</summary>
+
+Flipping will only affect the swap in & swap out token if the swap in token was set beforehand.
+
+##### Using
+
+```js
+dexter.newSwapRequest()
+    .flip()
     ...
 ```
 </details>
