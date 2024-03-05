@@ -1,7 +1,7 @@
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { AvailableDexs, DexterConfig, RequestConfig } from '@app/types';
 import { Minswap } from '@dex/minswap';
-import { SundaeSwap } from '@dex/sundaeswap';
+import { SundaeSwapV1 } from '@dex/sundaeswap-v1';
 import { MuesliSwap } from '@dex/muesliswap';
 import { WingRiders } from '@dex/wingriders';
 import { SwapRequest } from '@requests/swap-request';
@@ -58,7 +58,7 @@ export class Dexter {
         this.metadataProvider = new TokenRegistryProvider(this.requestConfig);
         this.availableDexs = {
             [Minswap.identifier]: new Minswap(this.requestConfig),
-            [SundaeSwap.identifier]: new SundaeSwap(this.requestConfig),
+            [SundaeSwapV1.identifier]: new SundaeSwapV1(this.requestConfig),
             [MuesliSwap.identifier]: new MuesliSwap(this.requestConfig),
             [WingRiders.identifier]: new WingRiders(this.requestConfig),
             [VyFinance.identifier]: new VyFinance(this.requestConfig),
