@@ -6,7 +6,7 @@ import { SundaeSwapV1 } from '../sundaeswap-v1';
 import { RequestConfig } from '@app/types';
 import { appendSlash } from '@app/utils';
 
-export class SundaeSwapApi extends BaseApi {
+export class SundaeSwapV1Api extends BaseApi {
 
     protected readonly api: AxiosInstance;
     protected readonly dex: SundaeSwapV1;
