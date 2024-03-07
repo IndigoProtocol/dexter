@@ -2,7 +2,6 @@ import { BaseApi } from './base-api';
 import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
-import { SundaeSwapV1 } from '../sundaeswap-v1';
 import { RequestConfig } from '@app/types';
 import { appendSlash } from '@app/utils';
 import { SundaeSwapV3 } from '@dex/sundaeswap-v3';
@@ -25,90 +24,99 @@ export class SundaeSwapV3Api extends BaseApi {
         });
     }
 
-    liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
-        const maxPerPage: number = 100;
-
+    async liquidityPools(assetA: Token, assetB?: Token): Promise<LiquidityPool[]> {
         const assetAId: string = (assetA === 'lovelace')
-            ? ''
+            ? 'ada.lovelace'
             : assetA.identifier('.');
-        let assetBId: string = (assetB && assetB !== 'lovelace')
+        const assetBId: string = (assetB && assetB !== 'lovelace')
             ? assetB.identifier('.')
-            : '';
+            : 'ada.lovelace';
+        const assets: string[] = [assetAId, assetBId].sort();
 
-        const getPaginatedResponse = (page: number): Promise<LiquidityPool[]> => {
-            return this.api.post('', {
-                operationName: 'getPoolsByAssetIds',
-                query: `
-                    query getPoolsByAssetIds($assetIds: [String!]!, $pageSize: Int, $page: Int) {
-                        pools(assetIds: $assetIds, pageSize: $pageSize, page: $page) {
-                            ...PoolFragment
+        return await this.api.post('', {
+            operationName: 'fetchPoolsByPair',
+            query: `
+                query fetchPoolsByPair($assetA: ID!, $assetB: ID!) { 
+                    pools {
+                        byPair(assetA: $assetA, assetB: $assetB) {
+                            ...PoolBrambleFragment
                         }
                     }
-                    fragment PoolFragment on Pool {
-                        assetA {
-                            ...AssetFragment
-                        }
-                        assetB {
-                            ...AssetFragment
-                        }
-                        assetLP {
-                            ...AssetFragment
-                        }
-                        name
-                        fee
-                        quantityA
-                        quantityB
-                        quantityLP
-                        ident
-                        assetID
+                }
+                fragment PoolBrambleFragment on Pool {
+                  id
+                  assetA {
+                    ...AssetBrambleFragment
+                  }
+                  assetB {
+                    ...AssetBrambleFragment
+                  }
+                  assetLP {
+                    ...AssetBrambleFragment
+                  }
+                  feesFinalized {
+                    slot
+                  }
+                  marketOpen {
+                    slot
+                  }
+                  openingFee
+                  finalFee
+                  current {
+                    quantityA {
+                      quantity
                     }
-                    fragment AssetFragment on Asset {
-                        assetId
-                        decimals
+                    quantityB {
+                      quantity
                     }
-                `,
-                variables: {
-                    page: page,
-                    pageSize: maxPerPage,
-                    assetIds: [assetBId !== '' ? assetBId : assetAId],
-                },
-            }).then((response: any) => {
-                const pools = response.data.data.pools;
-                const liquidityPools = pools.map((pool: any) => {
+                    quantityLP {
+                      quantity
+                    }
+                    tvl {
+                      quantity
+                    }
+                  }
+                  version
+                }
+                fragment AssetBrambleFragment on Asset {
+                  id
+                  decimals
+                }
+            `,
+            variables: {
+                assetA: assets[0],
+                assetB: assets[1],
+            },
+        }).then((response: any) => {
+            const pools = response.data.data.pools.byPair;
+
+            return pools
+                .filter((pool: any) => pool.version === 'V3')
+                .map((pool: any) => {
                     let liquidityPool: LiquidityPool = new LiquidityPool(
-                        SundaeSwapV1.identifier,
-                        pool.assetA.assetId
-                            ? Asset.fromIdentifier(pool.assetA.assetId, pool.assetA.decimals)
-                            : 'lovelace',
-                        pool.assetB.assetId
-                            ? Asset.fromIdentifier(pool.assetB.assetId, pool.assetB.decimals)
-                            : 'lovelace',
-                        BigInt(pool.quantityA),
-                        BigInt(pool.quantityB),
+                        SundaeSwapV3.identifier,
+                        pool.assetA.id === 'ada.lovelace'
+                            ? 'lovelace'
+                            : Asset.fromIdentifier(pool.assetA.id, pool.assetA.decimals),
+                        pool.assetB.id === 'ada.lovelace'
+                            ? 'lovelace'
+                            : Asset.fromIdentifier(pool.assetB.id, pool.assetB.decimals),
+                        BigInt(pool.current.quantityA),
+                        BigInt(pool.current.quantityB),
                         this.dex.poolAddress,
                         this.dex.orderAddress,
                         this.dex.orderAddress,
                     );
 
-                    liquidityPool.identifier = pool.ident;
-                    liquidityPool.lpToken = Asset.fromIdentifier(pool.assetLP.assetId);
-                    liquidityPool.poolFeePercent = Number(pool.fee);
-                    liquidityPool.totalLpTokens = BigInt(pool.quantityLP);
+                    liquidityPool.identifier = pool.id;
+                    liquidityPool.lpToken = Asset.fromIdentifier(pool.assetLP.id);
+                    liquidityPool.poolFeePercent = Number((pool.openingFee[0] / pool.openingFee[1]) * 100);
+                    liquidityPool.totalLpTokens = BigInt(pool.current.quantityLP.quantity);
 
                     return liquidityPool;
                 });
+        });
 
-                if (pools.length < maxPerPage) {
-                    return liquidityPools;
-                }
-
-                return getPaginatedResponse(page + 1).then((nextPagePools: LiquidityPool[]) => {
-                    return liquidityPools.concat(nextPagePools);
-                });
-            });
-        };
-
-        return getPaginatedResponse(0);
     }
 
 }

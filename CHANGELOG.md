@@ -2,6 +2,9 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [UNRELEASED]
+- SundaeSwap v3 implementation
+
 ## [v5.1.0]
 - Fix cancelling orders for each DEX
 - Add new split cancel order request
