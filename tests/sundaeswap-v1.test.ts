@@ -2,7 +2,7 @@ import {
     Asset,
     Dexter,
     LiquidityPool,
-    SundaeSwap,
+    SundaeSwapV1,
     MockDataProvider,
     SwapRequest,
     MockWalletProvider,
@@ -13,7 +13,7 @@ import {
     UTxO,
 } from '../src';
 
-describe('SundaeSwap', () => {
+describe('SundaeSwapV1', () => {
 
     const walletProvider: MockWalletProvider = new MockWalletProvider();
     walletProvider.loadWalletFromSeedPhrase(['']);
@@ -25,7 +25,7 @@ describe('SundaeSwap', () => {
     describe('Set Swap In', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            SundaeSwap.identifier,
+            SundaeSwapV1.identifier,
             'lovelace',
             asset,
             3699642000000n,
@@ -48,7 +48,7 @@ describe('SundaeSwap', () => {
         });
 
         it('Can build swap order', () => {
-            const sundaeswap: SundaeSwap = new SundaeSwap();
+            const sundaeswap: SundaeSwapV1 = new SundaeSwapV1();
             const defaultSwapParameters: DatumParameters = {
                 [DatumParameterKey.PoolIdentifier]: '1234',
                 [DatumParameterKey.SenderPubKeyHash]: walletProvider.publicKeyHash(),
@@ -77,7 +77,7 @@ describe('SundaeSwap', () => {
     describe('Set Swap Out', () => {
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            SundaeSwap.identifier,
+            SundaeSwapV1.identifier,
             'lovelace',
             asset,
             1032791394311n,
@@ -99,10 +99,11 @@ describe('SundaeSwap', () => {
     });
 
     describe('SundaeSwap Cancel Order', () => {
-        let sundaeswap: SundaeSwap;
+        let sundaeswap: SundaeSwapV1;
         const returnAddress = 'addr1';
+
         beforeEach(() => {
-            sundaeswap = new SundaeSwap();
+            sundaeswap = new SundaeSwapV1();
         });
 
         it('should successfully cancel an order', async () => {

@@ -56,7 +56,7 @@ export abstract class BaseDex {
     /**
      * Fees associated with submitting a swap order.
      */
-    abstract swapOrderFees(): SwapFee[];
+    abstract swapOrderFees(liquidityPool?: LiquidityPool, swapInToken?: Token, swapInAmount?: bigint): SwapFee[];
 
     /**
      * Adjust the payment for the DEX order address to include the swap in amount.

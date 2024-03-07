@@ -34,6 +34,10 @@ export enum DatumParameterKey {
     BatcherFee = 'BatcherFee',
     DepositFee = 'DepositFee',
     ScooperFee = 'ScooperFee',
+    OpeningFee = 'OpeningFee',
+    FinalFee = 'FinalFee',
+    FeesFinalized = 'FeesFinalized',
+    MarketOpen = 'MarketOpen',
 
     /**
      * LP info.
