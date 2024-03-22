@@ -2,6 +2,9 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [v5.2.0]
+- Add `withMinimumReceive(minReceive: bigint)` to SwapRequest
+
 ## [v5.1.0]
 - Fix cancelling orders for each DEX
 - Add new split cancel order request
