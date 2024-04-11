@@ -23,7 +23,7 @@ import { SundaeSwapV3Api } from '@dex/api/sundaeswap-v3-api';
 
 export class SundaeSwapV3 extends BaseDex {
 
-    public static readonly identifier: string = 'SundaeSwapV1';
+    public static readonly identifier: string = 'SundaeSwapV3';
     public readonly api: BaseApi;
 
     /**
