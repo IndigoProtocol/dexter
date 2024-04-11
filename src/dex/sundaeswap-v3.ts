@@ -184,7 +184,7 @@ export class SundaeSwapV3 extends BaseDex {
                         },
                     ],
                     datum: datumBuilder.getCbor(),
-                    isInlineDatum: false,
+                    isInlineDatum: true,
                     spendUtxos: spendUtxos,
                 }
             )
