@@ -41,6 +41,7 @@ export * from './dex/models/dex-transaction';
 export * from './dex/base-dex';
 export * from './dex/minswap';
 export * from './dex/sundaeswap-v1';
+export * from './dex/sundaeswap-v3';
 export * from './dex/muesliswap';
 export * from './dex/wingriders';
 export * from './dex/vyfinance';
