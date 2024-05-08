@@ -1,48 +1,35 @@
 import { DatumParameterKey } from '@app/constants';
+import { DefinitionField, DefinitionList } from '@app/types';
 
 export default {
   constructor: 0,
   fields: [
     {
-      bytes: DatumParameterKey.PoolIdentifier
+      bytes: DatumParameterKey.PoolIdentifier,
     },
-    [
-      [
+    {
+      list: [
         {
-          bytes: DatumParameterKey.PoolAssetAPolicyId
+          list: [{ bytes: DatumParameterKey.PoolAssetAPolicyId }, { bytes: DatumParameterKey.PoolAssetAAssetName }] as DefinitionList,
         },
         {
-          bytes: DatumParameterKey.PoolAssetAAssetName
-        }
-      ],
-      [
-        {
-          bytes: DatumParameterKey.PoolAssetBPolicyId
+          list: [{ bytes: DatumParameterKey.PoolAssetBPolicyId }, { bytes: DatumParameterKey.PoolAssetBAssetName }] as DefinitionList,
         },
-        {
-          bytes: DatumParameterKey.PoolAssetBAssetName
-        }
-      ]
-    ],
-    {
-      int: DatumParameterKey.TotalLpTokens
+      ] as unknown as DefinitionList,
     },
-    [
-      {
-        int: DatumParameterKey.OpeningFee
-      },
-      {
-        int: DatumParameterKey.FinalFee
-      }
-    ],
+    { int: DatumParameterKey.TotalLpTokens },
     {
-      int: DatumParameterKey.FeesFinalized
+      list: [{ int: DatumParameterKey.OpeningFee }, { int: DatumParameterKey.FinalFee }] as DefinitionList, // Need to confirm these?
     },
     {
-      int: DatumParameterKey.MarketOpen
+      list: [{ int: DatumParameterKey.OpeningFee }, { int: DatumParameterKey.FinalFee }] as DefinitionList, // Need to confirm these?
     },
     {
-      int: "36925460726"
-    }
-  ]
-}
+      fields: [],
+      constructor: 1,
+    },
+    { int: DatumParameterKey.MarketOpen },
+    { int: DatumParameterKey.FeesFinalized },
+    { int: DatumParameterKey.ProtocolFee },
+  ] as DefinitionField[],
+};

@@ -5,154 +5,158 @@ import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Script } from 'lucid-cardano';
 
 export interface DexterConfig {
-    shouldFetchMetadata?: boolean,
-    shouldFallbackToApi?: boolean,
-    shouldSubmitOrders?: boolean,
-    metadataMsgBranding?: string,
+  shouldFetchMetadata?: boolean;
+  shouldFallbackToApi?: boolean;
+  shouldSubmitOrders?: boolean;
+  metadataMsgBranding?: string;
 }
 
 export interface RequestConfig {
-    timeout?: number,
-    proxyUrl?: string,
-    retries?: number,
+  timeout?: number;
+  proxyUrl?: string;
+  retries?: number;
 }
 
 export interface BlockfrostConfig {
-    url: string,
-    projectId: string,
+  url: string;
+  projectId: string;
 }
 
 export interface KupoConfig {
-    url: string,
+  url: string;
 }
 
 export interface KupmiosConfig {
-    kupoUrl: string,
-    ogmiosUrl: string,
+  kupoUrl: string;
+  ogmiosUrl: string;
 }
 
 export type AvailableDexs = {
-    [dex: string]: BaseDex,
-}
+  [dex: string]: BaseDex;
+};
 
 export type DatumParameters = {
-    [key in DatumParameterKey | string]?: string | number | bigint
-}
+  [key in DatumParameterKey | string]?: string | number | bigint;
+};
 
 export type AssetBalance = {
-    asset: Token,
-    quantity: bigint,
-}
+  asset: Token;
+  quantity: bigint;
+};
 
 export type UTxO = {
-    txHash: string,
-    address: string,
-    datumHash: string,
-    datum?: string,
-    outputIndex: number,
-    assetBalances: AssetBalance[],
+  txHash: string;
+  address: string;
+  datumHash: string;
+  datum?: string;
+  outputIndex: number;
+  assetBalances: AssetBalance[];
 };
 
 export type Transaction = {
-    hash: string,
-    inputs: UTxO[],
-    outputs: UTxO[],
+  hash: string;
+  inputs: UTxO[];
+  outputs: UTxO[];
 };
 
 export type AssetAddress = {
-    address: string,
-    quantity: bigint,
-}
+  address: string;
+  quantity: bigint;
+};
 
 export type DefinitionBytes = {
-    bytes: string | DatumParameterKey,
-}
+  bytes: string | DatumParameterKey;
+};
 
 export type DefinitionInt = {
-    int: number | DatumParameterKey,
-}
+  int: number | DatumParameterKey;
+};
 
-export type DefinitionField = DefinitionConstr | DefinitionBytes | DefinitionInt | DefinitionField[] | Function
+export type DefinitionField = DefinitionConstr | DefinitionBytes | DefinitionInt | DefinitionField[] | DefinitionList | DefinitionList[] | Function;
+export type DefinitionList = DefinitionBytes | DefinitionInt | DefinitionList[] | Function;
 
 export type DefinitionConstr = {
-    constructor: number | DatumParameterKey,
-    fields: DefinitionField[],
-}
+  constructor: number | DatumParameterKey;
+  fields: DefinitionField[];
+};
 
 export type WalletOptions = {
-    addressType?: AddressType,
-    accountIndex?: number,
-}
+  addressType?: AddressType;
+  accountIndex?: number;
+};
 
 export type SpendUTxO = {
-    utxo: UTxO,
-    redeemer?: string,
-    validator?: Script,
-    signer?: string,
+  utxo: UTxO;
+  redeemer?: string;
+  validator?: Script;
+  signer?: string;
 };
 
 export type PayToAddress = {
-    address: string,
-    addressType: AddressType,
-    assetBalances: AssetBalance[],
-    spendUtxos?: SpendUTxO[],
-    datum?: string,
-    isInlineDatum: boolean,
+  address: string;
+  addressType: AddressType;
+  assetBalances: AssetBalance[];
+  spendUtxos?: SpendUTxO[];
+  datum?: string;
+  isInlineDatum: boolean;
 };
 
 export type SwapFee = {
-    id: string,
-    title: string,
-    description: string,
-    value: bigint,
-    isReturned: boolean,
+  id: string;
+  title: string;
+  description: string;
+  value: bigint;
+  isReturned: boolean;
 };
 
 export type SwapInAmountMapping = {
-    swapInAmount: bigint,
-    liquidityPool: LiquidityPool,
-}
+  swapInAmount: bigint;
+  liquidityPool: LiquidityPool;
+};
 
 export type SwapOutAmountMapping = {
-    swapOutAmount: bigint,
-    liquidityPool: LiquidityPool,
-}
+  swapOutAmount: bigint;
+  liquidityPool: LiquidityPool;
+};
 
 export type SplitCancelSwapMapping = {
-    txHash: string,
-    dex: string,
-}
+  txHash: string;
+  dex: string;
+};
 
 export type DexTransactionError = {
-    step: TransactionStatus,
-    reason: string,
-    reasonRaw: string,
+  step: TransactionStatus;
+  reason: string;
+  reasonRaw: string;
 };
 
 export type AssetMetadata = {
-    policyId: string,
-    nameHex: string,
-    decimals: number,
+  policyId: string;
+  nameHex: string;
+  decimals: number;
 };
 
 export type Cip30Api = {
-    getNetworkId(): Promise<number>;
-    getUtxos(): Promise<string[] | undefined>;
-    getBalance(): Promise<string>;
-    getUsedAddresses(): Promise<string[]>;
-    getUnusedAddresses(): Promise<string[]>;
-    getChangeAddress(): Promise<string>;
-    getRewardAddresses(): Promise<string[]>;
-    signTx(tx: string, partialSign: boolean): Promise<string>;
-    signData(address: string, payload: string): Promise<{
-        signature: string;
-        key: string;
-    }>;
-    submitTx(tx: string): Promise<string>;
+  getNetworkId(): Promise<number>;
+  getUtxos(): Promise<string[] | undefined>;
+  getBalance(): Promise<string>;
+  getUsedAddresses(): Promise<string[]>;
+  getUnusedAddresses(): Promise<string[]>;
+  getChangeAddress(): Promise<string>;
+  getRewardAddresses(): Promise<string[]>;
+  signTx(tx: string, partialSign: boolean): Promise<string>;
+  signData(
+    address: string,
+    payload: string
+  ): Promise<{
+    signature: string;
+    key: string;
+  }>;
+  submitTx(tx: string): Promise<string>;
+  getCollateral(): Promise<string[]>;
+  experimental: {
     getCollateral(): Promise<string[]>;
-    experimental: {
-        getCollateral(): Promise<string[]>;
-        on(eventName: string, callback: (...args: unknown[]) => void): void;
-        off(eventName: string, callback: (...args: unknown[]) => void): void;
-    };
+    on(eventName: string, callback: (...args: unknown[]) => void): void;
+    off(eventName: string, callback: (...args: unknown[]) => void): void;
+  };
 };
