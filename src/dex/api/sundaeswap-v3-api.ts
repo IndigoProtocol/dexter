@@ -104,8 +104,8 @@ export class SundaeSwapV3Api extends BaseApi {
                         BigInt(pool.current.quantityA),
                         BigInt(pool.current.quantityB),
                         this.dex.poolAddress,
-                        this.dex.orderAddress,
-                        this.dex.orderAddress,
+                        this.dex.getDynamicOrderAddress(''), // TODO Need to get sender stake key hash.
+                        this.dex.getDynamicOrderAddress(''), // TODO Need to get sender stake key hash.
                     );
 
                     liquidityPool.identifier = pool.id;
