@@ -21,9 +21,8 @@ export class SundaeSwapV3 extends BaseDex {
     /**
      * On-Chain constants.
      */
-    public readonly poolAddress: string = 'addr1xyzpy0vxwfqwh0m8qvchgj06qcreee687ztsvaeks08srk6cg0uvjyu9nr727qnsc2ljadfkldrtqdp3ehnyyavpz9uq58yqg9';
+    public readonly poolAddress: string = 'addr1x8srqftqemf0mjlukfszd97ljuxdp44r372txfcr75wrz26rnxqnmtv3hdu2t6chcfhl2zzjh36a87nmd6dwsu3jenqsslnz7e';
     public readonly lpTokenPolicyId: string = 'e0302560ced2fdcbfcb2602697df970cd0d6a38f94b32703f51c312b';
-    public readonly validityTokenPolicyId: string = '04123d867240ebbf6703317449fa06079ce747f09706773683cf01db';
     public readonly cancelDatum: string = 'd87a80';
     public readonly orderScript: Script = {
         type: 'PlutusV2',
@@ -65,7 +64,7 @@ export class SundaeSwapV3 extends BaseDex {
         const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
           const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier();
 
-          return !assetBalanceId.startsWith(this.validityTokenPolicyId);
+          return !assetBalanceId.startsWith(this.lpTokenPolicyId);
         });
 
         // Irrelevant UTxO
