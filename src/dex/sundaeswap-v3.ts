@@ -78,18 +78,29 @@ export class SundaeSwapV3 extends BaseDex {
         const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
         const orderAddress: string = wallet ? this.getDynamicOrderAddress(wallet?.stakingKeyHash()) : '';
 
-        const liquidityPool: LiquidityPool = new LiquidityPool(
-            SundaeSwapV3.identifier,
-            relevantAssets[assetAIndex].asset,
-            relevantAssets[assetBIndex].asset,
-            relevantAssets[assetAIndex].quantity,
-            relevantAssets[assetBIndex].quantity,
-            utxo.address,
-            orderAddress,
-            orderAddress
-        );
-
         try {
+            const builder: DefinitionBuilder = await new DefinitionBuilder().loadDefinition(pool);
+            const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
+            const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+
+            const reservesA: bigint = relevantAssets[assetAIndex].asset === 'lovelace'
+                ? relevantAssets[assetAIndex].quantity - BigInt((parameters.ProtocolFee ?? 0) as number)
+                : relevantAssets[assetAIndex].quantity;
+            const reservesB: bigint = relevantAssets[assetBIndex].asset === 'lovelace'
+                ? relevantAssets[assetBIndex].quantity - BigInt((parameters.ProtocolFee ?? 0) as number)
+                : relevantAssets[assetBIndex].quantity;
+
+            const liquidityPool: LiquidityPool = new LiquidityPool(
+                SundaeSwapV3.identifier,
+                relevantAssets[assetAIndex].asset,
+                relevantAssets[assetBIndex].asset,
+                reservesA,
+                reservesB,
+                utxo.address,
+                orderAddress,
+                orderAddress
+            );
+
             const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
                 return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
             })?.asset as Asset;
@@ -100,22 +111,16 @@ export class SundaeSwapV3 extends BaseDex {
                 liquidityPool.identifier = lpToken.identifier();
             }
 
-            const builder: DefinitionBuilder = await new DefinitionBuilder().loadDefinition(pool);
-            const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-            const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
-
             liquidityPool.lpToken = lpToken;
             liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string' ? parameters.PoolIdentifier : '';
             liquidityPool.poolFeePercent = typeof parameters.OpeningFee === 'number' ? (parameters.OpeningFee / 10_000) * 100 : 0;
             liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number' ? BigInt(parameters.TotalLpTokens) : 0n;
             liquidityPool.extra.protocolFee = typeof parameters.ProtocolFee === 'number' ? parameters.ProtocolFee : this.protocolFeeDefault;
-
-
         } catch (e) {
-            return liquidityPool;
+            return undefined;
         }
 
-        return liquidityPool;
+        return undefined;
     }
 
     estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
