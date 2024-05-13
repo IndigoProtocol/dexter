@@ -111,6 +111,7 @@ export class SundaeSwapV1 extends BaseDex {
             const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
             const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
 
+            liquidityPool.lpToken = lpToken;
             liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string'
                 ? parameters.PoolIdentifier
                 : '';

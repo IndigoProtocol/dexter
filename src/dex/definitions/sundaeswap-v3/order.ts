@@ -1,7 +1,6 @@
 import { DatumParameterKey } from '@app/constants';
-import { DefinitionField } from '@app/types';
 
-const datum = {
+export default {
   constructor: 0,
   fields: [
     {
@@ -93,7 +92,5 @@ const datum = {
     {
       bytes: DatumParameterKey.CancelDatum,
     },
-  ] as DefinitionField[],
+  ],
 };
-
-export default datum;

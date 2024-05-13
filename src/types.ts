@@ -72,8 +72,11 @@ export type DefinitionInt = {
   int: number | DatumParameterKey;
 };
 
-export type DefinitionField = DefinitionConstr | DefinitionBytes | DefinitionInt | DefinitionField[] | DefinitionList | DefinitionList[] | Function;
-export type DefinitionList = DefinitionBytes | DefinitionInt | DefinitionList[] | Function;
+export type DefinitionList = {
+  list: DefinitionField[] | DefinitionList[];
+};
+
+export type DefinitionField = DefinitionConstr | DefinitionBytes | DefinitionInt | DefinitionList| Function | DefinitionField[];
 
 export type DefinitionConstr = {
   constructor: number | DatumParameterKey;

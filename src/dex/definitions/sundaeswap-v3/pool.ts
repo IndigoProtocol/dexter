@@ -1,5 +1,4 @@
 import { DatumParameterKey } from '@app/constants';
-import { DefinitionField, DefinitionList } from '@app/types';
 
 export default {
   constructor: 0,
@@ -10,26 +9,62 @@ export default {
     {
       list: [
         {
-          list: [{ bytes: DatumParameterKey.PoolAssetAPolicyId }, { bytes: DatumParameterKey.PoolAssetAAssetName }] as DefinitionList,
+          list: [
+            {
+              bytes: DatumParameterKey.PoolAssetAPolicyId
+            },
+            {
+              bytes: DatumParameterKey.PoolAssetAAssetName
+            }
+          ],
         },
         {
-          list: [{ bytes: DatumParameterKey.PoolAssetBPolicyId }, { bytes: DatumParameterKey.PoolAssetBAssetName }] as DefinitionList,
+          list: [
+            {
+              bytes: DatumParameterKey.PoolAssetBPolicyId
+            },
+            {
+              bytes: DatumParameterKey.PoolAssetBAssetName
+            }
+          ],
         },
-      ] as unknown as DefinitionList,
-    },
-    { int: DatumParameterKey.TotalLpTokens },
-    {
-      list: [{ int: DatumParameterKey.OpeningFee }, { int: DatumParameterKey.FinalFee }] as DefinitionList, // Need to confirm these?
+      ],
     },
     {
-      list: [{ int: DatumParameterKey.OpeningFee }, { int: DatumParameterKey.FinalFee }] as DefinitionList, // Need to confirm these?
+      int: DatumParameterKey.TotalLpTokens
+    },
+    {
+      list: [
+        {
+          int: DatumParameterKey.OpeningFee
+        },
+        {
+          int: DatumParameterKey.FinalFee
+        }
+      ],
+    },
+    {
+      list: [
+        {
+          int: DatumParameterKey.OpeningFee
+        },
+        {
+          int: DatumParameterKey.FinalFee
+        }
+      ],
     },
     {
       fields: [],
       constructor: 1,
     },
-    { int: DatumParameterKey.MarketOpen },
-    { int: DatumParameterKey.FeesFinalized },
-    { int: DatumParameterKey.ProtocolFee },
-  ] as DefinitionField[],
+    {
+      int: DatumParameterKey.MarketOpen
+    },
+    {
+      int: DatumParameterKey.FeesFinalized
+    },
+    {
+      int: DatumParameterKey.ProtocolFee
+    },
+  ],
 };
