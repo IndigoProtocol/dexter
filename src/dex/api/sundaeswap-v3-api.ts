@@ -17,7 +17,7 @@ export class SundaeSwapV3Api extends BaseApi {
         this.dex = dex;
         this.api = axios.create({
             timeout: requestConfig.timeout,
-            baseURL: `${appendSlash(requestConfig.proxyUrl)}https://stats.sundaeswap.finance/graphql`,
+            baseURL: `${appendSlash(requestConfig.proxyUrl)}https://api.sundae.fi/graphql`,
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -34,15 +34,16 @@ export class SundaeSwapV3Api extends BaseApi {
         const assets: string[] = [assetAId, assetBId].sort();
 
         return await this.api.post('', {
-            operationName: 'fetchPoolsByPair',
+            operationName: 'fetchPoolByAssets',
             query: `
-                query fetchPoolsByPair($assetA: ID!, $assetB: ID!) { 
-                    pools {
-                        byPair(assetA: $assetA, assetB: $assetB) {
-                            ...PoolBrambleFragment
-                        }
+                query fetchPoolByAssets($assets: [ID!]!) {
+                  pools {
+                    byAssets(assets: $assets) {
+                      ...PoolBrambleFragment
                     }
+                  }
                 }
+                
                 fragment PoolBrambleFragment on Pool {
                   id
                   assetA {
@@ -78,9 +79,30 @@ export class SundaeSwapV3Api extends BaseApi {
                   }
                   version
                 }
+                
                 fragment AssetBrambleFragment on Asset {
                   id
+                  policyId
+                  description
+                  dateListed {
+                    format
+                  }
                   decimals
+                  ticker
+                  name
+                  logo
+                  assetName
+                  metadata {
+                    ... on OnChainLabel20 {
+                      __typename
+                    }
+                    ... on OnChainLabel721 {
+                      __typename
+                    }
+                    ... on CardanoTokenRegistry {
+                      __typename
+                    }
+                  }
                 }
             `,
             variables: {
