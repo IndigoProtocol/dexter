@@ -15,15 +15,15 @@ import {
 import { DefinitionBuilder } from '@app/definition-builder';
 import { correspondingReserves, tokensMatch } from '@app/utils';
 import { AddressType, DatumParameterKey } from '@app/constants';
-import pool from '@dex/definitions/sundaeswap/pool';
-import order from '@dex/definitions/sundaeswap/order';
+import pool from '@dex/definitions/sundaeswap-v1/pool';
+import order from '@dex/definitions/sundaeswap-v1/order';
 import { BaseApi } from '@dex/api/base-api';
-import { SundaeSwapApi } from '@dex/api/sundaeswap-api';
+import { SundaeSwapV1Api } from '@dex/api/sundaeswap-v1-api';
 import { Script } from 'lucid-cardano';
 
-export class SundaeSwap extends BaseDex {
+export class SundaeSwapV1 extends BaseDex {
 
-    public static readonly identifier: string = 'SundaeSwap';
+    public static readonly identifier: string = 'SundaeSwapV1';
     public readonly api: BaseApi;
 
     /**
@@ -41,7 +41,7 @@ export class SundaeSwap extends BaseDex {
     constructor(requestConfig: RequestConfig = {}) {
         super();
 
-        this.api = new SundaeSwapApi(this, requestConfig);
+        this.api = new SundaeSwapV1Api(this, requestConfig);
     }
 
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
@@ -84,7 +84,7 @@ export class SundaeSwap extends BaseDex {
         const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
 
         const liquidityPool: LiquidityPool = new LiquidityPool(
-            SundaeSwap.identifier,
+            SundaeSwapV1.identifier,
             relevantAssets[assetAIndex].asset,
             relevantAssets[assetBIndex].asset,
             relevantAssets[assetAIndex].quantity,
@@ -111,6 +111,7 @@ export class SundaeSwap extends BaseDex {
             const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
             const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
 
+            liquidityPool.lpToken = lpToken;
             liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string'
                 ? parameters.PoolIdentifier
                 : '';
