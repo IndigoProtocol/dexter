@@ -1,4 +1,5 @@
 import { DatumParameterKey } from '@app/constants';
+import { DatumParameters, DefinitionField } from '@app/types';
 
 export default {
   constructor: 0,
@@ -34,37 +35,13 @@ export default {
       int: DatumParameterKey.TotalLpTokens
     },
     {
-      list: [
-        {
-          int: DatumParameterKey.OpeningFee
-        },
-        {
-          int: DatumParameterKey.FinalFee
-        }
-      ],
+      int: DatumParameterKey.OpeningFee
     },
     {
-      list: [
-        {
-          int: DatumParameterKey.OpeningFee
-        },
-        {
-          int: DatumParameterKey.FinalFee
-        }
-      ],
+      int: DatumParameterKey.FinalFee
     },
-    {
-      fields: [],
-      constructor: 1,
-    },
-    {
-      int: DatumParameterKey.MarketOpen
-    },
-    {
-      int: DatumParameterKey.FeesFinalized
-    },
-    {
-      int: DatumParameterKey.ProtocolFee
+    (field: DefinitionField, parameters: DatumParameters, shouldExtract: boolean = true) => {
+      return;
     },
   ],
 };
