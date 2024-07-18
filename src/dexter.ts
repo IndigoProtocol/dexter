@@ -18,6 +18,7 @@ import { SplitSwapRequest } from '@requests/split-swap-request';
 import { TeddySwap } from '@dex/teddyswap';
 import { Spectrum } from '@dex/spectrum';
 import { SplitCancelSwapRequest } from '@requests/split-cancel-swap-request';
+import { MinswapV2 } from '@dex/minswap-v2';
 
 export class Dexter {
 
@@ -58,6 +59,7 @@ export class Dexter {
         this.metadataProvider = new TokenRegistryProvider(this.requestConfig);
         this.availableDexs = {
             [Minswap.identifier]: new Minswap(this.requestConfig),
+            [MinswapV2.identifier]: new MinswapV2(this.requestConfig),
             [SundaeSwap.identifier]: new SundaeSwap(this.requestConfig),
             [MuesliSwap.identifier]: new MuesliSwap(this.requestConfig),
             [WingRiders.identifier]: new WingRiders(this.requestConfig),

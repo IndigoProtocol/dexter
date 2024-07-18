@@ -40,6 +40,7 @@ export * from './dex/models/dex-transaction';
 
 export * from './dex/base-dex';
 export * from './dex/minswap';
+export * from './dex/minswap-v2';
 export * from './dex/sundaeswap';
 export * from './dex/muesliswap';
 export * from './dex/wingriders';

@@ -1,5 +1,8 @@
 import { Token } from '@dex/models/asset';
 import { LiquidityPool } from '@dex/models/liquidity-pool';
+import { Lucid, Utils } from 'lucid-cardano';
+
+export const lucidUtils: Utils = new Utils(new Lucid());
 
 export function tokensMatch(tokenA: Token, tokenB: Token): boolean {
     const tokenAId: string = tokenA === 'lovelace' ? 'lovelace' : tokenA.identifier();

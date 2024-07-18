@@ -109,6 +109,8 @@ export class DefinitionBuilder {
      * Recursively pull parameters from datum using definition template.
      */
     private extractParameters(definedDefinition: DefinitionField, templateDefinition: DefinitionField, foundParameters: DatumParameters = {}): DatumParameters {
+        if (! templateDefinition) return foundParameters;
+
         if (templateDefinition instanceof Function) {
             templateDefinition(definedDefinition, foundParameters);
 

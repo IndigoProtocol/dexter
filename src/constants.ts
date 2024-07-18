@@ -9,6 +9,8 @@ export enum DatumParameterKey {
     Action = 'Action',
     TokenPolicyId = 'TokenPolicyId',
     TokenAssetName = 'TokenAssetName',
+    ReserveA = 'ReserveA',
+    ReserveB = 'ReserveB',
 
     /**
      * Swap/wallet info.
@@ -34,6 +36,8 @@ export enum DatumParameterKey {
     BatcherFee = 'BatcherFee',
     DepositFee = 'DepositFee',
     ScooperFee = 'ScooperFee',
+    BaseFee = 'BaseFee',
+    FeeSharingNumerator = 'FeeSharingNumerator',
 
     /**
      * LP info.

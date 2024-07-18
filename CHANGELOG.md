@@ -2,6 +2,9 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [UNRELEASED]
+- Minswap v2 integration
+
 ## [v5.2.0]
 - Add `withMinimumReceive(minReceive: bigint)` to SwapRequest
 
