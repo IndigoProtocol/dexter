@@ -114,7 +114,7 @@ export default {
           int: DatumParameterKey.MinReceive
         },
         {
-          constructor: 0,
+          constructor: DatumParameterKey.FireOrKill,
           fields: []
         }
       ]
