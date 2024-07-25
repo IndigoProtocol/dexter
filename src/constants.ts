@@ -28,6 +28,7 @@ export enum DatumParameterKey {
     MinReceive = 'MinReceive',
     Expiration = 'Expiration',
     AllowPartialFill = 'AllowPartialFill',
+    FireOrKill = 'FireOrKill',
 
     /**
      * Trading fees.
@@ -38,6 +39,7 @@ export enum DatumParameterKey {
     ScooperFee = 'ScooperFee',
     BaseFee = 'BaseFee',
     FeeSharingNumerator = 'FeeSharingNumerator',
+    FeePaymentKeyHash = 'FeePaymentKeyHash',
 
     /**
      * LP info.
@@ -62,6 +64,8 @@ export enum DatumParameterKey {
     RequestScriptHash = 'RequestScriptHash',
     StakeAdminPolicy = 'StakeAdminPolicy',
     LqBound = 'LqBound',
+
+    Unknown = 'Unknown',
 }
 
 export enum TransactionStatus {

@@ -192,6 +192,7 @@ export class MinswapV2 extends BaseDex {
             [DatumParameterKey.BatcherFee]: batcherFee.value,
             [DatumParameterKey.LpTokenPolicyId]: liquidityPool.lpToken.policyId,
             [DatumParameterKey.LpTokenAssetName]: liquidityPool.lpToken.nameHex,
+            [DatumParameterKey.FireOrKill]: 0,
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
