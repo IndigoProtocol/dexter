@@ -99,7 +99,7 @@ export default {
       constructor: 0,
       fields: [
         {
-          constructor: 1,
+          constructor: 0,
           fields: []
         },
         {
