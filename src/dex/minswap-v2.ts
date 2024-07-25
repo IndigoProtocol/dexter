@@ -187,11 +187,18 @@ export class MinswapV2 extends BaseDex {
             return Promise.reject('Parameters for datum are not set.');
         }
 
+        const swapInToken: string = (swapParameters.SwapInTokenPolicyId as string) + (swapParameters.SwapInTokenAssetName as string);
+        const swapOutToken: string = (swapParameters.SwapOutTokenPolicyId as string) + (swapParameters.SwapOutTokenAssetName as string);
+        const swapDirection: number = [swapInToken, swapOutToken].sort((a: string, b: string) => {
+            return a.localeCompare(b);
+        })[0] === swapInToken ? 1 : 0;
+
         swapParameters = {
             ...swapParameters,
             [DatumParameterKey.BatcherFee]: batcherFee.value,
             [DatumParameterKey.LpTokenPolicyId]: liquidityPool.lpToken.policyId,
             [DatumParameterKey.LpTokenAssetName]: liquidityPool.lpToken.nameHex,
+            [DatumParameterKey.Direction]: swapDirection,
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();

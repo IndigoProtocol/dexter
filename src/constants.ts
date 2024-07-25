@@ -28,6 +28,7 @@ export enum DatumParameterKey {
     MinReceive = 'MinReceive',
     Expiration = 'Expiration',
     AllowPartialFill = 'AllowPartialFill',
+    Direction = 'Direction',
 
     /**
      * Trading fees.
