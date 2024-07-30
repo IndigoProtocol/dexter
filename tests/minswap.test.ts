@@ -72,7 +72,7 @@ describe('Minswap', () => {
                     expect(() => { minswap.buildSwapOrder(liquidityPool, defaultSwapParameters); }).not.toThrowError();
                     expect(payments[0].addressType).toBe(AddressType.Contract);
                     expect(payments[0].assetBalances[0].quantity).toEqual(10000004000000n);
-                    expect(payments[0].datum).toBe('d8799fd8799fd8799f42ed56ffd8799fd8799fd8799f42bac6ffffffffd8799fd8799f42ed56ffd8799fd8799fd8799f42bac6ffffffffd87a80d8799fd8799f581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b698804469555344ff1b00004d616c553b2dff1a001e84801a001e8480ff');
+                    expect(payments[0].datum).toBe('d8799fd8799fd8799f42ed56ffd8799fd8799fd8799f42ed56ffffffffd8799fd8799f42ed56ffd8799fd8799fd8799f42bac6ffffffffd87a80d8799fd8799f581cf66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b698804469555344ff1b00004d616c553b2dff1a001e84801a001e8480ff');
                 });
         });
 
