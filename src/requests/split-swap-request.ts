@@ -13,6 +13,7 @@ export class SplitSwapRequest {
     private _swapInToken: Token;
     private _swapOutToken: Token;
     private _slippagePercent: number = 1.0;
+    private _metadata: string = '';
 
     constructor(dexter: Dexter) {
         this._dexter = dexter;
@@ -48,6 +49,12 @@ export class SplitSwapRequest {
         this._swapRequests.forEach((swapRequest: SwapRequest) => {
            swapRequest.flip();
         });
+
+        return this;
+    }
+
+    public withMetadata(metadata: string): SplitSwapRequest {
+        this._metadata = metadata;
 
         return this;
     }
@@ -190,7 +197,7 @@ export class SplitSwapRequest {
         const swapOutTokenName: string = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.assetName;
         splitSwapTransaction.attachMetadata(MetadataKey.Message, {
             msg: [
-                `[${this._dexter.config.metadataMsgBranding}] Split ${swapInTokenName} -> ${swapOutTokenName} Swap`
+                this._metadata ?? `[${this._dexter.config.metadataMsgBranding}] Split ${swapInTokenName} -> ${swapOutTokenName} Swap`
             ]
         });
 
