@@ -163,3 +163,12 @@ export type Cip30Api = {
     off(eventName: string, callback: (...args: unknown[]) => void): void;
   };
 };
+
+export type DatumJson = {
+  int?: number;
+  bytes?: string;
+  list?: Array<DatumJson>;
+  map?: Array<{ k: unknown; v: unknown }>;
+  fields?: Array<DatumJson>;
+  [constructor: string]: unknown;
+};

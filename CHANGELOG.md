@@ -3,7 +3,10 @@
 All notable changes to Dexter will be documented in this file.
 
 ## [UNRELEASED]
-- SundaeSwap v3 implementation
+- SundaeSwap v3 integration
+
+## [v5.3.0]
+- Minswap v2 integration
 
 ## [v5.2.0]
 - Add `withMinimumReceive(minReceive: bigint)` to SwapRequest

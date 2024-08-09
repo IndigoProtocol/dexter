@@ -31,80 +31,11 @@ export class SundaeSwapV3Api extends BaseApi {
         const assetBId: string = (assetB && assetB !== 'lovelace')
             ? assetB.identifier('.')
             : 'ada.lovelace';
-        const assets: string[] = [assetAId, assetBId].sort();
+        const assets: string[] = [assetAId, assetBId];
 
         return await this.api.post('', {
-            operationName: 'fetchPoolByAssets',
-            query: `
-                query fetchPoolByAssets($assets: [ID!]!) {
-                  pools {
-                    byAssets(assets: $assets) {
-                      ...PoolBrambleFragment
-                    }
-                  }
-                }
-                
-                fragment PoolBrambleFragment on Pool {
-                  id
-                  assetA {
-                    ...AssetBrambleFragment
-                  }
-                  assetB {
-                    ...AssetBrambleFragment
-                  }
-                  assetLP {
-                    ...AssetBrambleFragment
-                  }
-                  feesFinalized {
-                    slot
-                  }
-                  marketOpen {
-                    slot
-                  }
-                  openingFee
-                  finalFee
-                  current {
-                    quantityA {
-                      quantity
-                    }
-                    quantityB {
-                      quantity
-                    }
-                    quantityLP {
-                      quantity
-                    }
-                    tvl {
-                      quantity
-                    }
-                  }
-                  version
-                }
-                
-                fragment AssetBrambleFragment on Asset {
-                  id
-                  policyId
-                  description
-                  dateListed {
-                    format
-                  }
-                  decimals
-                  ticker
-                  name
-                  logo
-                  assetName
-                  metadata {
-                    ... on OnChainLabel20 {
-                      __typename
-                    }
-                    ... on OnChainLabel721 {
-                      __typename
-                    }
-                    ... on CardanoTokenRegistry {
-                      __typename
-                    }
-                  }
-                }
-            `,
+            operationName: 'fetchPoolsByPair',
+            query: `query fetchPoolsByPair($assetA: ID!, $assetB: ID!) {\n  pools {\n    byPair(assetA: $assetA, assetB: $assetB) {\n      ...PoolBrambleFragment\n    }\n  }\n}\n\nfragment PoolBrambleFragment on Pool {\n  id\n  assetA {\n    ...AssetBrambleFragment\n  }\n  assetB {\n    ...AssetBrambleFragment\n  }\n  assetLP {\n    ...AssetBrambleFragment\n  }\n  feesFinalized {\n    slot\n  }\n  marketOpen {\n    slot\n  }\n  askFee\n  bidFee\n  feeManagerId\n  current {\n    quantityA {\n      quantity\n    }\n    quantityB {\n      quantity\n    }\n    quantityLP {\n      quantity\n    }\n    tvl {\n      quantity\n    }\n  }\n  version\n}\n\nfragment AssetBrambleFragment on Asset {\n  id\n  policyId\n  description\n  dateListed {\n    format\n  }\n  decimals\n  ticker\n  name\n  logo\n  assetName\n  metadata {\n    ... on OnChainLabel20 {\n      __typename\n    }\n    ... on OnChainLabel721 {\n      __typename\n    }\n    ... on CardanoTokenRegistry {\n      __typename\n    }\n  }\n}`,
             variables: {
                 assetA: assets[0],
                 assetB: assets[1],
@@ -123,8 +54,8 @@ export class SundaeSwapV3Api extends BaseApi {
                         pool.assetB.id === 'ada.lovelace'
                             ? 'lovelace'
                             : Asset.fromIdentifier(pool.assetB.id, pool.assetB.decimals),
-                        BigInt(pool.current.quantityA),
-                        BigInt(pool.current.quantityB),
+                        BigInt(pool.current.quantityA.quantity),
+                        BigInt(pool.current.quantityB.quantity),
                         this.dex.poolAddress,
                         '',
                         '',
@@ -132,7 +63,7 @@ export class SundaeSwapV3Api extends BaseApi {
 
                     liquidityPool.identifier = pool.id;
                     liquidityPool.lpToken = Asset.fromIdentifier(pool.assetLP.id);
-                    liquidityPool.poolFeePercent = Number((pool.openingFee[0] / pool.openingFee[1]) * 100);
+                    liquidityPool.poolFeePercent = Number((pool.bidFee[0] / pool.bidFee[1]) * 100);
                     liquidityPool.totalLpTokens = BigInt(pool.current.quantityLP.quantity);
 
                     return liquidityPool;

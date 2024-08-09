@@ -3,6 +3,7 @@
     <p align="center">Customizable Typescript SDK for interacting with Cardano DEXs.</p>
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/sundaeswap.png" width="30" />
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/minswap.png" width="30" /> 
+    <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/minswapv2.png" width="30" /> 
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/muesliswap.png" width="30" />
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/wingriders.png" width="30" />
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/vyfinance.png" width="30" />

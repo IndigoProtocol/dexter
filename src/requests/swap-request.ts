@@ -15,6 +15,7 @@ export class SwapRequest {
     private _swapInAmount: bigint = 0n;
     private _slippagePercent: number = 1.0;
     private _withUtxos: UTxO[] = [];
+    private _metadata: string = '';
 
     constructor(dexter: Dexter) {
         this._dexter = dexter;
@@ -55,6 +56,12 @@ export class SwapRequest {
             [this._swapInToken, this._swapOutToken] = [this._swapOutToken, this._swapInToken];
             this.withSwapOutAmount(this._swapInAmount);
         }
+
+        return this;
+    }
+
+    public withMetadata(metadata: string): SwapRequest {
+        this._metadata = metadata;
 
         return this;
     }
@@ -272,7 +279,7 @@ export class SwapRequest {
         const swapOutTokenName: string = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.assetName;
         swapTransaction.attachMetadata(MetadataKey.Message, {
             msg: [
-                `[${this._dexter.config.metadataMsgBranding}] ${this._liquidityPool.dex} ${swapInTokenName} -> ${swapOutTokenName} Swap`
+                this._metadata ?? `[${this._dexter.config.metadataMsgBranding}] ${this._liquidityPool.dex} ${swapInTokenName} -> ${swapOutTokenName} Swap`
             ]
         });
 

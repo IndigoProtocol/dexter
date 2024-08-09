@@ -7,9 +7,11 @@ export enum DatumParameterKey {
    * Generics.
    */
   Action = 'Action',
-  CancelDatum = 'CancelDatum',
   TokenPolicyId = 'TokenPolicyId',
   TokenAssetName = 'TokenAssetName',
+  ReserveA = 'ReserveA',
+  ReserveB = 'ReserveB',
+  CancelDatum = 'CancelDatum',
 
   /**
    * Swap/wallet info.
@@ -27,6 +29,7 @@ export enum DatumParameterKey {
   MinReceive = 'MinReceive',
   Expiration = 'Expiration',
   AllowPartialFill = 'AllowPartialFill',
+  Direction = 'Direction',
 
   /**
    * Trading fees.
@@ -35,6 +38,8 @@ export enum DatumParameterKey {
   BatcherFee = 'BatcherFee',
   DepositFee = 'DepositFee',
   ScooperFee = 'ScooperFee',
+  BaseFee = 'BaseFee',
+  FeeSharingNumerator = 'FeeSharingNumerator',
   OpeningFee = 'OpeningFee',
   FinalFee = 'FinalFee',
   FeesFinalized = 'FeesFinalized',

@@ -1,7 +1,7 @@
 import { DatumParameters, DefinitionConstr, DefinitionField } from './types';
-import { datumJsonToCbor } from 'lucid-cardano';
 import { DatumParameterKey } from './constants';
 import _ from 'lodash';
+import { datumJsonToCbor } from '@app/utils';
 
 export class DefinitionBuilder {
   private _definition: DefinitionConstr;
@@ -103,8 +103,6 @@ export class DefinitionBuilder {
       field.bytes = parameterValue;
     }
 
-    // Key Value Pairs.
-    // { bytes: "SwapInTokenPolicyId" }, { bytes: "SwapInTokenAssetName" },
     if (Array.isArray(field) && field.every((item) => typeof item === 'object' && Object.keys(item).length === 1)) {
       field.forEach((value) => {
         return this.applyParameters(value, mappedParameters);
@@ -118,6 +116,8 @@ export class DefinitionBuilder {
    * Recursively pull parameters from datum using definition template.
    */
   private extractParameters(definedDefinition: DefinitionField, templateDefinition: DefinitionField, foundParameters: DatumParameters = {}): DatumParameters {
+    if (! templateDefinition) return foundParameters;
+
     if (templateDefinition instanceof Function) {
       templateDefinition(definedDefinition, foundParameters);
 

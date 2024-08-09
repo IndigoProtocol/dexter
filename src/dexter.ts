@@ -19,6 +19,7 @@ import { TeddySwap } from '@dex/teddyswap';
 import { Spectrum } from '@dex/spectrum';
 import { SplitCancelSwapRequest } from '@requests/split-cancel-swap-request';
 import { SundaeSwapV3 } from '@dex/sundaeswap-v3';
+import { MinswapV2 } from '@dex/minswap-v2';
 
 export class Dexter {
 
@@ -61,6 +62,7 @@ export class Dexter {
             [Minswap.identifier]: new Minswap(this.requestConfig),
             [SundaeSwapV1.identifier]: new SundaeSwapV1(this.requestConfig),
             [SundaeSwapV3.identifier]: new SundaeSwapV3(this.requestConfig),
+            [MinswapV2.identifier]: new MinswapV2(this.requestConfig),
             [MuesliSwap.identifier]: new MuesliSwap(this.requestConfig),
             [WingRiders.identifier]: new WingRiders(this.requestConfig),
             [VyFinance.identifier]: new VyFinance(this.requestConfig),
