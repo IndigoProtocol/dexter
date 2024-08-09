@@ -197,7 +197,7 @@ export class SplitSwapRequest {
         const swapOutTokenName: string = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.assetName;
         splitSwapTransaction.attachMetadata(MetadataKey.Message, {
             msg: [
-                this._metadata ?? `[${this._dexter.config.metadataMsgBranding}] Split ${swapInTokenName} -> ${swapOutTokenName} Swap`
+                this._metadata !== '' ? this._metadata : `[${this._dexter.config.metadataMsgBranding}] Split ${swapInTokenName} -> ${swapOutTokenName} Swap`
             ]
         });
 

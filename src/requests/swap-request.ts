@@ -279,7 +279,7 @@ export class SwapRequest {
         const swapOutTokenName: string = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.assetName;
         swapTransaction.attachMetadata(MetadataKey.Message, {
             msg: [
-                this._metadata ?? `[${this._dexter.config.metadataMsgBranding}] ${this._liquidityPool.dex} ${swapInTokenName} -> ${swapOutTokenName} Swap`
+                this._metadata !== '' ? this._metadata : `[${this._dexter.config.metadataMsgBranding}] ${this._liquidityPool.dex} ${swapInTokenName} -> ${swapOutTokenName} Swap`
             ]
         });
 
