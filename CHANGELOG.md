@@ -2,7 +2,7 @@
 
 All notable changes to Dexter will be documented in this file.
 
-## [UNRELEASED]
+## [v5.4.0]
 - SundaeSwap v3 integration
 
 ## [v5.3.0]
