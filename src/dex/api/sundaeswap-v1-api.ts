@@ -2,16 +2,16 @@ import { BaseApi } from './base-api';
 import { Asset, Token } from '../models/asset';
 import { LiquidityPool } from '../models/liquidity-pool';
 import axios, { AxiosInstance } from 'axios';
-import { SundaeSwap } from '../sundaeswap';
+import { SundaeSwapV1 } from '../sundaeswap-v1';
 import { RequestConfig } from '@app/types';
 import { appendSlash } from '@app/utils';
 
-export class SundaeSwapApi extends BaseApi {
+export class SundaeSwapV1Api extends BaseApi {
 
     protected readonly api: AxiosInstance;
-    protected readonly dex: SundaeSwap;
+    protected readonly dex: SundaeSwapV1;
 
-    constructor(dex: SundaeSwap, requestConfig: RequestConfig) {
+    constructor(dex: SundaeSwapV1, requestConfig: RequestConfig) {
         super();
 
         this.dex = dex;
@@ -75,7 +75,7 @@ export class SundaeSwapApi extends BaseApi {
                 const pools = response.data.data.pools;
                 const liquidityPools = pools.map((pool: any) => {
                     let liquidityPool: LiquidityPool = new LiquidityPool(
-                        SundaeSwap.identifier,
+                        SundaeSwapV1.identifier,
                         pool.assetA.assetId
                             ? Asset.fromIdentifier(pool.assetA.assetId, pool.assetA.decimals)
                             : 'lovelace',

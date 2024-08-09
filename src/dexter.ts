@@ -1,7 +1,7 @@
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { AvailableDexs, DexterConfig, RequestConfig } from '@app/types';
 import { Minswap } from '@dex/minswap';
-import { SundaeSwap } from '@dex/sundaeswap';
+import { SundaeSwapV1 } from '@dex/sundaeswap-v1';
 import { MuesliSwap } from '@dex/muesliswap';
 import { WingRiders } from '@dex/wingriders';
 import { SwapRequest } from '@requests/swap-request';
@@ -12,12 +12,13 @@ import { BaseMetadataProvider } from '@providers/asset-metadata/base-metadata-pr
 import { TokenRegistryProvider } from '@providers/asset-metadata/token-registry-provider';
 import { CancelSwapRequest } from '@requests/cancel-swap-request';
 import { FetchRequest } from '@requests/fetch-request';
-import axios from "axios";
-import axiosRetry from "axios-retry";
+import axios from 'axios';
+import axiosRetry from 'axios-retry';
 import { SplitSwapRequest } from '@requests/split-swap-request';
 import { TeddySwap } from '@dex/teddyswap';
 import { Spectrum } from '@dex/spectrum';
 import { SplitCancelSwapRequest } from '@requests/split-cancel-swap-request';
+import { SundaeSwapV3 } from '@dex/sundaeswap-v3';
 import { MinswapV2 } from '@dex/minswap-v2';
 
 export class Dexter {
@@ -59,8 +60,9 @@ export class Dexter {
         this.metadataProvider = new TokenRegistryProvider(this.requestConfig);
         this.availableDexs = {
             [Minswap.identifier]: new Minswap(this.requestConfig),
+            [SundaeSwapV1.identifier]: new SundaeSwapV1(this.requestConfig),
+            [SundaeSwapV3.identifier]: new SundaeSwapV3(this.requestConfig),
             [MinswapV2.identifier]: new MinswapV2(this.requestConfig),
-            [SundaeSwap.identifier]: new SundaeSwap(this.requestConfig),
             [MuesliSwap.identifier]: new MuesliSwap(this.requestConfig),
             [WingRiders.identifier]: new WingRiders(this.requestConfig),
             [VyFinance.identifier]: new VyFinance(this.requestConfig),

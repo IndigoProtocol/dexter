@@ -5,6 +5,7 @@ import { AssetBalance, DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO }
 import { DatumParameterKey } from '@app/constants';
 import { tokensMatch } from '@app/utils';
 import { BaseApi } from '@dex/api/base-api';
+import { BaseWalletProvider } from '@providers/wallet/base-wallet-provider';
 
 export abstract class BaseDex {
 
@@ -16,17 +17,17 @@ export abstract class BaseDex {
     /**
      * Fetch addresses mapped to a liquidity pool.
      */
-    abstract liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]>;
+    abstract liquidityPoolAddresses(provider?: BaseDataProvider): Promise<string[]>;
 
     /**
      * Fetch all liquidity pools.
      */
-    abstract liquidityPools(provider: BaseDataProvider): Promise<LiquidityPool[]>;
+    abstract liquidityPools(provider: BaseDataProvider, wallet?: BaseWalletProvider): Promise<LiquidityPool[]>;
 
     /**
      * Craft liquidity pool state from a valid UTxO.
      */
-    abstract liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO): Promise<LiquidityPool | undefined>;
+    abstract liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO, wallet?: BaseWalletProvider): Promise<LiquidityPool | undefined>;
 
     /**
      * Estimated swap in amount given for a swap out token & amount on a liquidity pool.
@@ -51,12 +52,12 @@ export abstract class BaseDex {
     /**
      * Craft a swap order cancellation for this DEX.
      */
-    abstract buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]>;
+    abstract buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string, wallet?: BaseWalletProvider): Promise<PayToAddress[]>;
 
     /**
      * Fees associated with submitting a swap order.
      */
-    abstract swapOrderFees(): SwapFee[];
+    abstract swapOrderFees(liquidityPool?: LiquidityPool, swapInToken?: Token, swapInAmount?: bigint): SwapFee[];
 
     /**
      * Adjust the payment for the DEX order address to include the swap in amount.

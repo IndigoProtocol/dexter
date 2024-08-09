@@ -1,80 +1,86 @@
 export enum MetadataKey {
-    Message = 674,
+  Message = 674,
 }
 
 export enum DatumParameterKey {
-    /**
-     * Generics.
-     */
-    Action = 'Action',
-    TokenPolicyId = 'TokenPolicyId',
-    TokenAssetName = 'TokenAssetName',
-    ReserveA = 'ReserveA',
-    ReserveB = 'ReserveB',
+  /**
+   * Generics.
+   */
+  Action = 'Action',
+  TokenPolicyId = 'TokenPolicyId',
+  TokenAssetName = 'TokenAssetName',
+  ReserveA = 'ReserveA',
+  ReserveB = 'ReserveB',
+  CancelDatum = 'CancelDatum',
 
-    /**
-     * Swap/wallet info.
-     */
-    SenderPubKeyHash = 'SenderPubKeyHash',
-    SenderStakingKeyHash = 'SenderStakingKeyHash',
-    SenderKeyHashes = 'SenderKeyHashes',
-    ReceiverPubKeyHash = 'ReceiverPubKeyHash',
-    ReceiverStakingKeyHash = 'ReceiverStakingKeyHash',
-    SwapInAmount = 'SwapInAmount',
-    SwapInTokenPolicyId = 'SwapInTokenPolicyId',
-    SwapInTokenAssetName = 'SwapInTokenAssetName',
-    SwapOutTokenPolicyId = 'SwapOutTokenPolicyId',
-    SwapOutTokenAssetName = 'SwapOutTokenAssetName',
-    MinReceive = 'MinReceive',
-    Expiration = 'Expiration',
-    AllowPartialFill = 'AllowPartialFill',
-    Direction = 'Direction',
+  /**
+   * Swap/wallet info.
+   */
+  SenderPubKeyHash = 'SenderPubKeyHash',
+  SenderStakingKeyHash = 'SenderStakingKeyHash',
+  SenderKeyHashes = 'SenderKeyHashes',
+  ReceiverPubKeyHash = 'ReceiverPubKeyHash',
+  ReceiverStakingKeyHash = 'ReceiverStakingKeyHash',
+  SwapInAmount = 'SwapInAmount',
+  SwapInTokenPolicyId = 'SwapInTokenPolicyId',
+  SwapInTokenAssetName = 'SwapInTokenAssetName',
+  SwapOutTokenPolicyId = 'SwapOutTokenPolicyId',
+  SwapOutTokenAssetName = 'SwapOutTokenAssetName',
+  MinReceive = 'MinReceive',
+  Expiration = 'Expiration',
+  AllowPartialFill = 'AllowPartialFill',
+  Direction = 'Direction',
 
-    /**
-     * Trading fees.
-     */
-    TotalFees = 'TotalFees',
-    BatcherFee = 'BatcherFee',
-    DepositFee = 'DepositFee',
-    ScooperFee = 'ScooperFee',
-    BaseFee = 'BaseFee',
-    FeeSharingNumerator = 'FeeSharingNumerator',
+  /**
+   * Trading fees.
+   */
+  TotalFees = 'TotalFees',
+  BatcherFee = 'BatcherFee',
+  DepositFee = 'DepositFee',
+  ScooperFee = 'ScooperFee',
+  BaseFee = 'BaseFee',
+  FeeSharingNumerator = 'FeeSharingNumerator',
+  OpeningFee = 'OpeningFee',
+  FinalFee = 'FinalFee',
+  FeesFinalized = 'FeesFinalized',
+  MarketOpen = 'MarketOpen',
+  ProtocolFee = 'ProtocolFee',
 
-    /**
-     * LP info.
-     */
-    PoolIdentifier = 'PoolIdentifier',
-    TotalLpTokens = 'TotalLpTokens',
-    LpTokenPolicyId = 'LpTokenPolicyId',
-    LpTokenAssetName = 'LpTokenAssetName',
-    LpFee = 'LpFee',
-    LpFeeNumerator = 'LpFeeNumerator',
-    LpFeeDenominator = 'LpFeeDenominator',
-    PoolAssetAPolicyId = 'PoolAssetAPolicyId',
-    PoolAssetAAssetName = 'PoolAssetAAssetName',
-    PoolAssetATreasury = 'PoolAssetATreasury',
-    PoolAssetABarFee = 'PoolAssetABarFee',
-    PoolAssetBPolicyId = 'PoolAssetBPolicyId',
-    PoolAssetBAssetName = 'PoolAssetBAssetName',
-    PoolAssetBTreasury = 'PoolAssetBTreasury',
-    PoolAssetBBarFee = 'PoolAssetBBarFee',
-    RootKLast = 'RootKLast',
-    LastInteraction = 'LastInteraction',
-    RequestScriptHash = 'RequestScriptHash',
-    StakeAdminPolicy = 'StakeAdminPolicy',
-    LqBound = 'LqBound',
+  /**
+   * LP info.
+   */
+  PoolIdentifier = 'PoolIdentifier',
+  TotalLpTokens = 'TotalLpTokens',
+  LpTokenPolicyId = 'LpTokenPolicyId',
+  LpTokenAssetName = 'LpTokenAssetName',
+  LpFee = 'LpFee',
+  LpFeeNumerator = 'LpFeeNumerator',
+  LpFeeDenominator = 'LpFeeDenominator',
+  PoolAssetAPolicyId = 'PoolAssetAPolicyId',
+  PoolAssetAAssetName = 'PoolAssetAAssetName',
+  PoolAssetATreasury = 'PoolAssetATreasury',
+  PoolAssetABarFee = 'PoolAssetABarFee',
+  PoolAssetBPolicyId = 'PoolAssetBPolicyId',
+  PoolAssetBAssetName = 'PoolAssetBAssetName',
+  PoolAssetBTreasury = 'PoolAssetBTreasury',
+  PoolAssetBBarFee = 'PoolAssetBBarFee',
+  RootKLast = 'RootKLast',
+  LastInteraction = 'LastInteraction',
+  RequestScriptHash = 'RequestScriptHash',
+  StakeAdminPolicy = 'StakeAdminPolicy',
+  LqBound = 'LqBound',
 }
 
 export enum TransactionStatus {
-    Building,
-    Signing,
-    Submitting,
-    Submitted,
-    Errored,
+  Building,
+  Signing,
+  Submitting,
+  Submitted,
+  Errored,
 }
 
 export enum AddressType {
-    Contract,
-    Base,
-    Enterprise,
+  Contract,
+  Base,
+  Enterprise,
 }
