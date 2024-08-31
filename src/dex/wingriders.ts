@@ -20,7 +20,7 @@ import order from '@dex/definitions/wingriders/order';
 import { BaseApi } from '@dex/api/base-api';
 import { WingRidersApi } from '@dex/api/wingriders-api';
 import pool from "@dex/definitions/wingriders/pool";
-import { Script } from 'lucid-cardano';
+import { Script } from '@lucid-evolution/lucid';
 
 /**
  * WingRiders constants.

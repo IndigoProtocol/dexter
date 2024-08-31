@@ -2,7 +2,7 @@ import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
 import { Token } from '@dex/models/asset';
 import { BaseDex } from '@dex/base-dex';
 import { LiquidityPool } from '@dex/models/liquidity-pool';
-import { Script } from 'lucid-cardano';
+import { Script } from '@lucid-evolution/lucid';
 
 export interface DexterConfig {
   shouldFetchMetadata?: boolean;

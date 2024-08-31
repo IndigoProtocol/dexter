@@ -18,7 +18,7 @@ import order from '@dex/definitions/minswap/order';
 import { BaseApi } from '@dex/api/base-api';
 import { MinswapApi } from '@dex/api/minswap-api';
 import pool from '@dex/definitions/minswap/pool';
-import { Script } from 'lucid-cardano';
+import { Script } from '@lucid-evolution/lucid';
 
 export class Minswap extends BaseDex {
 

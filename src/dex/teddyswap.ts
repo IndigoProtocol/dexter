@@ -19,7 +19,7 @@ import pool from './definitions/teddyswap/pool';
 import order from './definitions/teddyswap/order';
 import { correspondingReserves, tokensMatch } from '@app/utils';
 import { TeddyswapApi } from '@dex/api/teddyswap-api';
-import { Script } from 'lucid-cardano';
+import { Script } from '@lucid-evolution/lucid';
 
 const MAX_INT: bigint = 9_223_372_036_854_775_807n;
 

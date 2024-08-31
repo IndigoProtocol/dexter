@@ -20,7 +20,7 @@ import pool from '@dex/definitions/muesliswap/pool';
 import order from '@dex/definitions/muesliswap/order';
 import { BaseApi } from '@dex/api/base-api';
 import { MuesliSwapApi } from '@dex/api/muesliswap-api';
-import { Script } from 'lucid-cardano';
+import { Script } from '@lucid-evolution/lucid';
 
 export class MuesliSwap extends BaseDex {
 

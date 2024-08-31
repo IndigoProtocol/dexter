@@ -1,7 +1,7 @@
 import { DatumParameters, DefinitionConstr, DefinitionField } from './types';
 import { DatumParameterKey } from './constants';
 import _ from 'lodash';
-import { datumJsonToCbor } from '@app/utils';
+import { datumJsonToCbor } from '@lucid-evolution/lucid';
 
 export class DefinitionBuilder {
   private _definition: DefinitionConstr;
