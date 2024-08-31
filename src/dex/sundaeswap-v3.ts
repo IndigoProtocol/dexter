@@ -178,10 +178,10 @@ export class SundaeSwapV3 extends BaseDex {
                 ),
                 addressType: AddressType.Contract,
                 assetBalances: [
-                  {
-                    asset: 'lovelace',
-                    quantity: this.protocolFeeDefault + deposit.value,
-                  },
+                    {
+                        asset: 'lovelace',
+                        quantity: this.protocolFeeDefault + deposit.value,
+                    },
                 ],
                 datum: datumBuilder.getCbor(),
                 isInlineDatum: true,

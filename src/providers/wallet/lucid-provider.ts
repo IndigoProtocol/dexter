@@ -62,7 +62,18 @@ export class LucidProvider extends BaseWalletProvider {
         return this.loadLucid(config)
             .then((lucid: LucidEvolution) => {
                 this._api = lucid;
-                this._api.selectWallet.fromSeed(seed.join(' '));
+
+                const addressType: 'Base' | 'Enterprise' = options.addressType === AddressType.Enterprise
+                    ? 'Enterprise'
+                    : 'Base';
+
+                this._api.selectWallet.fromSeed(
+                    seed.join(' '),
+                    {
+                        addressType: addressType,
+                        accountIndex: options.accountIndex ?? 0,
+                    },
+                );
 
                 return this.loadWalletInformation();
             });
