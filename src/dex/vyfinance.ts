@@ -9,7 +9,7 @@ import { AddressType, DatumParameterKey } from '@app/constants';
 import order from '@dex/definitions/vyfinance/order';
 import { BaseApi } from '@dex/api/base-api';
 import { VyfinanceApi } from '@dex/api/vyfinance-api';
-import { Data, Script } from 'lucid-cardano';
+import { Data, Script } from '@lucid-evolution/lucid';
 
 /**
  * VyFinance constants.

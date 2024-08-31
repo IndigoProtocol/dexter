@@ -19,7 +19,7 @@ import pool from '@dex/definitions/sundaeswap-v1/pool';
 import order from '@dex/definitions/sundaeswap-v1/order';
 import { BaseApi } from '@dex/api/base-api';
 import { SundaeSwapV1Api } from '@dex/api/sundaeswap-v1-api';
-import { Script } from 'lucid-cardano';
+import { Script } from '@lucid-evolution/lucid';
 
 export class SundaeSwapV1 extends BaseDex {
 

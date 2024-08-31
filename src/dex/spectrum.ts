@@ -19,7 +19,7 @@ import pool from './definitions/spectrum/pool';
 import order from './definitions/spectrum/order';
 import { correspondingReserves, tokensMatch } from '@app/utils';
 import { SpectrumApi } from '@dex/api/spectrum-api';
-import { Script } from 'lucid-cardano';
+import { Script } from '@lucid-evolution/lucid';
 
 const MAX_INT: bigint = 9_223_372_036_854_775_807n;
 

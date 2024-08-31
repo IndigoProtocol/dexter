@@ -14,20 +14,23 @@ import {
     AddressDetails,
     Assets,
     Blockfrost,
-    Datum, Kupmios,
+    CBORHex,
+    getAddressDetails,
+    Kupmios,
     Lucid,
-    TxComplete,
+    LucidEvolution,
     TxHash,
+    TxSignBuilder,
     TxSigned,
     Unit
-} from 'lucid-cardano';
+} from '@lucid-evolution/lucid';
 import { AddressType } from '@app/constants';
 
 export class LucidProvider extends BaseWalletProvider {
 
     public isWalletLoaded: boolean = false;
 
-    private _api: Lucid;
+    private _api: LucidEvolution;
     private _usableAddress: string;
     private _paymentCredential: string;
     private _stakingCredential: string | undefined;
@@ -46,10 +49,10 @@ export class LucidProvider extends BaseWalletProvider {
 
     public loadWallet(walletApi: Cip30Api, config: BlockfrostConfig | KupmiosConfig): Promise<BaseWalletProvider> {
         return this.loadLucid(config)
-            .then((lucid: Lucid) => {
+            .then((lucid: LucidEvolution) => {
                 this._api = lucid;
 
-                this._api.selectWallet(walletApi);
+                this._api.selectWallet.fromAPI(walletApi);
 
                 return this.loadWalletInformation();
             });
@@ -57,14 +60,14 @@ export class LucidProvider extends BaseWalletProvider {
 
     public loadWalletFromSeedPhrase(seed: string[], options: WalletOptions = {}, config: BlockfrostConfig | KupmiosConfig): Promise<BaseWalletProvider> {
         return this.loadLucid(config)
-            .then((lucid: Lucid) => {
+            .then((lucid: LucidEvolution) => {
                 this._api = lucid;
 
                 const addressType: 'Base' | 'Enterprise' = options.addressType === AddressType.Enterprise
                     ? 'Enterprise'
                     : 'Base';
 
-                this._api.selectWalletFromSeed(
+                this._api.selectWallet.fromSeed(
                     seed.join(' '),
                     {
                         addressType: addressType,
@@ -112,7 +115,7 @@ export class LucidProvider extends BaseWalletProvider {
                     ], spendUtxo.redeemer);
 
                     if (spendUtxo.validator) {
-                        transaction.providerData.tx.attachSpendingValidator(spendUtxo.validator);
+                        transaction.providerData.tx.attach.SpendingValidator(spendUtxo.validator);
                     }
 
                     if (spendUtxo.signer) {
@@ -123,19 +126,23 @@ export class LucidProvider extends BaseWalletProvider {
 
             switch (payToAddress.addressType) {
                 case AddressType.Contract:
-                    transaction.providerData.tx.payToContract(
+                    transaction.providerData.tx.pay.ToContract(
                         payToAddress.address,
                         payToAddress.isInlineDatum
                             ? {
-                                inline: payToAddress.datum as Datum,
+                                kind: 'inline',
+                                value: payToAddress.datum as CBORHex,
                             }
-                            : payToAddress.datum as Datum,
+                            : {
+                                kind: 'asHash',
+                                value: payToAddress.datum as CBORHex
+                            },
                         payment,
                     );
                     break;
                 case AddressType.Base:
                 case AddressType.Enterprise:
-                    transaction.providerData.tx.payToAddress(
+                    transaction.providerData.tx.pay.ToAddress(
                         payToAddress.address,
                         payment,
                     );
@@ -146,7 +153,7 @@ export class LucidProvider extends BaseWalletProvider {
         });
 
         return transaction.providerData.tx.complete()
-            .then((tx: TxComplete) => {
+            .then((tx: TxSignBuilder) => {
                 transaction.providerData.tx = tx;
 
                 return transaction;
@@ -158,7 +165,7 @@ export class LucidProvider extends BaseWalletProvider {
             throw new Error('Must load wallet before signing transaction.');
         }
 
-        return transaction.providerData.tx.sign().complete()
+        return transaction.providerData.tx.sign.withWallet().complete()
             .then((signedTx: TxSigned) => {
                 transaction.providerData.tx = signedTx;
 
@@ -183,9 +190,9 @@ export class LucidProvider extends BaseWalletProvider {
     }
 
     private loadWalletInformation(): Promise<BaseWalletProvider> {
-        return this._api.wallet.address()
+        return this._api.wallet().address()
             .then((address: Address) => {
-                const details: AddressDetails = this._api.utils.getAddressDetails(
+                const details: AddressDetails = getAddressDetails(
                     address,
                 );
 
@@ -199,8 +206,8 @@ export class LucidProvider extends BaseWalletProvider {
             });
     }
 
-    private loadLucid(config: BlockfrostConfig | KupmiosConfig): Promise<Lucid> {
-        return Lucid.new(
+    private loadLucid(config: BlockfrostConfig | KupmiosConfig): Promise<LucidEvolution> {
+        return Lucid(
             'kupoUrl' in config
                 ? new Kupmios(
                     config.kupoUrl,
@@ -209,7 +216,8 @@ export class LucidProvider extends BaseWalletProvider {
                 : new Blockfrost(
                     config.url,
                     config.projectId
-                )
+                ),
+            'Mainnet',
         );
     }
 

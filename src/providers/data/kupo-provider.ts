@@ -13,7 +13,7 @@ import {
     UTxO
 } from '@app/types';
 import axios, { AxiosInstance } from 'axios';
-import { Data } from 'lucid-cardano';
+import { Data } from '@lucid-evolution/lucid';
 import { appendSlash } from '@app/utils';
 
 export class KupoProvider extends BaseDataProvider {

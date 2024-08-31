@@ -14,12 +14,12 @@ import {
     UTxO
 } from '@app/types';
 import { DefinitionBuilder } from '@app/definition-builder';
-import { correspondingReserves, lucidUtils } from '@app/utils';
+import { correspondingReserves } from '@app/utils';
 import { AddressType, DatumParameterKey } from '@app/constants';
 import order from '@dex/definitions/minswap-v2/order';
 import { BaseApi } from '@dex/api/base-api';
 import pool from '@dex/definitions/minswap-v2/pool';
-import { AddressDetails, Script } from 'lucid-cardano';
+import { AddressDetails, credentialToAddress, getAddressDetails, Script } from '@lucid-evolution/lucid';
 
 export class MinswapV2 extends BaseDex {
 
@@ -211,7 +211,8 @@ export class MinswapV2 extends BaseDex {
             this.buildSwapOrderPayment(
                 swapParameters,
                 {
-                    address: lucidUtils.credentialToAddress(
+                    address: credentialToAddress(
+                        'Mainnet',
                         {
                             type: 'Script',
                             hash: this.orderScriptHash,
@@ -238,7 +239,7 @@ export class MinswapV2 extends BaseDex {
 
     public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
         const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
-            const addressDetails: AddressDetails | undefined = lucidUtils.getAddressDetails(utxo.address);
+            const addressDetails: AddressDetails | undefined = getAddressDetails(utxo.address);
 
             return (addressDetails.paymentCredential?.hash ?? '') === this.orderScriptHash;
         });
