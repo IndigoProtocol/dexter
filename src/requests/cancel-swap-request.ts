@@ -26,7 +26,6 @@ export class CancelSwapRequest {
         return this;
     }
 
-
     public getPaymentsToAddresses(): Promise<PayToAddress[]> {
         if (! this._dexter.walletProvider) {
             throw new Error('Wallet provider must be set before submitting a swap order.');

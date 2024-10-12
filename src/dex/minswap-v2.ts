@@ -269,7 +269,7 @@ export class MinswapV2 extends BaseDex {
                 id: 'batcherFee',
                 title: 'Batcher Fee',
                 description: 'Fee paid for the service of off-chain Laminar batcher to process transactions.',
-                value: 1_000000n,
+                value: 2_000000n,
                 isReturned: false,
             },
             {
