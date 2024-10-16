@@ -14,7 +14,7 @@ import { Asset, Token } from './models/asset';
 import { LiquidityPool } from './models/liquidity-pool';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { DefinitionBuilder } from '@app/definition-builder';
-import { correspondingReserves } from '@app/utils';
+import { correspondingReserves, tokensMatch } from '@app/utils';
 import { AddressType, DatumParameterKey } from '@app/constants';
 import pool from '@dex/definitions/muesliswap/pool';
 import order from '@dex/definitions/muesliswap/order';
@@ -94,37 +94,40 @@ export class MuesliSwap extends BaseDex {
             return Promise.resolve(undefined);
         }
 
-        // Could be ADA/X or X/X pool
-        const assetAIndex: number = relevantAssets.length === 2 ? 0 : 1;
-        const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
-
-        const liquidityPool: LiquidityPool = new LiquidityPool(
-            MuesliSwap.identifier,
-            relevantAssets[assetAIndex].asset,
-            relevantAssets[assetBIndex].asset,
-            relevantAssets[assetAIndex].quantity,
-            relevantAssets[assetBIndex].quantity,
-            utxo.address,
-            this.orderAddress,
-            this.orderAddress,
-        );
-
-        // Load additional pool information
-        const lpToken: Asset = utxo.assetBalances.find((assetBalance: AssetBalance) => {
-            return assetBalance.asset !== 'lovelace' && [this.poolNftPolicyIdV1, this.poolNftPolicyIdV2].includes(assetBalance.asset.policyId);
-        })?.asset as Asset;
-
-        if (lpToken) {
-            lpToken.policyId = this.lpTokenPolicyId;
-            liquidityPool.lpToken = lpToken;
-            liquidityPool.identifier = lpToken.identifier();
-        }
-
         try {
             const builder: DefinitionBuilder = await (new DefinitionBuilder())
                 .loadDefinition(pool);
             const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
             const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+
+            const tokenA: Token = parameters.PoolAssetAPolicyId
+                ? new Asset(parameters.PoolAssetAPolicyId as string, parameters.PoolAssetAAssetName as string)
+                : 'lovelace';
+            const tokenB: Token = parameters.PoolAssetBPolicyId
+                ? new Asset(parameters.PoolAssetBPolicyId as string, parameters.PoolAssetBAssetName as string)
+                : 'lovelace';
+
+            const liquidityPool: LiquidityPool = new LiquidityPool(
+                MuesliSwap.identifier,
+                tokenA,
+                tokenB,
+                relevantAssets.find((balance: AssetBalance) => tokensMatch(tokenA, balance.asset))?.quantity ?? 0n,
+                relevantAssets.find((balance: AssetBalance) => tokensMatch(tokenB, balance.asset))?.quantity ?? 0n,
+                utxo.address,
+                this.orderAddress,
+                this.orderAddress,
+            );
+
+            // Load additional pool information
+            const lpToken: Asset = utxo.assetBalances.find((assetBalance: AssetBalance) => {
+                return assetBalance.asset !== 'lovelace' && [this.poolNftPolicyIdV1, this.poolNftPolicyIdV2].includes(assetBalance.asset.policyId);
+            })?.asset as Asset;
+
+            if (lpToken) {
+                lpToken.policyId = this.lpTokenPolicyId;
+                liquidityPool.lpToken = lpToken;
+                liquidityPool.identifier = lpToken.identifier();
+            }
 
             liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number'
                 ? BigInt(parameters.TotalLpTokens)
@@ -133,11 +136,10 @@ export class MuesliSwap extends BaseDex {
                 ? parameters.LpFee / 100
                 : 0;
 
+            return Promise.resolve(liquidityPool);
         } catch (e) {
-            return liquidityPool;
+            return Promise.resolve(undefined);
         }
-
-        return liquidityPool;
     }
 
     estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
