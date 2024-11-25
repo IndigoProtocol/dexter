@@ -6,6 +6,7 @@
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/minswapv2.png" width="30" /> 
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/muesliswap.png" width="30" />
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/wingriders.png" width="30" />
+    <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/wingridersv2.png" width="30" />
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/vyfinance.png" width="30" />
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/teddyswap.png" width="30" />
     <img src="https://raw.githubusercontent.com/IndigoProtocol/dexter/master/src/dex/logo/spectrum.png" width="30" />

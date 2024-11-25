@@ -12,6 +12,8 @@ export enum DatumParameterKey {
   ReserveA = 'ReserveA',
   ReserveB = 'ReserveB',
   CancelDatum = 'CancelDatum',
+  AScale = 'AScale',
+  BScale = 'BScale',
 
   /**
    * Swap/wallet info.
@@ -45,6 +47,11 @@ export enum DatumParameterKey {
   FeesFinalized = 'FeesFinalized',
   MarketOpen = 'MarketOpen',
   ProtocolFee = 'ProtocolFee',
+  SwapFee = 'SwapFee',
+  ProjectFeeInBasis = 'ProjectFeeInBasis',
+  ReserveFeeInBasis = 'ReserveFeeInBasis',
+  FeeBasis = 'FeeBasis',
+  AgentFee = 'AgentFee',
 
   /**
    * LP info.
@@ -69,6 +76,8 @@ export enum DatumParameterKey {
   RequestScriptHash = 'RequestScriptHash',
   StakeAdminPolicy = 'StakeAdminPolicy',
   LqBound = 'LqBound',
+
+  Unknown = 'Unknown',
 }
 
 export enum TransactionStatus {
