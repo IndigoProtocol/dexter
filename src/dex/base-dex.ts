@@ -47,7 +47,7 @@ export abstract class BaseDex {
     /**
      * Craft a swap order for this DEX.
      */
-    abstract buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos?: SpendUTxO[]): Promise<PayToAddress[]>;
+    abstract buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos?: SpendUTxO[], dataProvider?: BaseDataProvider): Promise<PayToAddress[]>;
 
     /**
      * Craft a swap order cancellation for this DEX.

@@ -18,6 +18,7 @@ export enum DatumParameterKey {
   /**
    * Swap/wallet info.
    */
+  Address = 'Address',
   SenderPubKeyHash = 'SenderPubKeyHash',
   SenderStakingKeyHash = 'SenderStakingKeyHash',
   SenderKeyHashes = 'SenderKeyHashes',
@@ -32,6 +33,10 @@ export enum DatumParameterKey {
   Expiration = 'Expiration',
   AllowPartialFill = 'AllowPartialFill',
   Direction = 'Direction',
+  FeePaymentKeyHash = 'FeePaymentKeyHash',
+  Beacon = 'Beacon',
+  Batcher = 'Batcher',
+  InToken = 'InToken',
 
   /**
    * Trading fees.
@@ -41,6 +46,7 @@ export enum DatumParameterKey {
   DepositFee = 'DepositFee',
   ScooperFee = 'ScooperFee',
   BaseFee = 'BaseFee',
+  ExecutionFee = 'ExecutionFee',
   FeeSharingNumerator = 'FeeSharingNumerator',
   OpeningFee = 'OpeningFee',
   FinalFee = 'FinalFee',

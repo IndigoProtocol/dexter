@@ -225,6 +225,7 @@ export class SwapRequest {
 
         // Standard parameters for a swap order
         const defaultSwapParameters: DatumParameters = {
+            [DatumParameterKey.Address]: this._dexter.walletProvider.address(),
             [DatumParameterKey.SenderPubKeyHash]: this._dexter.walletProvider.publicKeyHash(),
             [DatumParameterKey.SenderStakingKeyHash]: this._dexter.walletProvider.stakingKeyHash(),
             [DatumParameterKey.ReceiverPubKeyHash]: this._dexter.walletProvider.publicKeyHash(),
@@ -246,7 +247,8 @@ export class SwapRequest {
                     return {
                         utxo,
                     }
-                }) as SpendUTxO[]
+                }) as SpendUTxO[],
+                this._dexter.dataProvider
             );
     }
 
