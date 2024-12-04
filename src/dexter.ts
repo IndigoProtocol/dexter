@@ -15,12 +15,11 @@ import { FetchRequest } from '@requests/fetch-request';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import { SplitSwapRequest } from '@requests/split-swap-request';
-import { TeddySwap } from '@dex/teddyswap';
-import { Spectrum } from '@dex/spectrum';
 import { SplitCancelSwapRequest } from '@requests/split-cancel-swap-request';
 import { SundaeSwapV3 } from '@dex/sundaeswap-v3';
 import { MinswapV2 } from '@dex/minswap-v2';
 import { WingRidersV2 } from '@dex/wingriders-v2';
+import { Splash } from '@dex/splash';
 
 export class Dexter {
 
@@ -68,8 +67,7 @@ export class Dexter {
             [WingRiders.identifier]: new WingRiders(this.requestConfig),
             [WingRidersV2.identifier]: new WingRidersV2(this.requestConfig),
             [VyFinance.identifier]: new VyFinance(this.requestConfig),
-            [TeddySwap.identifier]: new TeddySwap(this.requestConfig),
-            [Spectrum.identifier]: new Spectrum(this.requestConfig),
+            [Splash.identifier]: new Splash(this.requestConfig),
         };
     }
 

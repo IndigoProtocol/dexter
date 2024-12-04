@@ -2,6 +2,9 @@
 
 All notable changes to Dexter will be documented in this file.
 
+## [v5.4.9]
+- Splash integration
+
 ## [v5.4.0]
 - SundaeSwap v3 integration
 

@@ -47,5 +47,4 @@ export * from './dex/muesliswap';
 export * from './dex/wingriders';
 export * from './dex/wingriders-v2';
 export * from './dex/vyfinance';
-export * from './dex/teddyswap';
-export * from './dex/spectrum';
+export * from './dex/splash';
