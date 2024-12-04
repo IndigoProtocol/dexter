@@ -102,6 +102,9 @@ export class Splash extends BaseDex {
             return Promise.resolve(undefined);
         }
 
+        const assetAIndex: number = relevantAssets.length === 2 ? 0 : 1;
+        const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
+
         try {
             const builder: DefinitionBuilder = await new DefinitionBuilder().loadDefinition(pool);
             const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
@@ -113,8 +116,8 @@ export class Splash extends BaseDex {
                     ? 'lovelace'
                     : new Asset(parameters.PoolAssetAPolicyId as string, parameters.PoolAssetAAssetName as string),
                 new Asset(parameters.PoolAssetBPolicyId as string, parameters.PoolAssetBAssetName as string),
-                BigInt(parameters.ReserveA as number),
-                BigInt(parameters.ReserveB as number),
+                relevantAssets[assetAIndex].quantity - BigInt(parameters.PoolAssetATreasury as number),
+                relevantAssets[assetBIndex].quantity - BigInt(parameters.PoolAssetBTreasury as number),
                 utxo.address,
                 '',
                 '',

@@ -55,10 +55,10 @@ export default {
       int: DatumParameterKey.Unknown
     },
     {
-      int: DatumParameterKey.ReserveA
+      int: DatumParameterKey.PoolAssetATreasury
     },
     {
-      int: DatumParameterKey.ReserveB
+      int: DatumParameterKey.PoolAssetBTreasury
     },
     (field: DefinitionField, parameters: DatumParameters, shouldExtract: boolean = true) => {
       return;
