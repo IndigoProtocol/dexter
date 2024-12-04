@@ -183,7 +183,7 @@ export class Splash extends BaseDex {
         const walletUtxos: UTxO[] = await dataProvider.utxos(
             swapParameters[DatumParameterKey.Address] as string,
             swapParameters[DatumParameterKey.SwapInTokenPolicyId] !== ''
-                ? new Asset(DatumParameterKey.SwapInTokenPolicyId, DatumParameterKey.SwapInTokenAssetName)
+                ? new Asset(swapParameters.SwapInTokenPolicyId as string, swapParameters.SwapInTokenAssetName as string)
                 : undefined
         );
         const firstUtxo: UTxO = walletUtxos[0];
