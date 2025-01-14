@@ -1,4 +1,5 @@
 import { DatumParameterKey } from '@app/constants';
+import { DatumParameters, DefinitionField } from '@app/types';
 
 export default {
   constructor: 0,
@@ -48,15 +49,19 @@ export default {
       ]
     },
     {
-      int: DatumParameterKey.LpFee
+      int: DatumParameterKey.Unknown
     },
-    [
-      {
-        bytes: DatumParameterKey.StakeAdminPolicy
-      }
-    ],
     {
-      int: DatumParameterKey.LqBound
-    }
+      int: DatumParameterKey.Unknown
+    },
+    {
+      int: DatumParameterKey.PoolAssetATreasury
+    },
+    {
+      int: DatumParameterKey.PoolAssetBTreasury
+    },
+    (field: DefinitionField, parameters: DatumParameters, shouldExtract: boolean = true) => {
+      return;
+    },
   ]
 }

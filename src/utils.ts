@@ -2,6 +2,7 @@ import { Token } from '@dex/models/asset';
 import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { C, Datum, fromHex, Lucid, toHex, Utils } from 'lucid-cardano';
 import { DatumJson } from '@app/types';
+import { encoder } from 'js-encoding-utils';
 
 export const lucidUtils: Utils = new Utils(new Lucid());
 
@@ -63,3 +64,6 @@ export function datumJsonToCbor(json: DatumJson): Datum {
 
     return toHex(convert(json).to_bytes());
 }
+
+export const bytesToHex = (bytes: Uint8Array): string => encoder.arrayBufferToHexString(bytes);
+export const hexToBytes = (hex: string): Uint8Array => encoder.hexStringToArrayBuffer(hex);

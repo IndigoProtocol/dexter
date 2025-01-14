@@ -15,39 +15,53 @@ import {
 import { DefinitionBuilder } from '@app/definition-builder';
 import { AddressType, DatumParameterKey } from '@app/constants';
 import { BaseApi } from '@dex/api/base-api';
-import pool from './definitions/spectrum/pool';
-import order from './definitions/spectrum/order';
-import { correspondingReserves, tokensMatch } from '@app/utils';
-import { SpectrumApi } from '@dex/api/spectrum-api';
-import { Script } from 'lucid-cardano';
+import pool from '@dex/definitions/splash/pool';
+import order from '@dex/definitions/splash/order';
+import { bytesToHex, correspondingReserves, hexToBytes, lucidUtils, tokensMatch } from '@app/utils';
+import { AddressDetails, Script } from 'lucid-cardano';
+import { Uint64BE } from 'int64-buffer';
+import blake2b from 'blake2b';
+import { SplashApi } from '@dex/api/splash-api';
 
 const MAX_INT: bigint = 9_223_372_036_854_775_807n;
+const EXECUTOR_FEE: bigint = 1100000n;
+const WORST_ORDER_STEP_COST: bigint = 900000n;
 
-export class Spectrum extends BaseDex {
+export class Splash extends BaseDex {
 
-    public static readonly identifier: string = 'Spectrum';
-    public readonly api: BaseApi;
+    public static readonly identifier: string = 'Splash';
+    readonly api: BaseApi;
 
     /**
      * On-Chain constants.
      */
-    public readonly orderAddress: string = 'addr1wynp362vmvr8jtc946d3a3utqgclfdl5y9d3kn849e359hsskr20n';
-    public readonly cancelDatum: string = 'd8799f00000001ff';
+    public readonly cancelDatum: string = 'd87980';
+    public readonly orderScriptHash: string = '464eeee89f05aff787d40045af2a40a83fd96c513197d32fbc54ff02';
+    public readonly batcherKey: string = '5cb2c968e5d1c7197a6ce7615967310a375545d9bc65063a964335b2';
     public readonly orderScript: Script = {
         type: 'PlutusV2',
-        script: '5904f901000032323232323232323232323232323232323232323222253330143232323232323232323232323232323232323232323232323232323253330303370e90010010991919299981999b8753330333370e6eb4c0d0c0d403d2000148000520024800054cc090cdc399814805181a00e240042a66048664466ebcdd3981c0011ba730380013034004303400815330243370e666064444a666060002200426600666e00009200230380014800004d20041533024337126eb4c0d0c0d405800854cc0900044cccc8888cdc499b833370466e08cc0b403800c008004cdc019b823302d00e004483403ccdc100100099b8000648008c0d0078c0d0074dd6981a00b1bad303401b13322332303522533303200114a02a66607066ebcc0e400400c52889801181d0009ba90010023758606864606c606c606c606c606c002606a0286eb8c0d00614cc8cc0cc00452899191929981319b8f375c606c606e0046eb8c0d8c0dc0044cdc79bae3036002375c606c002606e04e606c002606603826666644444646466e24cdc099b81302900d375a00266e0ccdc10028020019814809a99981c191929981599b8f375c607660780046eb8c0ecc0f00044cdc79bae303b002375c60760026078058607600c26ea00144004dd424000606603a6eb4c0cc054004dd6981980c9bad303301853330313232325330253371e6eb8c0d4c0d8008dd7181a981b000899b8f375c606a0046eb8c0d4004c0d8098c0d4004c0c806c4cdc199b82001375a606402e66e04dd6981900b9bad30320181001337026604c01460620346604c00860620342c606600460540026ea8c0b8c0bc064dd599181718179818000981698170009817000998139bad302b00700a37566460566058605a002605460560026056002660486eb4c0a001401ccc88c8c8c94ccc0acc8c8c94ccc0b8cdc3a40040042646464a66606266e1d200000214a0266ebcdd38021ba70013034002302b001375400e2646464a66606266e1d200200214a0266ebcdd38021ba70013034002302b001375400e606200460500026ea8004400858c8c8c8c8c94ccc0bccdc3a4000004264646464a66606666e1d200000213232323253330373370e90010010b099ba548000004c0e8008c0c4004dd5000981a0008b181b00118168009baa001303000113374a9001015181900118148009baa001302c302d302e001302b302d0053756646464a66605866e1d2002002161533302c3371e6eb8c0b40040184c0b4c0b8c0bc01c58c0bc008c098004dd50009918151816000981498158019bae302700b302700a33022375a604c002008604c002604a002604a0206eb0c088008dd61810801181098108009810980f805180f800980f000980e800980e000980d800980d000980c800980c000980c002180b8008a4c2c4a66601600229000099980899baf300d3012001375200c6eb4c054c048dd5980a9809000a4000446660220040020062940cdd2a4000660026ea4008cc004dd48010042ba0489002232333004003375c601c0026eb8c038c03c004c03c004888cccc01000920002333300500248001d69bab00100323002375200244446601444a66600e002200a2a66601a66ebcc024c0380040184c010c044c0380044c008c03c00400555cfa5eb8155ce91299980299b8800248000584cc00c008004c0048894ccc014cdc3801240002600c00226600666e04009200230070012323002233002002001230022330020020015734ae855d1118011baa0015573c1',
+        script: '59042d01000033232323232323222323232232253330093232533300b0041323300100137566022602460246024602460246024601c6ea8008894ccc040004528099299980719baf00d300f301300214a226600600600260260022646464a66601c6014601e6ea80044c94ccc03cc030c040dd5000899191929998090038a99980900108008a5014a066ebcc020c04cdd5001180b180b980b980b980b980b980b980b980b980b98099baa00f3375e600860246ea8c010c048dd5180a98091baa00230043012375400260286eb0c050c054c054c044dd50028b1991191980080080191299980a8008a60103d87a80001323253330143375e6016602c6ea80080144cdd2a40006603000497ae0133004004001301900230170013758600a60206ea8010c04cc040dd50008b180098079baa0052301230130013322323300100100322533301200114a0264a66602066e3cdd7180a8010020a5113300300300130150013758602060226022602260226022602260226022601a6ea8004dd71808180898089808980898089808980898089808980898069baa0093001300c37540044601e00229309b2b19299980598050008a999804180218048008a51153330083005300900114a02c2c6ea8004c8c94ccc01cc010c020dd50028991919191919191919191919191919191919191919191919299981118128010991919191924c646600200200c44a6660500022930991980180198160011bae302a0015333022301f30233754010264646464a666052605800426464931929998141812800899192999816981800109924c64a666056605000226464a66606060660042649318140008b181880098169baa0021533302b3027001132323232323253330343037002149858dd6981a800981a8011bad30330013033002375a6062002605a6ea800858c0acdd50008b181700098151baa0031533302830240011533302b302a37540062930b0b18141baa002302100316302a001302a0023028001302437540102ca666042603c60446ea802c4c8c8c8c94ccc0a0c0ac00852616375a605200260520046eb4c09c004c08cdd50058b180d006180c8098b1bac30230013023002375c60420026042004603e002603e0046eb4c074004c074008c06c004c06c008c064004c064008dd6980b800980b8011bad30150013015002375a60260026026004602200260220046eb8c03c004c03c008dd7180680098049baa0051625333007300430083754002264646464a66601c60220042930b1bae300f001300f002375c601a00260126ea8004588c94ccc01cc0100044c8c94ccc030c03c00852616375c601a00260126ea800854ccc01cc00c0044c8c94ccc030c03c00852616375c601a00260126ea800858c01cdd50009b8748008dc3a4000ae6955ceaab9e5573eae815d0aba24c0126d8799fd87a9f581c96f5c1bee23481335ff4aece32fe1dfa1aa40a944a66d2d6edc9a9a5ffff0001',
     };
 
     constructor(requestConfig: RequestConfig = {}) {
         super();
 
-        this.api = new SpectrumApi(this, requestConfig);
+        this.api = new SplashApi(this, requestConfig);
     }
 
     public async liquidityPoolAddresses(provider: BaseDataProvider): Promise<string[]> {
         return Promise.resolve([
             'addr1x94ec3t25egvhqy2n265xfhq882jxhkknurfe9ny4rl9k6dj764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrst84slu',
             'addr1x8nz307k3sr60gu0e47cmajssy4fmld7u493a4xztjrll0aj764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrswgxsta',
+            'addr1x8xw6pmmy8jcnpss6sg7za9c5lk2v9nflq684vzxyn70unaj764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrs4tm5z7',
+            'addr1x8cq97k066w4rd37wprvd4qrfxctzlyd6a67us2uv6hnen9j764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrsgzvahe',
+            'addr1xxcdveqw6g88w6cvwkf705xw30gflshu79ljc3ysrmmluadj764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrscak26z',
+            'addr1x8mql508pa9emlqfeh0g6lmlzfmauf55eq49zmta8ny7q04j764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrs08z9dt',
+            'addr1xxw7upjedpkr4wq839wf983jsnq3yg40l4cskzd7dy8eyndj764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrsgddq74',
+            'addr1x8zjsd5fagcwpysv2zklwu69kkqfcpwfvtxpz8s0r5kmakaj764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrszgx7ef',
+            'addr1x92m92cttwgpllls5y4c889splwgujjyy0eccl424nlezm9j764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrswdesh2',
+            'addr1xxg94wrfjcdsjncmsxtj0r87zk69e0jfl28n934sznu95tdj764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrs2993lw',
+            'addr1x9wnm7vle7al9q4aw63aw63wxz7aytnpc4h3gcjy0yufxwaj764lvrxdayh2ux30fl0ktuh27csgmpevdu89jlxppvrs84l0h4',
         ]);
     }
 
@@ -80,7 +94,6 @@ export class Spectrum extends BaseDex {
         const relevantAssets = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
             const assetName = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.assetName;
             return !assetName?.toLowerCase()?.endsWith('_nft')
-                && !assetName?.toLowerCase()?.endsWith('_identity')
                 && !assetName?.toLowerCase()?.endsWith('_lq');
         });
 
@@ -89,25 +102,26 @@ export class Spectrum extends BaseDex {
             return Promise.resolve(undefined);
         }
 
-        // Could be ADA/X or X/X pool
         const assetAIndex: number = relevantAssets.length === 2 ? 0 : 1;
         const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
-
-        const liquidityPool: LiquidityPool = new LiquidityPool(
-            Spectrum.identifier,
-            relevantAssets[assetAIndex].asset,
-            relevantAssets[assetBIndex].asset,
-            relevantAssets[assetAIndex].quantity,
-            relevantAssets[assetBIndex].quantity,
-            utxo.address,
-            this.orderAddress,
-            this.orderAddress
-        );
 
         try {
             const builder: DefinitionBuilder = await new DefinitionBuilder().loadDefinition(pool);
             const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
             const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
+
+            const liquidityPool: LiquidityPool = new LiquidityPool(
+                Splash.identifier,
+                parameters.PoolAssetAPolicyId === ''
+                    ? 'lovelace'
+                    : new Asset(parameters.PoolAssetAPolicyId as string, parameters.PoolAssetAAssetName as string),
+                new Asset(parameters.PoolAssetBPolicyId as string, parameters.PoolAssetBAssetName as string),
+                relevantAssets[assetAIndex].quantity - BigInt(parameters.PoolAssetATreasury as number),
+                relevantAssets[assetBIndex].quantity - BigInt(parameters.PoolAssetBTreasury as number),
+                utxo.address,
+                '',
+                '',
+            );
 
             const [lpTokenPolicyId, lpTokenAssetName] = typeof parameters.LpTokenPolicyId === 'string' && typeof parameters.LpTokenAssetName === 'string'
                 ? [parameters.LpTokenPolicyId, parameters.LpTokenAssetName]
@@ -131,27 +145,22 @@ export class Spectrum extends BaseDex {
             liquidityPool.identifier = liquidityPool.lpToken.identifier();
             liquidityPool.poolFeePercent = typeof parameters.LpFee === 'number' ? (1000 - parameters.LpFee) / 10 : 0.3;
         } catch (e) {
-            return liquidityPool;
+            return undefined;
         }
 
-        return liquidityPool;
+        return undefined;
     }
 
     estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
         const [reserveOut, reserveIn]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
 
-        const receive: bigint = (reserveIn * reserveOut) / (reserveOut - swapOutAmount) - reserveIn;
-        const swapFee: bigint = ((receive * BigInt(Math.floor(liquidityPool.poolFeePercent * 100))) + BigInt(10000) - 1n) / 10000n;
-
-        return receive + swapFee;
+        return (reserveIn * reserveOut) / (reserveOut - swapOutAmount) - reserveIn;
     }
 
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
         const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
 
-        const swapFee: bigint = ((swapInAmount * BigInt(Math.floor(liquidityPool.poolFeePercent * 100))) + BigInt(10000) - 1n) / 10000n;
-
-        return reserveOut - (reserveIn * reserveOut) / (reserveIn + swapInAmount - swapFee);
+        return reserveOut - (reserveIn * reserveOut) / (reserveIn + swapInAmount);
     }
 
     priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
@@ -162,7 +171,7 @@ export class Spectrum extends BaseDex {
         return (1 - (Number(reserveIn) / Number(reserveIn + swapInAmount))) * 100;
     }
 
-    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: SpendUTxO[] = []): Promise<PayToAddress[]> {
+    public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: SpendUTxO[] = [], dataProvider?: BaseDataProvider): Promise<PayToAddress[]> {
         const batcherFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'batcherFee');
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
         const minReceive = swapParameters.MinReceive as bigint;
@@ -170,9 +179,17 @@ export class Spectrum extends BaseDex {
         if (! batcherFee || ! deposit || ! minReceive) {
             return Promise.reject('Parameters for datum are not set.');
         }
-        if (! liquidityPool.poolNft) {
-            return Promise.reject('Pool NFT is required.');
+        if (! dataProvider) {
+            return Promise.reject('Data provider is required.');
         }
+
+        const walletUtxos: UTxO[] = await dataProvider.utxos(
+            swapParameters[DatumParameterKey.Address] as string,
+            swapParameters[DatumParameterKey.SwapInTokenPolicyId] !== ''
+                ? new Asset(swapParameters.SwapInTokenPolicyId as string, swapParameters.SwapInTokenAssetName as string)
+                : undefined
+        );
+        const firstUtxo: UTxO = walletUtxos[0];
 
         const decimalToFractionalImproved = (decimalValue: bigint | number): [bigint, bigint] => {
             const [whole, decimals = ''] = decimalValue.toString()?.split('.');
@@ -182,17 +199,24 @@ export class Spectrum extends BaseDex {
             return [numerator, denominator];
         }
 
-        const batcherFeeForToken = Number(batcherFee.value) / Number(minReceive);
-        const [numerator, denominator] = decimalToFractionalImproved(batcherFeeForToken);
-        const lpfee: bigint = BigInt(1000 - Math.floor(liquidityPool.poolFeePercent * 10));
+        const swapOutToken: Token = swapParameters.SwapOutTokenPolicyId === 'lovelace'
+            ? 'lovelace'
+            : new Asset(swapParameters.SwapOutTokenPolicyId as string, swapParameters.SwapOutTokenAssetName as string);
+
+        const outDecimals: number = swapOutToken === 'lovelace'
+            ? 6
+            : (tokensMatch(swapOutToken, liquidityPool.assetA)) ? (liquidityPool.assetA as Asset).decimals : (liquidityPool.assetB as Asset).decimals;
+        const [numerator, denominator] = decimalToFractionalImproved(Number(minReceive) / 10**outDecimals);
 
         swapParameters = {
             ...swapParameters,
-            [DatumParameterKey.TokenPolicyId]: liquidityPool.poolNft.policyId,
-            [DatumParameterKey.TokenAssetName]: liquidityPool.poolNft.nameHex,
-            [DatumParameterKey.LpFee]: lpfee,
+            [DatumParameterKey.Action]: '00',
+            [DatumParameterKey.BaseFee]: WORST_ORDER_STEP_COST,
+            [DatumParameterKey.ExecutionFee]: EXECUTOR_FEE,
             [DatumParameterKey.LpFeeNumerator]: numerator,
             [DatumParameterKey.LpFeeDenominator]: denominator,
+            [DatumParameterKey.Beacon]: bytesToHex(Uint8Array.from(new Array(28).fill(0))),
+            [DatumParameterKey.Batcher]: this.batcherKey,
         };
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
@@ -200,9 +224,26 @@ export class Spectrum extends BaseDex {
             builder.pushParameters(swapParameters);
         });
 
+        const hash: string = blake2b(28).update(hexToBytes(datumBuilder.getCbor())).digest('hex');
+
+        swapParameters.Beacon = this.getBeacon(firstUtxo, hash);
+
+        await datumBuilder.loadDefinition(order).then((builder: DefinitionBuilder) => {
+            builder.pushParameters(swapParameters);
+        });
+
         return [
             this.buildSwapOrderPayment(swapParameters, {
-                address: this.orderAddress,
+                address: lucidUtils.credentialToAddress(
+                    {
+                        type: 'Script',
+                        hash: this.orderScriptHash,
+                    },
+                    {
+                        type: 'Key',
+                        hash: swapParameters.SenderStakingKeyHash as string,
+                    },
+                ),
                 addressType: AddressType.Contract,
                 assetBalances: [
                     {
@@ -212,14 +253,16 @@ export class Spectrum extends BaseDex {
                 ],
                 datum: datumBuilder.getCbor(),
                 isInlineDatum: true,
-                spendUtxos: spendUtxos,
+                spendUtxos: spendUtxos.concat({ utxo: firstUtxo }),
             }),
         ];
     }
 
     public async buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]> {
         const relevantUtxo: UTxO | undefined = txOutputs.find((utxo: UTxO) => {
-            return utxo.address === this.orderAddress;
+            const addressDetails: AddressDetails | undefined = lucidUtils.getAddressDetails(utxo.address);
+
+            return (addressDetails.paymentCredential?.hash ?? '') === this.orderScriptHash;
         });
 
         if (! relevantUtxo) {
@@ -265,5 +308,16 @@ export class Spectrum extends BaseDex {
                 isReturned: true,
             },
         ];
+    }
+
+    private getBeacon(utxo: UTxO, datumHash: string) {
+        return blake2b(28).update(
+            Uint8Array.from([
+                ...hexToBytes(utxo.txHash),
+                ...new Uint64BE(Number(utxo.outputIndex)).toArray(),
+                ...new Uint64BE(0).toArray(),
+                ...hexToBytes(datumHash),
+            ])
+        ).digest('hex');
     }
 }
