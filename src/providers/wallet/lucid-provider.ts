@@ -93,7 +93,7 @@ export class LucidProvider extends BaseWalletProvider {
         return transaction;
     }
 
-    public paymentsForTransaction(transaction: DexTransaction, payToAddresses: PayToAddress[]): Promise<DexTransaction> {
+    public async paymentsForTransaction(transaction: DexTransaction, payToAddresses: PayToAddress[]): Promise<DexTransaction> {
         payToAddresses.forEach((payToAddress: PayToAddress) => {
             const payment: Assets = this.paymentFromAssets(payToAddress.assetBalances);
 
