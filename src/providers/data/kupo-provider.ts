@@ -1,5 +1,4 @@
 import { BaseDataProvider } from './base-data-provider';
-import { Asset } from '@dex/models/asset';
 import {
     AssetAddress,
     AssetBalance,
@@ -15,6 +14,7 @@ import {
 import axios, { AxiosInstance } from 'axios';
 import { Data } from 'lucid-cardano';
 import { appendSlash } from '@app/utils';
+import { Asset } from '@indigo-labs/iris-sdk';
 
 export class KupoProvider extends BaseDataProvider {
 

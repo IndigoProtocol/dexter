@@ -1,28 +1,19 @@
-import { LiquidityPool } from './models/liquidity-pool';
-import { BaseDataProvider } from '@providers/data/base-data-provider';
-import { Asset, Token } from './models/asset';
 import { BaseDex } from './base-dex';
-import { AssetBalance, DatumParameters, DefinitionConstr, DefinitionField, PayToAddress, RequestConfig, SpendUTxO, SwapFee, UTxO } from '@app/types';
+import { DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO } from '@app/types';
 import { DefinitionBuilder } from '@app/definition-builder';
 import { correspondingReserves, lucidUtils, tokensMatch } from '@app/utils';
 import { AddressType, DatumParameterKey } from '@app/constants';
-import pool from '@dex/definitions/sundaeswap-v3/pool';
 import order from '@dex/definitions/sundaeswap-v3/order';
-import { BaseApi } from '@dex/api/base-api';
 import { AddressDetails, Script } from 'lucid-cardano';
-import { SundaeSwapV3Api } from '@dex/api/sundaeswap-v3-api';
-import { BaseWalletProvider } from '@providers/wallet/base-wallet-provider';
+import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 
 export class SundaeSwapV3 extends BaseDex {
 
     public static readonly identifier: string = 'SundaeSwapV3';
-    public readonly api: BaseApi;
 
     /**
      * On-Chain constants.
      */
-    public readonly poolAddress: string = 'addr1x8srqftqemf0mjlukfszd97ljuxdp44r372txfcr75wrz26rnxqnmtv3hdu2t6chcfhl2zzjh36a87nmd6dwsu3jenqsslnz7e';
-    public readonly lpTokenPolicyId: string = 'e0302560ced2fdcbfcb2602697df970cd0d6a38f94b32703f51c312b';
     public readonly cancelDatum: string = 'd87a80';
     public readonly orderScriptHash: string = 'fa6a58bbe2d0ff05534431c8e2f0ef2cbdc1602a8456e4b13c8f3077';
     public readonly orderScript: Script = {
@@ -32,114 +23,32 @@ export class SundaeSwapV3 extends BaseDex {
 
     private readonly protocolFeeDefault: bigint = 1_280000n;
 
-    constructor(requestConfig: RequestConfig = {}) {
-        super();
-
-        this.api = new SundaeSwapV3Api(this, requestConfig);
-    }
-
-    public async liquidityPoolAddresses(): Promise<string[]> {
-        return Promise.resolve([this.poolAddress]);
-    }
-
-    async liquidityPools(provider: BaseDataProvider, wallet?: BaseWalletProvider): Promise<LiquidityPool[]> {
-        const utxos: UTxO[] = await provider.utxos(this.poolAddress);
-
-        return await Promise.all(
-            utxos.map(async (utxo: UTxO) => {
-                return await this.liquidityPoolFromUtxo(provider, utxo, wallet);
-            })
-        ).then((liquidityPools: (LiquidityPool | undefined)[]) => {
-            return liquidityPools.filter((liquidityPool?: LiquidityPool) => {
-                return liquidityPool !== undefined;
-            }) as LiquidityPool[];
-        });
-    }
-
-    public async liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO, wallet?: BaseWalletProvider): Promise<LiquidityPool | undefined> {
-        if (! utxo.datumHash) {
-            return Promise.resolve(undefined);
-        }
-
-        const relevantAssets: AssetBalance[] = utxo.assetBalances.filter((assetBalance: AssetBalance) => {
-          const assetBalanceId: string = assetBalance.asset === 'lovelace' ? 'lovelace' : assetBalance.asset.identifier();
-
-          return !assetBalanceId.startsWith(this.lpTokenPolicyId);
-        });
-
-        // Irrelevant UTxO
-        if (![2, 3].includes(relevantAssets.length)) {
-            return Promise.resolve(undefined);
-        }
-
-        // Could be ADA/X or X/X pool
-        const assetAIndex: number = relevantAssets.length === 2 ? 0 : 1;
-        const assetBIndex: number = relevantAssets.length === 2 ? 1 : 2;
-
-        try {
-            const builder: DefinitionBuilder = await new DefinitionBuilder().loadDefinition(pool);
-            const datum: DefinitionField = await provider.datumValue(utxo.datumHash);
-            const parameters: DatumParameters = builder.pullParameters(datum as DefinitionConstr);
-
-            const reservesA: bigint = relevantAssets[assetAIndex].asset === 'lovelace'
-                ? relevantAssets[assetAIndex].quantity - BigInt((parameters.ProtocolFee ?? 0) as number)
-                : relevantAssets[assetAIndex].quantity;
-            const reservesB: bigint = relevantAssets[assetBIndex].asset === 'lovelace'
-                ? relevantAssets[assetBIndex].quantity - BigInt((parameters.ProtocolFee ?? 0) as number)
-                : relevantAssets[assetBIndex].quantity;
-
-            const liquidityPool: LiquidityPool = new LiquidityPool(
-                SundaeSwapV3.identifier,
-                relevantAssets[assetAIndex].asset,
-                relevantAssets[assetBIndex].asset,
-                reservesA,
-                reservesB,
-                utxo.address,
-                '',
-                ''
-            );
-
-            const lpToken: Asset = utxo.assetBalances.find((assetBalance) => {
-                return assetBalance.asset !== 'lovelace' && assetBalance.asset.policyId === this.lpTokenPolicyId;
-            })?.asset as Asset;
-
-            if (lpToken) {
-                lpToken.nameHex = '0014df1' + lpToken.nameHex.substr(7);
-                liquidityPool.lpToken = lpToken;
-                liquidityPool.identifier = lpToken.identifier();
-            }
-
-            liquidityPool.lpToken = lpToken;
-            liquidityPool.identifier = typeof parameters.PoolIdentifier === 'string' ? parameters.PoolIdentifier : '';
-            liquidityPool.poolFeePercent = typeof parameters.OpeningFee === 'number' ? (parameters.OpeningFee / 10_000) * 100 : 0;
-            liquidityPool.totalLpTokens = typeof parameters.TotalLpTokens === 'number' ? BigInt(parameters.TotalLpTokens) : 0n;
-            liquidityPool.extra.protocolFee = typeof parameters.ProtocolFee === 'number' ? parameters.ProtocolFee : this.protocolFeeDefault;
-
-            return liquidityPool;
-        } catch (e) {
-            return undefined;
-        }
-    }
-
     estimatedGive(liquidityPool: LiquidityPool, swapOutToken: Token, swapOutAmount: bigint): bigint {
+        if (! liquidityPool.state) return 0n;
+
         const [reserveOut, reserveIn]: bigint[] = correspondingReserves(liquidityPool, swapOutToken);
 
+        const poolFeePercent: number = tokensMatch(liquidityPool.tokenA, swapOutToken) ? liquidityPool.state.sellFeePercent : liquidityPool.state.buyFeePercent;
         const receive: bigint = (reserveIn * reserveOut) / (reserveOut - swapOutAmount) - reserveIn;
-        const swapFee: bigint = (receive * BigInt(Math.floor(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
+        const swapFee: bigint = (receive * BigInt(Math.floor(poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
 
         return receive + swapFee;
     }
 
     estimatedReceive(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): bigint {
-        const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
+        if (! liquidityPool.state) return 0n;
 
-        const swapFee: bigint = (swapInAmount * BigInt(Math.floor(liquidityPool.poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
+        const [reserveIn, reserveOut]: bigint[] = correspondingReserves(liquidityPool, swapInToken);
+        const poolFeePercent: number = tokensMatch(liquidityPool.tokenA, swapInToken) ? liquidityPool.state.buyFeePercent : liquidityPool.state.sellFeePercent;
+        const swapFee: bigint = (swapInAmount * BigInt(Math.floor(poolFeePercent * 100)) + BigInt(10000) - 1n) / 10000n;
 
         return reserveOut - (reserveIn * reserveOut) / (reserveIn + swapInAmount - swapFee);
     }
 
     priceImpactPercent(liquidityPool: LiquidityPool, swapInToken: Token, swapInAmount: bigint): number {
-        const reserveIn: bigint = tokensMatch(swapInToken, liquidityPool.assetA) ? liquidityPool.reserveA : liquidityPool.reserveB;
+        if (! liquidityPool.state) return 0;
+
+        const reserveIn: bigint = tokensMatch(swapInToken, liquidityPool.tokenA) ? liquidityPool.state.reserveA : liquidityPool.state.reserveB;
 
         return (1 - Number(reserveIn) / Number(reserveIn + swapInAmount)) * 100;
     }

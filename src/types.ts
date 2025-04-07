@@ -1,8 +1,7 @@
 import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
-import { Token } from '@dex/models/asset';
 import { BaseDex } from '@dex/base-dex';
-import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { Script } from 'lucid-cardano';
+import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 
 export interface DexterConfig {
   shouldFetchMetadata?: boolean;

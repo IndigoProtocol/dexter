@@ -1,17 +1,12 @@
-import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { AvailableDexs, DexterConfig, RequestConfig } from '@app/types';
 import { Minswap } from '@dex/minswap';
-import { SundaeSwapV1 } from '@dex/sundaeswap-v1';
+import { SundaeSwap } from '@dex/sundaeswap';
 import { MuesliSwap } from '@dex/muesliswap';
 import { WingRiders } from '@dex/wingriders';
 import { SwapRequest } from '@requests/swap-request';
 import { BaseWalletProvider } from '@providers/wallet/base-wallet-provider';
 import { BaseDex } from '@dex/base-dex';
-import { VyFinance } from '@dex/vyfinance';
-import { BaseMetadataProvider } from '@providers/asset-metadata/base-metadata-provider';
-import { TokenRegistryProvider } from '@providers/asset-metadata/token-registry-provider';
 import { CancelSwapRequest } from '@requests/cancel-swap-request';
-import { FetchRequest } from '@requests/fetch-request';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import { SplitSwapRequest } from '@requests/split-swap-request';
@@ -20,16 +15,14 @@ import { SundaeSwapV3 } from '@dex/sundaeswap-v3';
 import { MinswapV2 } from '@dex/minswap-v2';
 import { WingRidersV2 } from '@dex/wingriders-v2';
 import { Splash } from '@dex/splash';
+import { BaseDataProvider } from '@providers/data/base-data-provider';
 
 export class Dexter {
 
     public config: DexterConfig;
     public requestConfig: RequestConfig;
-
-    public dataProvider?: BaseDataProvider;
     public walletProvider?: BaseWalletProvider;
-    public metadataProvider: BaseMetadataProvider;
-
+    public dataProvider?: BaseDataProvider;
     public availableDexs: AvailableDexs;
 
     constructor(config: DexterConfig = {}, requestConfig: RequestConfig = {}) {
@@ -57,17 +50,15 @@ export class Dexter {
         axiosRetry(axios, { retries: this.requestConfig.retries });
         axios.defaults.timeout = this.requestConfig.timeout;
 
-        this.metadataProvider = new TokenRegistryProvider(this.requestConfig);
         this.availableDexs = {
-            [Minswap.identifier]: new Minswap(this.requestConfig),
-            [SundaeSwapV1.identifier]: new SundaeSwapV1(this.requestConfig),
-            [SundaeSwapV3.identifier]: new SundaeSwapV3(this.requestConfig),
-            [MinswapV2.identifier]: new MinswapV2(this.requestConfig),
-            [MuesliSwap.identifier]: new MuesliSwap(this.requestConfig),
-            [WingRiders.identifier]: new WingRiders(this.requestConfig),
-            [WingRidersV2.identifier]: new WingRidersV2(this.requestConfig),
-            [VyFinance.identifier]: new VyFinance(this.requestConfig),
-            [Splash.identifier]: new Splash(this.requestConfig),
+            [Minswap.identifier]: new Minswap(this),
+            [SundaeSwap.identifier]: new SundaeSwap(this),
+            [SundaeSwapV3.identifier]: new SundaeSwapV3(this),
+            [MinswapV2.identifier]: new MinswapV2(this),
+            [MuesliSwap.identifier]: new MuesliSwap(this),
+            [WingRiders.identifier]: new WingRiders(this),
+            [WingRidersV2.identifier]: new WingRidersV2(this),
+            [Splash.identifier]: new Splash(this),
         };
     }
 
@@ -94,22 +85,6 @@ export class Dexter {
         this.walletProvider = walletProvider;
 
         return this;
-    }
-
-    /**
-     * Switch to a new asset metadata provider.
-     */
-    public withMetadataProvider(metadataProvider: BaseMetadataProvider): Dexter {
-        this.metadataProvider = metadataProvider;
-
-        return this;
-    }
-
-    /**
-     * New request for data fetching.
-     */
-    public newFetchRequest(): FetchRequest {
-        return new FetchRequest(this);
     }
 
     /**

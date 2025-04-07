@@ -1,8 +1,7 @@
-import { Token } from '@dex/models/asset';
-import { LiquidityPool } from '@dex/models/liquidity-pool';
 import { C, Datum, fromHex, Lucid, toHex, Utils } from 'lucid-cardano';
 import { DatumJson } from '@app/types';
 import { encoder } from 'js-encoding-utils';
+import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 
 export const lucidUtils: Utils = new Utils(new Lucid());
 
@@ -14,9 +13,11 @@ export function tokensMatch(tokenA: Token, tokenB: Token): boolean {
 }
 
 export function correspondingReserves(liquidityPool: LiquidityPool, token: Token): bigint[] {
-    return tokensMatch(token, liquidityPool.assetA)
-        ? [liquidityPool.reserveA, liquidityPool.reserveB]
-        : [liquidityPool.reserveB, liquidityPool.reserveA]
+    if (! liquidityPool.state) return [0n, 0n];
+
+    return tokensMatch(token, liquidityPool.tokenA)
+        ? [liquidityPool.state.reserveA, liquidityPool.state.reserveB]
+        : [liquidityPool.state.reserveB, liquidityPool.state.reserveA]
 }
 
 export function appendSlash(value?: string) {
