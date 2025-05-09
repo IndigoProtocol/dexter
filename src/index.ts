@@ -13,6 +13,8 @@ export * from './definition-builder';
 export * from './providers/wallet/base-wallet-provider';
 export * from './providers/wallet/mock-wallet-provider';
 export * from './providers/wallet/lucid-provider';
+export * from './providers/data/blockfrost-provider';
+export * from './providers/data/kupo-provider';
 
 /**
  * Request exports.
