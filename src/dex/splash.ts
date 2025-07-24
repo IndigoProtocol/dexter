@@ -95,7 +95,7 @@ export class Splash extends BaseDex {
 
         swapParameters = {
             ...swapParameters,
-            [DatumParameterKey.Action]: '00',
+            [DatumParameterKey.Action]: '01',
             [DatumParameterKey.BaseFee]: WORST_ORDER_STEP_COST,
             [DatumParameterKey.ExecutionFee]: EXECUTOR_FEE,
             [DatumParameterKey.LpFeeNumerator]: numerator,

@@ -10,8 +10,8 @@
   ],
   "description": "Customizable Typescript SDK for interacting with Cardano DEXs",
   "type": "module",
-  "main": "./dist/index.cjs",
-  "types": "./dist/index.d.cts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist/**/*"
   ],
@@ -22,7 +22,7 @@
     "prepublishOnly": "npm run test"
   },
   "dependencies": {
-    "@indigo-labs/iris-sdk": "^1.0.4",
+    "@indigo-labs/iris-sdk": "file:../iris-sdk",
     "@types/blake2b": "^2.1.3",
     "@types/crypto-js": "^4.1.1",
     "axios": "^0.26.1",

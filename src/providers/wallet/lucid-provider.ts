@@ -16,6 +16,7 @@ import {
     Blockfrost,
     Datum, Kupmios,
     Lucid,
+    Network,
     TxComplete,
     TxHash,
     TxSigned,
@@ -31,6 +32,7 @@ export class LucidProvider extends BaseWalletProvider {
     private _usableAddress: string;
     private _paymentCredential: string;
     private _stakingCredential: string | undefined;
+    private _network: Network = 'Mainnet';
 
     public address(): string {
         return this._usableAddress;
@@ -88,7 +90,7 @@ export class LucidProvider extends BaseWalletProvider {
             return transaction;
         }
 
-        transaction.providerData.tx.attachMetadata(key, json);
+        // transaction.providerData.tx.attachMetadata(key, json);
 
         return transaction;
     }
@@ -173,6 +175,10 @@ export class LucidProvider extends BaseWalletProvider {
             });
     }
 
+    public setNetwork(network: Network): void {
+        this._network = network;
+    }
+
     private paymentFromAssets(assetBalances: AssetBalance[]): Assets {
         return assetBalances
             .reduce((payment: Record<Unit | 'lovelace', bigint>, assetBalance: AssetBalance) => {
@@ -209,7 +215,8 @@ export class LucidProvider extends BaseWalletProvider {
                 : new Blockfrost(
                     config.url,
                     config.projectId
-                )
+                ),
+            this._network
         );
     }
 

@@ -4,7 +4,9 @@ import { encoder } from 'js-encoding-utils';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 import { AddressType } from './constants';
 
-export const lucidUtils: Utils = new Utils(new Lucid());
+const l = new Lucid();
+l.network = 'Preprod';
+export const lucidUtils: Utils = new Utils(l);
 
 export function tokensMatch(tokenA: Token, tokenB: Token): boolean {
     const tokenAId: string = tokenA === 'lovelace' ? 'lovelace' : tokenA.identifier();
@@ -73,7 +75,7 @@ export function determineAddressType(address: string): AddressType {
     if (details.type === 'Enterprise') {
         return AddressType.Enterprise;
     }
-    
+
     return AddressType.Base;
 }
 

@@ -277,11 +277,11 @@ export class SwapRequest {
 
         const swapInTokenName: string = this._swapInToken === 'lovelace' ? 'ADA' : this._swapInToken.readableTicker;
         const swapOutTokenName: string = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.readableTicker;
-        swapTransaction.attachMetadata(MetadataKey.Message, {
-            msg: [
-                this._metadata !== '' ? this._metadata : `[${this._dexter.config.metadataMsgBranding}] ${this._liquidityPool.dex} ${swapInTokenName} -> ${swapOutTokenName} Swap`
-            ]
-        });
+        // swapTransaction.attachMetadata(MetadataKey.Message, {
+        //     msg: [
+        //         this._metadata !== '' ? this._metadata : `[${this._dexter.config.metadataMsgBranding}] ${this._liquidityPool.dex} ${swapInTokenName} -> ${swapOutTokenName} Swap`
+        //     ]
+        // });
 
         // Build transaction
         swapTransaction.payToAddresses(payToAddresses)
