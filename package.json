@@ -10,13 +10,13 @@
   ],
   "description": "Customizable Typescript SDK for interacting with Cardano DEXs",
   "type": "module",
-  "main": "./build/index.js",
-  "types": "./build/index.d.ts",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.cts",
   "files": [
-    "build/**/*"
+    "dist/**/*"
   ],
   "scripts": {
-    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean --tsconfig tsconfig.json",
     "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
     "prepare": "npm run build",
     "prepublishOnly": "npm run test"
@@ -47,6 +47,7 @@
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
     "tsc-alias": "^1.8.6",
+    "tsup": "^8.5.0",
     "typescript": "^5.0.3"
   }
 }

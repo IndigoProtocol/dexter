@@ -56,7 +56,7 @@ export default {
           constructor: 0,
           fields: [
             {
-              bytes: DatumParameterKey.SenderPubKeyHash,
+              bytes: DatumParameterKey.ReceiverPubKeyHash,
             }
           ]
         },
@@ -70,7 +70,7 @@ export default {
                   constructor: 0,
                   fields: [
                     {
-                      bytes: DatumParameterKey.SenderStakingKeyHash,
+                      bytes: DatumParameterKey.ReceiverStakingKeyHash,
                     }
                   ]
                 }
@@ -81,8 +81,11 @@ export default {
       ]
     },
     {
-      constructor: 0,
-      fields: []
+      constructor: DatumParameterKey.ReceiverDatumType, // none | inline | hash, none = 0, inline = 1, hash = 2
+      fields: [
+        // none = empty array
+        // hash or inline = hash of incoming datum as first field in the array
+      ]
     },
     {
       constructor: 0,

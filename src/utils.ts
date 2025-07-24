@@ -2,6 +2,7 @@ import { C, Datum, fromHex, Lucid, toHex, Utils } from 'lucid-cardano';
 import { DatumJson } from '@app/types';
 import { encoder } from 'js-encoding-utils';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
+import { AddressType } from './constants';
 
 export const lucidUtils: Utils = new Utils(new Lucid());
 
@@ -64,6 +65,16 @@ export function datumJsonToCbor(json: DatumJson): Datum {
     };
 
     return toHex(convert(json).to_bytes());
+}
+
+export function determineAddressType(address: string): AddressType {
+    const details = lucidUtils.getAddressDetails(address);
+
+    if (details.type === 'Enterprise') {
+        return AddressType.Enterprise;
+    }
+    
+    return AddressType.Base;
 }
 
 export const bytesToHex = (bytes: Uint8Array): string => encoder.arrayBufferToHexString(bytes);
