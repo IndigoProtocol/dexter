@@ -2653,7 +2653,7 @@ var Splash = class extends BaseDex {
     const [numerator, denominator] = decimalToFractionalImproved(Number(minReceive) / 10 ** outDecimals);
     swapParameters = {
       ...swapParameters,
-      ["Action" /* Action */]: "00",
+      ["Action" /* Action */]: "01",
       ["BaseFee" /* BaseFee */]: WORST_ORDER_STEP_COST,
       ["ExecutionFee" /* ExecutionFee */]: EXECUTOR_FEE,
       ["LpFeeNumerator" /* LpFeeNumerator */]: numerator,
