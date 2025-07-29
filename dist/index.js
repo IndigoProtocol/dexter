@@ -2601,8 +2601,8 @@ var order_default8 = {
 import { Uint64BE } from "int64-buffer";
 import blake2b from "blake2b";
 import { Asset as Asset2 } from "@indigo-labs/iris-sdk";
-var EXECUTOR_FEE = 1100000n;
-var WORST_ORDER_STEP_COST = 900000n;
+var EXECUTOR_FEE = 1000000n;
+var WORST_ORDER_STEP_COST = 1000000n;
 var Splash = class extends BaseDex {
   constructor() {
     super(...arguments);
@@ -2657,7 +2657,7 @@ var Splash = class extends BaseDex {
     const [numerator, denominator] = decimalToFractionalImproved(Number(minReceive) / 10 ** outDecimals);
     swapParameters = {
       ...swapParameters,
-      ["Action" /* Action */]: "01",
+      ["Action" /* Action */]: "00",
       ["BaseFee" /* BaseFee */]: WORST_ORDER_STEP_COST,
       ["ExecutionFee" /* ExecutionFee */]: EXECUTOR_FEE,
       ["LpFeeNumerator" /* LpFeeNumerator */]: numerator,

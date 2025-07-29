@@ -16,8 +16,8 @@ import blake2b from 'blake2b';
 import { BaseDataProvider } from '@providers/data/base-data-provider';
 import { Asset, LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 
-const EXECUTOR_FEE: bigint = 1100000n;
-const WORST_ORDER_STEP_COST: bigint = 900000n;
+const EXECUTOR_FEE: bigint = 1000000n;
+const WORST_ORDER_STEP_COST: bigint = 1000000n;
 
 export class Splash extends BaseDex {
 
@@ -95,7 +95,7 @@ export class Splash extends BaseDex {
 
         swapParameters = {
             ...swapParameters,
-            [DatumParameterKey.Action]: '01',
+            [DatumParameterKey.Action]: '00',
             [DatumParameterKey.BaseFee]: WORST_ORDER_STEP_COST,
             [DatumParameterKey.ExecutionFee]: EXECUTOR_FEE,
             [DatumParameterKey.LpFeeNumerator]: numerator,
