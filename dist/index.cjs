@@ -2723,7 +2723,7 @@ var Splash = class extends BaseDex {
     const price = liquidityPool.price;
     console.log(price);
     const outDecimals = swapOutToken === "lovelace" ? 6 : tokensMatch(swapOutToken, liquidityPool.tokenA) ? liquidityPool.tokenA.decimals ?? 0 : liquidityPool.tokenB.decimals ?? 0;
-    const [numerator, denominator] = decimalToFractionalImproved(Number(minReceive) / 10 ** outDecimals);
+    const [numerator, denominator] = decimalToFractionalImproved(0);
     swapParameters = {
       ...swapParameters,
       ["Action" /* Action */]: "00",
