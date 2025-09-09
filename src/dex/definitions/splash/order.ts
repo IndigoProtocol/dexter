@@ -107,6 +107,10 @@ export default {
     {
       bytes: DatumParameterKey.SenderPubKeyHash
     },
-    []
+    [
+      {
+        bytes: DatumParameterKey.Batcher
+      }
+    ]
   ]
 }
