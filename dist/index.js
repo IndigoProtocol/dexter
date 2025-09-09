@@ -92,9 +92,7 @@ var AddressType = /* @__PURE__ */ ((AddressType2) => {
 // src/utils.ts
 import { C, fromHex, Lucid, toHex, Utils } from "lucid-cardano";
 import { encoder } from "js-encoding-utils";
-var l = new Lucid();
-l.network = "Preprod";
-var lucidUtils = new Utils(l);
+var lucidUtils = new Utils(new Lucid());
 function tokensMatch(tokenA, tokenB) {
   const tokenAId = tokenA === "lovelace" ? "lovelace" : tokenA.identifier();
   const tokenBId = tokenB === "lovelace" ? "lovelace" : tokenB.identifier();
@@ -116,26 +114,26 @@ function datumJsonToCbor(json) {
     } else if (json2.bytes || !isNaN(Number(json2.bytes))) {
       return C.PlutusData.new_bytes(fromHex(json2.bytes));
     } else if (json2.map) {
-      const l2 = C.PlutusList.new();
+      const l = C.PlutusList.new();
       json2.forEach((v) => {
-        l2.add(convert(v));
+        l.add(convert(v));
       });
-      return C.PlutusData.new_list(l2);
+      return C.PlutusData.new_list(l);
     } else if (json2.list) {
-      const l2 = C.PlutusList.new();
+      const l = C.PlutusList.new();
       json2.list.forEach((v) => {
-        l2.add(convert(v));
+        l.add(convert(v));
       });
-      return C.PlutusData.new_list(l2);
+      return C.PlutusData.new_list(l);
     } else if (!isNaN(json2.constructor)) {
-      const l2 = C.PlutusList.new();
+      const l = C.PlutusList.new();
       json2.fields.forEach((v) => {
-        l2.add(convert(v));
+        l.add(convert(v));
       });
       return C.PlutusData.new_constr_plutus_data(
         C.ConstrPlutusData.new(
           C.BigNum.from_str(json2.constructor.toString()),
-          l2
+          l
         )
       );
     }

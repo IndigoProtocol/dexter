@@ -159,9 +159,7 @@ var AddressType = /* @__PURE__ */ ((AddressType2) => {
 // src/utils.ts
 var import_lucid_cardano = require("lucid-cardano");
 var import_js_encoding_utils = require("js-encoding-utils");
-var l = new import_lucid_cardano.Lucid();
-l.network = "Preprod";
-var lucidUtils = new import_lucid_cardano.Utils(l);
+var lucidUtils = new import_lucid_cardano.Utils(new import_lucid_cardano.Lucid());
 function tokensMatch(tokenA, tokenB) {
   const tokenAId = tokenA === "lovelace" ? "lovelace" : tokenA.identifier();
   const tokenBId = tokenB === "lovelace" ? "lovelace" : tokenB.identifier();
@@ -183,26 +181,26 @@ function datumJsonToCbor(json) {
     } else if (json2.bytes || !isNaN(Number(json2.bytes))) {
       return import_lucid_cardano.C.PlutusData.new_bytes((0, import_lucid_cardano.fromHex)(json2.bytes));
     } else if (json2.map) {
-      const l2 = import_lucid_cardano.C.PlutusList.new();
+      const l = import_lucid_cardano.C.PlutusList.new();
       json2.forEach((v) => {
-        l2.add(convert(v));
+        l.add(convert(v));
       });
-      return import_lucid_cardano.C.PlutusData.new_list(l2);
+      return import_lucid_cardano.C.PlutusData.new_list(l);
     } else if (json2.list) {
-      const l2 = import_lucid_cardano.C.PlutusList.new();
+      const l = import_lucid_cardano.C.PlutusList.new();
       json2.list.forEach((v) => {
-        l2.add(convert(v));
+        l.add(convert(v));
       });
-      return import_lucid_cardano.C.PlutusData.new_list(l2);
+      return import_lucid_cardano.C.PlutusData.new_list(l);
     } else if (!isNaN(json2.constructor)) {
-      const l2 = import_lucid_cardano.C.PlutusList.new();
+      const l = import_lucid_cardano.C.PlutusList.new();
       json2.fields.forEach((v) => {
-        l2.add(convert(v));
+        l.add(convert(v));
       });
       return import_lucid_cardano.C.PlutusData.new_constr_plutus_data(
         import_lucid_cardano.C.ConstrPlutusData.new(
           import_lucid_cardano.C.BigNum.from_str(json2.constructor.toString()),
-          l2
+          l
         )
       );
     }
