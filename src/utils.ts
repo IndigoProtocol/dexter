@@ -4,9 +4,7 @@ import { encoder } from 'js-encoding-utils';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 import { AddressType } from './constants';
 
-const l = new Lucid();
-l.network = 'Preprod';
-export const lucidUtils: Utils = new Utils(l);
+export const lucidUtils: Utils = new Utils(new Lucid());
 
 export function tokensMatch(tokenA: Token, tokenB: Token): boolean {
     const tokenAId: string = tokenA === 'lovelace' ? 'lovelace' : tokenA.identifier();
