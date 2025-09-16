@@ -2700,6 +2700,7 @@ var Splash = class extends BaseDex {
   async buildSwapOrder(liquidityPool, swapParameters, spendUtxos = []) {
     const batcherFee = this.swapOrderFees().find((fee) => fee.id === "batcherFee");
     const deposit = this.swapOrderFees().find((fee) => fee.id === "deposit");
+    const swapInAmount = swapParameters.SwapInAmount;
     const minReceive = swapParameters.MinReceive;
     if (!batcherFee || !deposit || !minReceive) {
       return Promise.reject("Parameters for datum are not set.");
@@ -2712,17 +2713,11 @@ var Splash = class extends BaseDex {
       swapParameters["SwapInTokenPolicyId" /* SwapInTokenPolicyId */] !== "" ? new import_iris_sdk2.Asset(swapParameters.SwapInTokenPolicyId, swapParameters.SwapInTokenAssetName) : void 0
     );
     const firstUtxo = walletUtxos[0];
-    const decimalToFractionalImproved = (decimalValue) => {
-      const [whole, decimals = ""] = decimalValue.toString()?.split(".");
-      let truncatedDecimals = decimals.slice(0, 15);
-      const denominator2 = BigInt(10 ** truncatedDecimals.length);
-      const numerator2 = BigInt(whole) * denominator2 + BigInt(decimals);
-      return [numerator2, denominator2];
-    };
+    const swapInToken = swapParameters.SwapInTokenPolicyId === "lovelace" ? "lovelace" : new import_iris_sdk2.Asset(swapParameters.SwapInTokenPolicyId, swapParameters.SwapInTokenAssetName);
     const swapOutToken = swapParameters.SwapOutTokenPolicyId === "lovelace" ? "lovelace" : new import_iris_sdk2.Asset(swapParameters.SwapOutTokenPolicyId, swapParameters.SwapOutTokenAssetName);
-    const price = formatDigits(liquidityPool.price, 8);
+    const inDecimals = swapInToken === "lovelace" ? 6 : tokensMatch(swapInToken, liquidityPool.tokenA) ? liquidityPool.tokenA.decimals ?? 0 : liquidityPool.tokenB.decimals ?? 0;
     const outDecimals = swapOutToken === "lovelace" ? 6 : tokensMatch(swapOutToken, liquidityPool.tokenA) ? liquidityPool.tokenA.decimals ?? 0 : liquidityPool.tokenB.decimals ?? 0;
-    const [numerator, denominator] = decimalToFractionalImproved(formatDigits(Number(minReceive) / 10 ** outDecimals, 10));
+    const [numerator, denominator] = [Number(minReceive) / 10 ** outDecimals, Number(swapInAmount) / 10 ** inDecimals];
     swapParameters = {
       ...swapParameters,
       ["Action" /* Action */]: "00",

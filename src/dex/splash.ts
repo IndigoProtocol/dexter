@@ -58,7 +58,9 @@ export class Splash extends BaseDex {
     public async buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos: SpendUTxO[] = []): Promise<PayToAddress[]> {
         const batcherFee: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'batcherFee');
         const deposit: SwapFee | undefined = this.swapOrderFees().find((fee: SwapFee) => fee.id === 'deposit');
-        const minReceive = swapParameters.MinReceive as bigint;
+
+        const swapInAmount: bigint = swapParameters.SwapInAmount as bigint;
+        const minReceive: bigint = swapParameters.MinReceive as bigint;
 
         if (! batcherFee || ! deposit || ! minReceive) {
             return Promise.reject('Parameters for datum are not set.');
@@ -75,24 +77,20 @@ export class Splash extends BaseDex {
         );
         const firstUtxo: UTxO = walletUtxos[0];
 
-        const decimalToFractionalImproved = (decimalValue: bigint | number): [bigint, bigint] => {
-            const [whole, decimals = ''] = decimalValue.toString()?.split('.');
-            let truncatedDecimals = decimals.slice(0, 15);
-            const denominator: bigint = BigInt(10 ** truncatedDecimals.length);
-            const numerator = BigInt(whole) * denominator + BigInt(decimals);
-            return [numerator, denominator];
-        }
-
+        const swapInToken: Token = swapParameters.SwapInTokenPolicyId === 'lovelace'
+            ? 'lovelace'
+            : new Asset(swapParameters.SwapInTokenPolicyId as string, swapParameters.SwapInTokenAssetName as string);
         const swapOutToken: Token = swapParameters.SwapOutTokenPolicyId === 'lovelace'
             ? 'lovelace'
             : new Asset(swapParameters.SwapOutTokenPolicyId as string, swapParameters.SwapOutTokenAssetName as string);
 
-        const price = formatDigits(liquidityPool.price, 8);
-
+        const inDecimals: number = swapInToken === 'lovelace'
+            ? 6
+            : (tokensMatch(swapInToken, liquidityPool.tokenA)) ? (liquidityPool.tokenA as Asset).decimals ?? 0 : (liquidityPool.tokenB as Asset).decimals ?? 0;
         const outDecimals: number = swapOutToken === 'lovelace'
             ? 6
             : (tokensMatch(swapOutToken, liquidityPool.tokenA)) ? (liquidityPool.tokenA as Asset).decimals ?? 0 : (liquidityPool.tokenB as Asset).decimals ?? 0;
-        const [numerator, denominator] = decimalToFractionalImproved(formatDigits(Number(minReceive) / 10**outDecimals, 10));
+        const [numerator, denominator] = [Number(minReceive) / 10**outDecimals, Number(swapInAmount) / 10**inDecimals];
 
         swapParameters = {
             ...swapParameters,
