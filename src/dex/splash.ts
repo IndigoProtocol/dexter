@@ -98,13 +98,16 @@ export class Splash extends BaseDex {
             ? 'lovelace'
             : new Asset(swapParameters.SwapOutTokenPolicyId as string, swapParameters.SwapOutTokenAssetName as string);
 
+        const estimatedReceive: bigint = this.estimatedReceive(liquidityPool, swapInToken, swapInAmount);
+        const receiveDifference: bigint = estimatedReceive - minReceive;
+
         const inDecimals: number = swapInToken === 'lovelace'
             ? 6
             : (tokensMatch(swapInToken, liquidityPool.tokenA)) ? (liquidityPool.tokenA as Asset).decimals ?? 0 : (liquidityPool.tokenB as Asset).decimals ?? 0;
         const outDecimals: number = swapOutToken === 'lovelace'
             ? 6
             : (tokensMatch(swapOutToken, liquidityPool.tokenA)) ? (liquidityPool.tokenA as Asset).decimals ?? 0 : (liquidityPool.tokenB as Asset).decimals ?? 0;
-        const [numerator, denominator] = decimalToFractionalImproved((Number(minReceive) / 10**outDecimals) / (Number(swapInAmount) / 10**inDecimals));
+        const [numerator, denominator] = decimalToFractionalImproved((Number(estimatedReceive + receiveDifference) / 10**outDecimals) / (Number(swapInAmount) / 10**inDecimals));
 
         swapParameters = {
             ...swapParameters,
