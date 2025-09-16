@@ -150,6 +150,7 @@ function determineAddressType(address) {
 }
 var bytesToHex = (bytes) => encoder.arrayBufferToHexString(bytes);
 var hexToBytes = (hex) => encoder.hexStringToArrayBuffer(hex);
+var formatDigits = (value, digits = 6) => Number(Number(value).toFixed(digits));
 
 // src/dex/base-dex.ts
 import { Asset } from "@indigo-labs/iris-sdk";
@@ -2651,7 +2652,7 @@ var Splash = class extends BaseDex {
       return [numerator2, denominator2];
     };
     const swapOutToken = swapParameters.SwapOutTokenPolicyId === "lovelace" ? "lovelace" : new Asset2(swapParameters.SwapOutTokenPolicyId, swapParameters.SwapOutTokenAssetName);
-    const price = liquidityPool.price;
+    const price = formatDigits(liquidityPool.price, 8);
     const outDecimals = swapOutToken === "lovelace" ? 6 : tokensMatch(swapOutToken, liquidityPool.tokenA) ? liquidityPool.tokenA.decimals ?? 0 : liquidityPool.tokenB.decimals ?? 0;
     const [numerator, denominator] = decimalToFractionalImproved(price);
     swapParameters = {
@@ -3433,6 +3434,7 @@ export {
   correspondingReserves,
   datumJsonToCbor,
   determineAddressType,
+  formatDigits,
   hexToBytes,
   lucidUtils,
   tokensMatch

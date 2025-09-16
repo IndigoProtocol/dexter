@@ -9,7 +9,7 @@ import {
 import { DefinitionBuilder } from '@app/definition-builder';
 import { AddressType, DatumParameterKey } from '@app/constants';
 import order from '@dex/definitions/splash/order';
-import { bytesToHex, correspondingReserves, hexToBytes, lucidUtils, tokensMatch } from '@app/utils';
+import { bytesToHex, correspondingReserves, formatDigits, hexToBytes, lucidUtils, tokensMatch } from '@app/utils';
 import { AddressDetails, Script } from 'lucid-cardano';
 import { Uint64BE } from 'int64-buffer';
 import blake2b from 'blake2b';
@@ -87,7 +87,7 @@ export class Splash extends BaseDex {
             ? 'lovelace'
             : new Asset(swapParameters.SwapOutTokenPolicyId as string, swapParameters.SwapOutTokenAssetName as string);
 
-        const price = liquidityPool.price;
+        const price = formatDigits(liquidityPool.price, 8);
 
         const outDecimals: number = swapOutToken === 'lovelace'
             ? 6

@@ -59,6 +59,7 @@ __export(index_exports, {
   correspondingReserves: () => correspondingReserves,
   datumJsonToCbor: () => datumJsonToCbor,
   determineAddressType: () => determineAddressType,
+  formatDigits: () => formatDigits,
   hexToBytes: () => hexToBytes,
   lucidUtils: () => lucidUtils,
   tokensMatch: () => tokensMatch
@@ -217,6 +218,7 @@ function determineAddressType(address) {
 }
 var bytesToHex = (bytes) => import_js_encoding_utils.encoder.arrayBufferToHexString(bytes);
 var hexToBytes = (hex) => import_js_encoding_utils.encoder.hexStringToArrayBuffer(hex);
+var formatDigits = (value, digits = 6) => Number(Number(value).toFixed(digits));
 
 // src/dex/base-dex.ts
 var import_iris_sdk = require("@indigo-labs/iris-sdk");
@@ -2718,7 +2720,7 @@ var Splash = class extends BaseDex {
       return [numerator2, denominator2];
     };
     const swapOutToken = swapParameters.SwapOutTokenPolicyId === "lovelace" ? "lovelace" : new import_iris_sdk2.Asset(swapParameters.SwapOutTokenPolicyId, swapParameters.SwapOutTokenAssetName);
-    const price = liquidityPool.price;
+    const price = formatDigits(liquidityPool.price, 8);
     const outDecimals = swapOutToken === "lovelace" ? 6 : tokensMatch(swapOutToken, liquidityPool.tokenA) ? liquidityPool.tokenA.decimals ?? 0 : liquidityPool.tokenB.decimals ?? 0;
     const [numerator, denominator] = decimalToFractionalImproved(price);
     swapParameters = {
@@ -3497,6 +3499,7 @@ var KupoProvider = class extends BaseDataProvider {
   correspondingReserves,
   datumJsonToCbor,
   determineAddressType,
+  formatDigits,
   hexToBytes,
   lucidUtils,
   tokensMatch

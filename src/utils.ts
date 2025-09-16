@@ -79,3 +79,4 @@ export function determineAddressType(address: string): AddressType {
 
 export const bytesToHex = (bytes: Uint8Array): string => encoder.arrayBufferToHexString(bytes);
 export const hexToBytes = (hex: string): Uint8Array => encoder.hexStringToArrayBuffer(hex);
+export const formatDigits = (value: any, digits: number = 6): number => Number(Number(value).toFixed(digits));
