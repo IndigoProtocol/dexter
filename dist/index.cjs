@@ -2713,11 +2713,19 @@ var Splash = class extends BaseDex {
       swapParameters["SwapInTokenPolicyId" /* SwapInTokenPolicyId */] !== "" ? new import_iris_sdk2.Asset(swapParameters.SwapInTokenPolicyId, swapParameters.SwapInTokenAssetName) : void 0
     );
     const firstUtxo = walletUtxos[0];
+    const decimalToFractionalImproved = (value) => {
+      let [whole, rawDecimals = ""] = Number(value).toLocaleString("en", { useGrouping: false, maximumSignificantDigits: 21 }).split(".");
+      const numDecimals = Math.min(rawDecimals.length, 20);
+      const decimals = rawDecimals.slice(0, numDecimals);
+      const denominator2 = BigInt("1" + "0".repeat(numDecimals));
+      const numerator2 = BigInt(whole) * denominator2 + BigInt(decimals || "0");
+      return [numerator2, denominator2];
+    };
     const swapInToken = swapParameters.SwapInTokenPolicyId === "lovelace" ? "lovelace" : new import_iris_sdk2.Asset(swapParameters.SwapInTokenPolicyId, swapParameters.SwapInTokenAssetName);
     const swapOutToken = swapParameters.SwapOutTokenPolicyId === "lovelace" ? "lovelace" : new import_iris_sdk2.Asset(swapParameters.SwapOutTokenPolicyId, swapParameters.SwapOutTokenAssetName);
     const inDecimals = swapInToken === "lovelace" ? 6 : tokensMatch(swapInToken, liquidityPool.tokenA) ? liquidityPool.tokenA.decimals ?? 0 : liquidityPool.tokenB.decimals ?? 0;
     const outDecimals = swapOutToken === "lovelace" ? 6 : tokensMatch(swapOutToken, liquidityPool.tokenA) ? liquidityPool.tokenA.decimals ?? 0 : liquidityPool.tokenB.decimals ?? 0;
-    const [numerator, denominator] = [Number(minReceive) / 10 ** outDecimals, Number(swapInAmount) / 10 ** inDecimals];
+    const [numerator, denominator] = decimalToFractionalImproved(Number(minReceive) / 10 ** outDecimals / (Number(swapInAmount) / 10 ** inDecimals));
     swapParameters = {
       ...swapParameters,
       ["Action" /* Action */]: "00",

@@ -77,6 +77,20 @@ export class Splash extends BaseDex {
         );
         const firstUtxo: UTxO = walletUtxos[0];
 
+        const decimalToFractionalImproved = (value: number): [bigint, bigint] => {
+            let [whole, rawDecimals = ''] = Number(value)
+                .toLocaleString("en", { useGrouping: false, maximumSignificantDigits: 21 })
+                .split('.');
+
+            const numDecimals = Math.min(rawDecimals.length, 20);
+            const decimals = rawDecimals.slice(0, numDecimals);
+
+            const denominator = BigInt("1" + "0".repeat(numDecimals));
+            const numerator = BigInt(whole) * denominator + BigInt(decimals || "0");
+
+            return [numerator, denominator];
+        }
+
         const swapInToken: Token = swapParameters.SwapInTokenPolicyId === 'lovelace'
             ? 'lovelace'
             : new Asset(swapParameters.SwapInTokenPolicyId as string, swapParameters.SwapInTokenAssetName as string);
@@ -90,7 +104,7 @@ export class Splash extends BaseDex {
         const outDecimals: number = swapOutToken === 'lovelace'
             ? 6
             : (tokensMatch(swapOutToken, liquidityPool.tokenA)) ? (liquidityPool.tokenA as Asset).decimals ?? 0 : (liquidityPool.tokenB as Asset).decimals ?? 0;
-        const [numerator, denominator] = [Number(minReceive) / 10**outDecimals, Number(swapInAmount) / 10**inDecimals];
+        const [numerator, denominator] = decimalToFractionalImproved((Number(minReceive) / 10**outDecimals) / (Number(swapInAmount) / 10**inDecimals));
 
         swapParameters = {
             ...swapParameters,
