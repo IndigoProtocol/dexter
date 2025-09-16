@@ -134,7 +134,7 @@ export class Splash extends BaseDex {
                 assetBalances: [
                     {
                         asset: 'lovelace',
-                        quantity: batcherFee?.value + deposit.value,
+                        quantity: 1_500_000n + batcherFee?.value + deposit.value,
                     },
                 ],
                 datum: datumBuilder.getCbor(),
