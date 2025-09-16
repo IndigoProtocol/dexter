@@ -92,7 +92,7 @@ export class Splash extends BaseDex {
         const outDecimals: number = swapOutToken === 'lovelace'
             ? 6
             : (tokensMatch(swapOutToken, liquidityPool.tokenA)) ? (liquidityPool.tokenA as Asset).decimals ?? 0 : (liquidityPool.tokenB as Asset).decimals ?? 0;
-        const [numerator, denominator] = decimalToFractionalImproved(price);
+        const [numerator, denominator] = decimalToFractionalImproved(formatDigits(Number(minReceive) / 10**outDecimals, 10));
 
         swapParameters = {
             ...swapParameters,

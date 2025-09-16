@@ -2654,7 +2654,7 @@ var Splash = class extends BaseDex {
     const swapOutToken = swapParameters.SwapOutTokenPolicyId === "lovelace" ? "lovelace" : new Asset2(swapParameters.SwapOutTokenPolicyId, swapParameters.SwapOutTokenAssetName);
     const price = formatDigits(liquidityPool.price, 8);
     const outDecimals = swapOutToken === "lovelace" ? 6 : tokensMatch(swapOutToken, liquidityPool.tokenA) ? liquidityPool.tokenA.decimals ?? 0 : liquidityPool.tokenB.decimals ?? 0;
-    const [numerator, denominator] = decimalToFractionalImproved(price);
+    const [numerator, denominator] = decimalToFractionalImproved(formatDigits(Number(minReceive) / 10 ** outDecimals, 10));
     swapParameters = {
       ...swapParameters,
       ["Action" /* Action */]: "00",
