@@ -2645,13 +2645,19 @@ var Splash = class extends BaseDex {
       swapParameters["SwapInTokenPolicyId" /* SwapInTokenPolicyId */] !== "" ? new Asset2(swapParameters.SwapInTokenPolicyId, swapParameters.SwapInTokenAssetName) : void 0
     );
     const firstUtxo = walletUtxos[0];
+    const decimalToFractionalImproved = (value) => {
+      let [whole, rawDecimals = ""] = Number(value).toLocaleString("en", { useGrouping: false, maximumSignificantDigits: 21 }).split(".");
+      const numDecimals = Math.min(rawDecimals.length, 20);
+      const decimals = rawDecimals.slice(0, numDecimals);
+      const denominator2 = BigInt("1" + "0".repeat(numDecimals));
+      const numerator2 = BigInt(whole) * denominator2 + BigInt(decimals || "0");
+      return [numerator2, denominator2];
+    };
     const swapInToken = swapParameters.SwapInTokenPolicyId === "lovelace" ? "lovelace" : new Asset2(swapParameters.SwapInTokenPolicyId, swapParameters.SwapInTokenAssetName);
     const swapOutToken = swapParameters.SwapOutTokenPolicyId === "lovelace" ? "lovelace" : new Asset2(swapParameters.SwapOutTokenPolicyId, swapParameters.SwapOutTokenAssetName);
-    const estimatedReceive = this.estimatedReceive(liquidityPool, swapInToken, swapInAmount);
-    const receiveDifference = estimatedReceive - minReceive;
     const inDecimals = swapInToken === "lovelace" ? 6 : tokensMatch(swapInToken, liquidityPool.tokenA) ? liquidityPool.tokenA.decimals ?? 0 : liquidityPool.tokenB.decimals ?? 0;
     const outDecimals = swapOutToken === "lovelace" ? 6 : tokensMatch(swapOutToken, liquidityPool.tokenA) ? liquidityPool.tokenA.decimals ?? 0 : liquidityPool.tokenB.decimals ?? 0;
-    const [numerator, denominator] = [minReceive, 1n];
+    const [numerator, denominator] = decimalToFractionalImproved(Number(swapInAmount) / 10 ** inDecimals / (Number(minReceive) / 10 ** outDecimals));
     swapParameters = {
       ...swapParameters,
       ["Action" /* Action */]: "00",
@@ -2687,7 +2693,7 @@ var Splash = class extends BaseDex {
         assetBalances: [
           {
             asset: "lovelace",
-            quantity: 1500000n + batcherFee?.value + deposit.value
+            quantity: WORST_ORDER_STEP_COST + batcherFee?.value + deposit.value
           }
         ],
         datum: datumBuilder.getCbor(),
@@ -2732,7 +2738,7 @@ var Splash = class extends BaseDex {
         id: "deposit",
         title: "Deposit",
         description: "This amount of ADA will be held as minimum UTxO ADA and will be returned when your order is processed or cancelled.",
-        value: 2000000n,
+        value: 1500000n,
         isReturned: true
       }
     ];

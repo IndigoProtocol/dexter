@@ -14,6 +14,7 @@ import { AddressDetails, Script } from 'lucid-cardano';
 import { Uint64BE } from 'int64-buffer';
 import blake2b from 'blake2b';
 import { Asset, LiquidityPool, Token } from '@indigo-labs/iris-sdk';
+import { min } from 'lodash';
 
 const EXECUTOR_FEE: bigint = 1000000n;
 const WORST_ORDER_STEP_COST: bigint = 1000000n;
@@ -77,6 +78,20 @@ export class Splash extends BaseDex {
         );
         const firstUtxo: UTxO = walletUtxos[0];
 
+        const decimalToFractionalImproved = (value: number): [bigint, bigint] => {
+            let [whole, rawDecimals = ''] = Number(value)
+                .toLocaleString("en", { useGrouping: false, maximumSignificantDigits: 21 })
+                .split('.');
+
+            const numDecimals = Math.min(rawDecimals.length, 20);
+            const decimals = rawDecimals.slice(0, numDecimals);
+
+            const denominator = BigInt("1" + "0".repeat(numDecimals));
+            const numerator = BigInt(whole) * denominator + BigInt(decimals || "0");
+
+            return [numerator, denominator];
+        }
+
         const swapInToken: Token = swapParameters.SwapInTokenPolicyId === 'lovelace'
             ? 'lovelace'
             : new Asset(swapParameters.SwapInTokenPolicyId as string, swapParameters.SwapInTokenAssetName as string);
@@ -84,16 +99,13 @@ export class Splash extends BaseDex {
             ? 'lovelace'
             : new Asset(swapParameters.SwapOutTokenPolicyId as string, swapParameters.SwapOutTokenAssetName as string);
 
-        const estimatedReceive: bigint = this.estimatedReceive(liquidityPool, swapInToken, swapInAmount);
-        const receiveDifference: bigint = estimatedReceive - minReceive;
-
         const inDecimals: number = swapInToken === 'lovelace'
             ? 6
             : (tokensMatch(swapInToken, liquidityPool.tokenA)) ? (liquidityPool.tokenA as Asset).decimals ?? 0 : (liquidityPool.tokenB as Asset).decimals ?? 0;
         const outDecimals: number = swapOutToken === 'lovelace'
             ? 6
             : (tokensMatch(swapOutToken, liquidityPool.tokenA)) ? (liquidityPool.tokenA as Asset).decimals ?? 0 : (liquidityPool.tokenB as Asset).decimals ?? 0;
-        const [numerator, denominator] = [minReceive, 1n];
+        const [numerator, denominator] = decimalToFractionalImproved((Number(swapInAmount) / 10**inDecimals) / (Number(minReceive) / 10**outDecimals));
 
         swapParameters = {
             ...swapParameters,
@@ -135,7 +147,7 @@ export class Splash extends BaseDex {
                 assetBalances: [
                     {
                         asset: 'lovelace',
-                        quantity: 1_500_000n + batcherFee?.value + deposit.value,
+                        quantity: WORST_ORDER_STEP_COST + batcherFee?.value + deposit.value,
                     },
                 ],
                 datum: datumBuilder.getCbor(),
@@ -185,7 +197,7 @@ export class Splash extends BaseDex {
                 id: 'deposit',
                 title: 'Deposit',
                 description: 'This amount of ADA will be held as minimum UTxO ADA and will be returned when your order is processed or cancelled.',
-                value: 2_000000n,
+                value: 1_500000n,
                 isReturned: true,
             },
         ];
