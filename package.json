@@ -1,6 +1,6 @@
 {
-  "name": "@indigo-labs/dexter",
-  "version": "5.4.10",
+  "name": "@zenith-securities/dexter",
+  "version": "5.5.0",
   "license": "MIT",
   "author": "Zachary Sluder",
   "keywords": [
@@ -18,8 +18,7 @@
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run test"
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@indigo-labs/iris-sdk": "^1.0.4",
