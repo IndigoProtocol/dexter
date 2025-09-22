@@ -1,5 +1,5 @@
-import { BaseDex } from './base-dex';
-import { DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO } from '../types';
+import { BaseDex } from './base-dex.js';
+import { DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO } from '../types.js';
 import { Script } from 'lucid-cardano';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 export declare class Minswap extends BaseDex {

@@ -1,7 +1,7 @@
-import { BaseDataProvider } from './base-data-provider';
+import { BaseDataProvider } from './base-data-provider.js';
 import axios from 'axios';
 import Bottleneck from 'bottleneck';
-import { appendSlash } from '../../utils';
+import { appendSlash } from '../../utils.js';
 import { Asset } from '@indigo-labs/iris-sdk';
 const API_BURST_SIZE = 500;
 const API_COOLDOWN_SIZE = 10;
@@ -16,7 +16,7 @@ export class BlockfrostProvider extends BaseDataProvider {
             timeout: 5000,
             proxyUrl: '',
         }, requestConfig);
-        this._api = axios.create({
+        this._api = axios.default.create({
             baseURL: (appendSlash(requestConfig.proxyUrl)) + config.url,
             timeout: this._requestConfig.timeout,
             headers: {

@@ -1,5 +1,5 @@
-import { DatumParameterKey } from '../../../constants';
-import { DatumParameters, DefinitionField } from '../../../types';
+import { DatumParameterKey } from '../../../constants.js';
+import { DatumParameters, DefinitionField } from '../../../types.js';
 declare const _default: {
     constructor: number;
     fields: ({

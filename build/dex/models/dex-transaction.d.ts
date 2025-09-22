@@ -1,6 +1,6 @@
-import { TransactionStatus } from '../../constants';
-import { BaseWalletProvider } from '../../providers/wallet/base-wallet-provider';
-import { DexTransactionError, PayToAddress } from '../../types';
+import { TransactionStatus } from '../../constants.js';
+import { BaseWalletProvider } from '../../providers/wallet/base-wallet-provider.js';
+import { DexTransactionError, PayToAddress } from '../../types.js';
 interface TransactionCallback {
     (transaction: DexTransaction): void;
 }

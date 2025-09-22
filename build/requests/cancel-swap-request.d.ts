@@ -1,6 +1,6 @@
-import { Dexter } from '../dexter';
-import { DexTransaction } from '../dex/models/dex-transaction';
-import { PayToAddress } from '../types';
+import { Dexter } from '../dexter.js';
+import { DexTransaction } from '../dex/models/dex-transaction.js';
+import { PayToAddress } from '../types.js';
 export declare class CancelSwapRequest {
     private _dexter;
     private _txHash;

@@ -1,6 +1,6 @@
-import { Cip30Api, PayToAddress, WalletOptions } from '@app/types';
-import { DexTransaction } from '@dex/models/dex-transaction';
-import { BaseWalletProvider } from './base-wallet-provider';
+import { Cip30Api, PayToAddress, WalletOptions } from '@app/types.js';
+import { DexTransaction } from '@dex/models/dex-transaction.js';
+import { BaseWalletProvider } from './base-wallet-provider.js';
 
 export class MockWalletProvider extends BaseWalletProvider {
 

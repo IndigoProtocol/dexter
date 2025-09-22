@@ -1,6 +1,6 @@
-import { Dexter } from '../dexter';
-import { PayToAddress, SwapFee, UTxO } from '../types';
-import { DexTransaction } from '../dex/models/dex-transaction';
+import { Dexter } from '../dexter.js';
+import { PayToAddress, SwapFee, UTxO } from '../types.js';
+import { DexTransaction } from '../dex/models/dex-transaction.js';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 export declare class SwapRequest {
     private _dexter;

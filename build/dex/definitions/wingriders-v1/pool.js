@@ -1,4 +1,4 @@
-import { DatumParameterKey } from '../../../constants';
+import { DatumParameterKey } from '../../../constants.js';
 /**
  * https://github.com/WingRiders/dex-serializer/blob/main/src/LiquidityPoolDatum.ts
  */

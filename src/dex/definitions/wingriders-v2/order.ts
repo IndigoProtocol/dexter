@@ -1,4 +1,4 @@
-import { DatumParameterKey } from '@app/constants';
+import { DatumParameterKey } from '@app/constants.js';
 
 export default {
   constructor: 0,

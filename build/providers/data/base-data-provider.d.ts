@@ -1,4 +1,4 @@
-import { AssetAddress, DefinitionField, Transaction, UTxO } from '../../types';
+import { AssetAddress, DefinitionField, Transaction, UTxO } from '../../types.js';
 import { Asset } from '@indigo-labs/iris-sdk';
 export declare abstract class BaseDataProvider {
     /**

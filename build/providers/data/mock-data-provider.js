@@ -1,4 +1,4 @@
-import { BaseDataProvider } from './base-data-provider';
+import { BaseDataProvider } from './base-data-provider.js';
 export class MockDataProvider extends BaseDataProvider {
     async utxos(address, asset) {
         return Promise.resolve([]);

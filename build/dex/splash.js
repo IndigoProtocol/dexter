@@ -1,8 +1,8 @@
-import { BaseDex } from './base-dex';
-import { DefinitionBuilder } from '../definition-builder';
-import { AddressType, DatumParameterKey } from '../constants';
-import order from './definitions/splash/order';
-import { bytesToHex, correspondingReserves, hexToBytes, lucidUtils, tokensMatch } from '../utils';
+import { BaseDex } from './base-dex.js';
+import { DefinitionBuilder } from '../definition-builder.js';
+import { AddressType, DatumParameterKey } from '../constants.js';
+import order from './definitions/splash/order.js';
+import { bytesToHex, correspondingReserves, hexToBytes, lucidUtils, tokensMatch } from '../utils.js';
 import { Uint64BE } from 'int64-buffer';
 import blake2b from 'blake2b';
 import { Asset } from '@indigo-labs/iris-sdk';

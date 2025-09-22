@@ -1,6 +1,6 @@
-import { BlockfrostConfig, Cip30Api, KupmiosConfig, PayToAddress, WalletOptions } from '../../types';
-import { DexTransaction } from '../../dex/models/dex-transaction';
-import { BaseWalletProvider } from './base-wallet-provider';
+import { BlockfrostConfig, Cip30Api, KupmiosConfig, PayToAddress, WalletOptions } from '../../types.js';
+import { DexTransaction } from '../../dex/models/dex-transaction.js';
+import { BaseWalletProvider } from './base-wallet-provider.js';
 export declare class LucidProvider extends BaseWalletProvider {
     isWalletLoaded: boolean;
     private _api;

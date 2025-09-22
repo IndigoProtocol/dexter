@@ -1,7 +1,7 @@
-import { DexTransaction } from '../../dex/models/dex-transaction';
-import { BaseWalletProvider } from './base-wallet-provider';
+import { DexTransaction } from '../../dex/models/dex-transaction.js';
+import { BaseWalletProvider } from './base-wallet-provider.js';
 import { Blockfrost, Kupmios, Lucid } from 'lucid-cardano';
-import { AddressType } from '../../constants';
+import { AddressType } from '../../constants.js';
 export class LucidProvider extends BaseWalletProvider {
     constructor() {
         super(...arguments);

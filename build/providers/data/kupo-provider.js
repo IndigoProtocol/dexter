@@ -1,7 +1,7 @@
-import { BaseDataProvider } from './base-data-provider';
+import { BaseDataProvider } from './base-data-provider.js';
 import axios from 'axios';
 import { Data } from 'lucid-cardano';
-import { appendSlash } from '../../utils';
+import { appendSlash } from '../../utils.js';
 import { Asset } from '@indigo-labs/iris-sdk';
 export class KupoProvider extends BaseDataProvider {
     constructor(config, requestConfig = {}) {
@@ -11,7 +11,7 @@ export class KupoProvider extends BaseDataProvider {
             proxyUrl: '',
         }, requestConfig);
         this._config = config;
-        this._kupoApi = axios.create({
+        this._kupoApi = axios.default.create({
             baseURL: appendSlash(requestConfig.proxyUrl) + config.url,
             timeout: this._requestConfig.timeout,
             headers: {

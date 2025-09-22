@@ -1,4 +1,4 @@
-import { MetadataKey, TransactionStatus } from '../constants';
+import { MetadataKey, TransactionStatus } from '../constants.js';
 export class CancelSwapRequest {
     constructor(dexter) {
         this._dexter = dexter;

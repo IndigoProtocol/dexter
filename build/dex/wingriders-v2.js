@@ -1,8 +1,8 @@
-import { BaseDex } from './base-dex';
-import { correspondingReserves, tokensMatch } from '../utils';
-import { AddressType, DatumParameterKey } from '../constants';
-import { DefinitionBuilder } from '../definition-builder';
-import order from './definitions/wingriders-v2/order';
+import { BaseDex } from './base-dex.js';
+import { correspondingReserves, tokensMatch } from '../utils.js';
+import { AddressType, DatumParameterKey } from '../constants.js';
+import { DefinitionBuilder } from '../definition-builder.js';
+import order from './definitions/wingriders-v2/order.js';
 export class WingRidersV2 extends BaseDex {
     constructor() {
         super(...arguments);

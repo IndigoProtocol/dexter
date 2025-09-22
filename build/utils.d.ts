@@ -1,5 +1,5 @@
 import { Datum, Utils } from 'lucid-cardano';
-import { DatumJson } from './types';
+import { DatumJson } from './types.js';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 export declare const lucidUtils: Utils;
 export declare function tokensMatch(tokenA: Token, tokenB: Token): boolean;

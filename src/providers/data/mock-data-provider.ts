@@ -1,5 +1,5 @@
-import { BaseDataProvider } from './base-data-provider';
-import { AssetAddress, DefinitionField, Transaction, UTxO } from '@app/types';
+import { BaseDataProvider } from './base-data-provider.js';
+import { AssetAddress, DefinitionField, Transaction, UTxO } from '@app/types.js';
 import { Asset } from '@indigo-labs/iris-sdk';
 
 export class MockDataProvider extends BaseDataProvider {

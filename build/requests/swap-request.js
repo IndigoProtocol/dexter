@@ -1,5 +1,5 @@
-import { tokensMatch } from '../utils';
-import { DatumParameterKey, MetadataKey, TransactionStatus } from '../constants';
+import { tokensMatch } from '../utils.js';
+import { DatumParameterKey, MetadataKey, TransactionStatus } from '../constants.js';
 export class SwapRequest {
     constructor(dexter) {
         this._swapInAmount = 0n;

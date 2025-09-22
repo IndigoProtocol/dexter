@@ -1,5 +1,5 @@
-import { AddressType, DatumParameterKey, TransactionStatus } from './constants';
-import { BaseDex } from '@dex/base-dex';
+import { AddressType, DatumParameterKey, TransactionStatus } from './constants.js';
+import { BaseDex } from '@dex/base-dex.js';
 import { Script } from 'lucid-cardano';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 

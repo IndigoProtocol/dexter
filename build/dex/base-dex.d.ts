@@ -1,6 +1,6 @@
-import { DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO } from '../types';
+import { DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO } from '../types.js';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
-import { Dexter } from '../dexter';
+import { Dexter } from '../dexter.js';
 export declare abstract class BaseDex {
     protected dexter: Dexter;
     constructor(dexter: Dexter);

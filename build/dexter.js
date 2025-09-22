@@ -1,17 +1,17 @@
-import { Minswap } from './dex/minswap';
-import { SundaeSwap } from './dex/sundaeswap';
-import { MuesliSwap } from './dex/muesliswap';
-import { WingRiders } from './dex/wingriders';
-import { SwapRequest } from './requests/swap-request';
-import { CancelSwapRequest } from './requests/cancel-swap-request';
+import { Minswap } from './dex/minswap.js';
+import { SundaeSwap } from './dex/sundaeswap.js';
+import { MuesliSwap } from './dex/muesliswap.js';
+import { WingRiders } from './dex/wingriders.js';
+import { SwapRequest } from './requests/swap-request.js';
+import { CancelSwapRequest } from './requests/cancel-swap-request.js';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { SplitSwapRequest } from './requests/split-swap-request';
-import { SplitCancelSwapRequest } from './requests/split-cancel-swap-request';
-import { SundaeSwapV3 } from './dex/sundaeswap-v3';
-import { MinswapV2 } from './dex/minswap-v2';
-import { WingRidersV2 } from './dex/wingriders-v2';
-import { Splash } from './dex/splash';
+import { SplitSwapRequest } from './requests/split-swap-request.js';
+import { SplitCancelSwapRequest } from './requests/split-cancel-swap-request.js';
+import { SundaeSwapV3 } from './dex/sundaeswap-v3.js';
+import { MinswapV2 } from './dex/minswap-v2.js';
+import { WingRidersV2 } from './dex/wingriders-v2.js';
+import { Splash } from './dex/splash.js';
 export class Dexter {
     constructor(config = {}, requestConfig = {}) {
         this.config = Object.assign({}, {
@@ -26,8 +26,8 @@ export class Dexter {
             retries: 3,
         }, requestConfig);
         // Axios configurations
-        axiosRetry(axios, { retries: this.requestConfig.retries });
-        axios.defaults.timeout = this.requestConfig.timeout;
+        axiosRetry(axios.default, { retries: this.requestConfig.retries });
+        axios.default.defaults.timeout = this.requestConfig.timeout;
         this.availableDexs = {
             [Minswap.identifier]: new Minswap(this),
             [SundaeSwap.identifier]: new SundaeSwap(this),

@@ -1,4 +1,4 @@
-import { TransactionStatus } from '../../constants';
+import { TransactionStatus } from '../../constants.js';
 export class DexTransaction {
     constructor(walletProvider) {
         this.providerData = {};

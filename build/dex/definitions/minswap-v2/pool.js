@@ -1,4 +1,4 @@
-import { DatumParameterKey } from '../../../constants';
+import { DatumParameterKey } from '../../../constants.js';
 /**
  * https://github.com/minswap/minswap-dex-v2/blob/main/src/types/pool.ts
  */

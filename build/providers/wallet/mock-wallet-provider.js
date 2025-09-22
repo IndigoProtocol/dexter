@@ -1,5 +1,5 @@
-import { DexTransaction } from '../../dex/models/dex-transaction';
-import { BaseWalletProvider } from './base-wallet-provider';
+import { DexTransaction } from '../../dex/models/dex-transaction.js';
+import { BaseWalletProvider } from './base-wallet-provider.js';
 export class MockWalletProvider extends BaseWalletProvider {
     constructor() {
         super();

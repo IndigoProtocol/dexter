@@ -1,5 +1,5 @@
-import { DatumParameterKey } from '@app/constants';
-import { DatumParameters, DefinitionField } from '@app/types';
+import { DatumParameterKey } from '@app/constants.js';
+import { DatumParameters, DefinitionField } from '@app/types.js';
 
 /**
  * https://github.com/minswap/minswap-dex-v2/blob/main/src/types/pool.ts

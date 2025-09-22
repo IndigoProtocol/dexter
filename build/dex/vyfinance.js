@@ -1,8 +1,8 @@
-import { BaseDex } from './base-dex';
-import { DefinitionBuilder } from '../definition-builder';
-import { correspondingReserves, tokensMatch } from '../utils';
-import { AddressType, DatumParameterKey } from '../constants';
-import order from './definitions/vyfinance/order';
+import { BaseDex } from './base-dex.js';
+import { DefinitionBuilder } from '../definition-builder.js';
+import { correspondingReserves, tokensMatch } from '../utils.js';
+import { AddressType, DatumParameterKey } from '../constants.js';
+import order from './definitions/vyfinance/order.js';
 /**
  * VyFinance constants.
  */

@@ -1,6 +1,6 @@
-import { DatumParameterKey } from './constants';
+import { DatumParameterKey } from './constants.js';
 import _ from 'lodash';
-import { datumJsonToCbor } from './utils';
+import { datumJsonToCbor } from './utils.js';
 export class DefinitionBuilder {
     /**
      * Load a DEX definition file as a template for this builder.

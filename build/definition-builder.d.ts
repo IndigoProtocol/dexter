@@ -1,4 +1,4 @@
-import { DatumParameters, DefinitionConstr } from './types';
+import { DatumParameters, DefinitionConstr } from './types.js';
 export declare class DefinitionBuilder {
     private _definition;
     /**

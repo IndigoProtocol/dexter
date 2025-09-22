@@ -1,5 +1,5 @@
-import { BaseDataProvider } from './base-data-provider';
-import { AssetAddress, DefinitionField, KupoConfig, RequestConfig, Transaction, UTxO } from '../../types';
+import { BaseDataProvider } from './base-data-provider.js';
+import { AssetAddress, DefinitionField, KupoConfig, RequestConfig, Transaction, UTxO } from '../../types.js';
 import { Asset } from '@indigo-labs/iris-sdk';
 export declare class KupoProvider extends BaseDataProvider {
     private _config;

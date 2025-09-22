@@ -1,8 +1,8 @@
-import { BaseDex } from './base-dex';
-import { DefinitionBuilder } from '../definition-builder';
-import { correspondingReserves, lucidUtils, tokensMatch } from '../utils';
-import { AddressType, DatumParameterKey } from '../constants';
-import order from './definitions/sundaeswap-v3/order';
+import { BaseDex } from './base-dex.js';
+import { DefinitionBuilder } from '../definition-builder.js';
+import { correspondingReserves, lucidUtils, tokensMatch } from '../utils.js';
+import { AddressType, DatumParameterKey } from '../constants.js';
+import order from './definitions/sundaeswap-v3/order.js';
 export class SundaeSwapV3 extends BaseDex {
     constructor() {
         super(...arguments);

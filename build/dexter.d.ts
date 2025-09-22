@@ -1,11 +1,11 @@
-import { AvailableDexs, DexterConfig, RequestConfig } from './types';
-import { SwapRequest } from './requests/swap-request';
-import { BaseWalletProvider } from './providers/wallet/base-wallet-provider';
-import { BaseDex } from './dex/base-dex';
-import { CancelSwapRequest } from './requests/cancel-swap-request';
-import { SplitSwapRequest } from './requests/split-swap-request';
-import { SplitCancelSwapRequest } from './requests/split-cancel-swap-request';
-import { BaseDataProvider } from './providers/data/base-data-provider';
+import { AvailableDexs, DexterConfig, RequestConfig } from './types.js';
+import { SwapRequest } from './requests/swap-request.js';
+import { BaseWalletProvider } from './providers/wallet/base-wallet-provider.js';
+import { BaseDex } from './dex/base-dex.js';
+import { CancelSwapRequest } from './requests/cancel-swap-request.js';
+import { SplitSwapRequest } from './requests/split-swap-request.js';
+import { SplitCancelSwapRequest } from './requests/split-cancel-swap-request.js';
+import { BaseDataProvider } from './providers/data/base-data-provider.js';
 export declare class Dexter {
     config: DexterConfig;
     requestConfig: RequestConfig;

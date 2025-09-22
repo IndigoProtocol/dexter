@@ -1,8 +1,8 @@
-import { Dexter } from '@app/dexter';
-import { CancelSwapRequest } from '@requests/cancel-swap-request';
-import { PayToAddress, SplitCancelSwapMapping } from '@app/types';
-import { DexTransaction } from '@dex/models/dex-transaction';
-import { MetadataKey, TransactionStatus } from '@app/constants';
+import { Dexter } from '@app/dexter.js';
+import { CancelSwapRequest } from '@requests/cancel-swap-request.js';
+import { PayToAddress, SplitCancelSwapMapping } from '@app/types.js';
+import { DexTransaction } from '@dex/models/dex-transaction.js';
+import { MetadataKey, TransactionStatus } from '@app/constants.js';
 
 export class SplitCancelSwapRequest {
 

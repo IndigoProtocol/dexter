@@ -1,8 +1,8 @@
-import { Dexter } from '@app/dexter';
-import { DexTransaction } from '@dex/models/dex-transaction';
-import { PayToAddress, UTxO } from '@app/types';
-import { MetadataKey, TransactionStatus } from '@app/constants';
-import { BaseDataProvider } from '@providers/data/base-data-provider';
+import { Dexter } from '@app/dexter.js';
+import { DexTransaction } from '@dex/models/dex-transaction.js';
+import { PayToAddress, UTxO } from '@app/types.js';
+import { MetadataKey, TransactionStatus } from '@app/constants.js';
+import { BaseDataProvider } from '@providers/data/base-data-provider.js';
 
 export class CancelSwapRequest {
 

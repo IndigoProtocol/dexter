@@ -1,7 +1,7 @@
-import { Dexter } from '../dexter';
-import { SwapFee, SwapInAmountMapping, SwapOutAmountMapping, UTxO } from '../types';
-import { DexTransaction } from '../dex/models/dex-transaction';
-import { SwapRequest } from './swap-request';
+import { Dexter } from '../dexter.js';
+import { SwapFee, SwapInAmountMapping, SwapOutAmountMapping, UTxO } from '../types.js';
+import { DexTransaction } from '../dex/models/dex-transaction.js';
+import { SwapRequest } from './swap-request.js';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 export declare class SplitSwapRequest {
     private _dexter;

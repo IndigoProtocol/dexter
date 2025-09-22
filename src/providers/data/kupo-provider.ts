@@ -1,4 +1,4 @@
-import { BaseDataProvider } from './base-data-provider';
+import { BaseDataProvider } from './base-data-provider.js';
 import {
     AssetAddress,
     AssetBalance,
@@ -10,10 +10,10 @@ import {
     RequestConfig,
     Transaction,
     UTxO
-} from '@app/types';
+} from '@app/types.js';
 import axios, { AxiosInstance } from 'axios';
 import { Data } from 'lucid-cardano';
-import { appendSlash } from '@app/utils';
+import { appendSlash } from '@app/utils.js';
 import { Asset } from '@indigo-labs/iris-sdk';
 
 export class KupoProvider extends BaseDataProvider {
@@ -35,7 +35,7 @@ export class KupoProvider extends BaseDataProvider {
         );
 
         this._config = config;
-        this._kupoApi = axios.create({
+        this._kupoApi = axios.default.create({
             baseURL: appendSlash(requestConfig.proxyUrl) + config.url,
             timeout: this._requestConfig.timeout,
             headers: {

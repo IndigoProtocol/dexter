@@ -2,10 +2,10 @@
   "compilerOptions": {
     "outDir": "./build",
     "baseUrl": ".",
-    "module": "es2020",
+    "module": "NodeNext",
     "target": "es2020",
     "lib": ["es2020", "DOM"],
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "allowJs": true,
     "noImplicitAny": true,
     "declaration": true,

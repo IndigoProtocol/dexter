@@ -1,4 +1,4 @@
-import { MetadataKey, TransactionStatus } from '../constants';
+import { MetadataKey, TransactionStatus } from '../constants.js';
 export class SplitSwapRequest {
     constructor(dexter) {
         this._swapRequests = [];

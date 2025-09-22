@@ -1,19 +1,19 @@
-import { BaseDex } from './base-dex';
+import { BaseDex } from './base-dex.js';
 import {
     DatumParameters,
     PayToAddress,
     SpendUTxO,
     SwapFee,
     UTxO
-} from '@app/types';
-import { DefinitionBuilder } from '@app/definition-builder';
-import { AddressType, DatumParameterKey } from '@app/constants';
-import order from '@dex/definitions/splash/order';
-import { bytesToHex, correspondingReserves, hexToBytes, lucidUtils, tokensMatch } from '@app/utils';
+} from '@app/types.js';
+import { DefinitionBuilder } from '@app/definition-builder.js';
+import { AddressType, DatumParameterKey } from '@app/constants.js';
+import order from '@dex/definitions/splash/order.js';
+import { bytesToHex, correspondingReserves, hexToBytes, lucidUtils, tokensMatch } from '@app/utils.js';
 import { AddressDetails, Script } from 'lucid-cardano';
 import { Uint64BE } from 'int64-buffer';
 import blake2b from 'blake2b';
-import { BaseDataProvider } from '@providers/data/base-data-provider';
+import { BaseDataProvider } from '@providers/data/base-data-provider.js';
 import { Asset, LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 
 const EXECUTOR_FEE: bigint = 1100000n;

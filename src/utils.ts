@@ -1,5 +1,5 @@
 import { C, Datum, fromHex, Lucid, toHex, Utils } from 'lucid-cardano';
-import { DatumJson } from '@app/types';
+import { DatumJson } from '@app/types.js';
 import { encoder } from 'js-encoding-utils';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 

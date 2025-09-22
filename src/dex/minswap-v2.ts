@@ -1,15 +1,15 @@
-import { BaseDex } from './base-dex';
+import { BaseDex } from './base-dex.js';
 import {
     DatumParameters,
     PayToAddress,
     SpendUTxO,
     SwapFee,
     UTxO
-} from '@app/types';
-import { DefinitionBuilder } from '@app/definition-builder';
-import { correspondingReserves, lucidUtils, tokensMatch } from '@app/utils';
-import { AddressType, DatumParameterKey } from '@app/constants';
-import order from '@dex/definitions/minswap-v2/order';
+} from '@app/types.js';
+import { DefinitionBuilder } from '@app/definition-builder.js';
+import { correspondingReserves, lucidUtils, tokensMatch } from '@app/utils.js';
+import { AddressType, DatumParameterKey } from '@app/constants.js';
+import order from '@dex/definitions/minswap-v2/order.js';
 import { AddressDetails, Script } from 'lucid-cardano';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 

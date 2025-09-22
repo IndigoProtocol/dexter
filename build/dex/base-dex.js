@@ -1,5 +1,5 @@
-import { DatumParameterKey } from '../constants';
-import { tokensMatch } from '../utils';
+import { DatumParameterKey } from '../constants.js';
+import { tokensMatch } from '../utils.js';
 import { Asset } from '@indigo-labs/iris-sdk';
 export class BaseDex {
     constructor(dexter) {
