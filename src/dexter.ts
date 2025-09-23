@@ -15,6 +15,7 @@ import { SundaeSwapV3 } from '@dex/sundaeswap-v3.js';
 import { MinswapV2 } from '@dex/minswap-v2.js';
 import { WingRidersV2 } from '@dex/wingriders-v2.js';
 import { Splash } from '@dex/splash.js';
+import { VyFinance } from '@dex/vyfinance.js';
 import { BaseDataProvider } from '@providers/data/base-data-provider.js';
 
 export class Dexter {
@@ -59,6 +60,7 @@ export class Dexter {
             [WingRiders.identifier]: new WingRiders(this),
             [WingRidersV2.identifier]: new WingRidersV2(this),
             [Splash.identifier]: new Splash(this),
+            [VyFinance.identifier]: new VyFinance(this),
         };
     }
 

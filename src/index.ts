@@ -38,3 +38,4 @@ export * from './dex/muesliswap.js';
 export * from './dex/wingriders.js';
 export * from './dex/wingriders-v2.js';
 export * from './dex/splash.js';
+export * from './dex/vyfinance.js';
