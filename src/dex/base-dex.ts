@@ -1,8 +1,8 @@
-import { AssetBalance, DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO } from '@app/types';
-import { DatumParameterKey } from '@app/constants';
-import { tokensMatch } from '@app/utils';
+import { AssetBalance, DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO } from '@app/types.js';
+import { DatumParameterKey } from '@app/constants.js';
+import { tokensMatch } from '@app/utils.js';
 import { Asset, LiquidityPool, Token } from '@indigo-labs/iris-sdk';
-import { Dexter } from '@app/dexter';
+import { Dexter } from '@app/dexter.js';
 
 export abstract class BaseDex {
 

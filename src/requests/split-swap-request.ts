@@ -1,8 +1,8 @@
-import { Dexter } from '@app/dexter';
-import { PayToAddress, SwapFee, SwapInAmountMapping, SwapOutAmountMapping, UTxO } from '@app/types';
-import { MetadataKey, TransactionStatus } from '@app/constants';
-import { DexTransaction } from '@dex/models/dex-transaction';
-import { SwapRequest } from '@requests/swap-request';
+import { Dexter } from '@app/dexter.js';
+import { PayToAddress, SwapFee, SwapInAmountMapping, SwapOutAmountMapping, UTxO } from '@app/types.js';
+import { MetadataKey, TransactionStatus } from '@app/constants.js';
+import { DexTransaction } from '@dex/models/dex-transaction.js';
+import { SwapRequest } from '@requests/swap-request.js';
 import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 
 export class SplitSwapRequest {

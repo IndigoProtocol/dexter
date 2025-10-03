@@ -1,21 +1,22 @@
-import { AvailableDexs, DexterConfig, RequestConfig } from '@app/types';
-import { Minswap } from '@dex/minswap';
-import { SundaeSwap } from '@dex/sundaeswap';
-import { MuesliSwap } from '@dex/muesliswap';
-import { WingRiders } from '@dex/wingriders';
-import { SwapRequest } from '@requests/swap-request';
-import { BaseWalletProvider } from '@providers/wallet/base-wallet-provider';
-import { BaseDex } from '@dex/base-dex';
-import { CancelSwapRequest } from '@requests/cancel-swap-request';
+import { AvailableDexs, DexterConfig, RequestConfig } from '@app/types.js';
+import { Minswap } from '@dex/minswap.js';
+import { SundaeSwap } from '@dex/sundaeswap.js';
+import { MuesliSwap } from '@dex/muesliswap.js';
+import { WingRiders } from '@dex/wingriders.js';
+import { SwapRequest } from '@requests/swap-request.js';
+import { BaseWalletProvider } from '@providers/wallet/base-wallet-provider.js';
+import { BaseDex } from '@dex/base-dex.js';
+import { CancelSwapRequest } from '@requests/cancel-swap-request.js';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { SplitSwapRequest } from '@requests/split-swap-request';
-import { SplitCancelSwapRequest } from '@requests/split-cancel-swap-request';
-import { SundaeSwapV3 } from '@dex/sundaeswap-v3';
-import { MinswapV2 } from '@dex/minswap-v2';
-import { WingRidersV2 } from '@dex/wingriders-v2';
-import { Splash } from '@dex/splash';
-import { BaseDataProvider } from '@providers/data/base-data-provider';
+import { SplitSwapRequest } from '@requests/split-swap-request.js';
+import { SplitCancelSwapRequest } from '@requests/split-cancel-swap-request.js';
+import { SundaeSwapV3 } from '@dex/sundaeswap-v3.js';
+import { MinswapV2 } from '@dex/minswap-v2.js';
+import { WingRidersV2 } from '@dex/wingriders-v2.js';
+import { Splash } from '@dex/splash.js';
+import { VyFinance } from '@dex/vyfinance.js';
+import { BaseDataProvider } from '@providers/data/base-data-provider.js';
 
 export class Dexter {
 
@@ -47,8 +48,8 @@ export class Dexter {
         );
 
         // Axios configurations
-        axiosRetry(axios, { retries: this.requestConfig.retries });
-        axios.defaults.timeout = this.requestConfig.timeout;
+        axiosRetry(axios.default, { retries: this.requestConfig.retries });
+        axios.default.defaults.timeout = this.requestConfig.timeout;
 
         this.availableDexs = {
             [Minswap.identifier]: new Minswap(this),
@@ -59,6 +60,7 @@ export class Dexter {
             [WingRiders.identifier]: new WingRiders(this),
             [WingRidersV2.identifier]: new WingRidersV2(this),
             [Splash.identifier]: new Splash(this),
+            [VyFinance.identifier]: new VyFinance(this),
         };
     }
 

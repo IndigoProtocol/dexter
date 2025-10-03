@@ -1,4 +1,4 @@
-import { DatumParameterKey } from '@app/constants';
+import { DatumParameterKey } from '@app/constants.js';
 
 /**
  * https://github.com/minswap/minswap-dex-v2/blob/main/src/types/order.ts

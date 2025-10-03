@@ -1,0 +1,37 @@
+import { Dexter } from '../dexter.js';
+import { PayToAddress, SwapFee, UTxO } from '../types.js';
+import { DexTransaction } from '../dex/models/dex-transaction.js';
+import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
+export declare class SwapRequest {
+    private _dexter;
+    private _liquidityPool;
+    private _swapInToken;
+    private _swapOutToken;
+    private _swapInAmount;
+    private _slippagePercent;
+    private _withUtxos;
+    private _metadata;
+    constructor(dexter: Dexter);
+    get liquidityPool(): LiquidityPool;
+    get swapInToken(): Token;
+    get swapOutToken(): Token;
+    get swapInAmount(): bigint;
+    get slippagePercent(): number;
+    forLiquidityPool(liquidityPool: LiquidityPool): SwapRequest;
+    flip(): SwapRequest;
+    withMetadata(metadata: string): SwapRequest;
+    withSwapInToken(swapInToken: Token): SwapRequest;
+    withSwapOutToken(swapOutToken: Token): SwapRequest;
+    withSwapInAmount(swapInAmount: bigint): SwapRequest;
+    withSwapOutAmount(swapOutAmount: bigint): SwapRequest;
+    withMinimumReceive(minReceive: bigint): SwapRequest;
+    withSlippagePercent(slippagePercent: number): SwapRequest;
+    withUtxos(utxos: UTxO[]): SwapRequest;
+    getEstimatedReceive(liquidityPool?: LiquidityPool): bigint;
+    getMinimumReceive(liquidityPool?: LiquidityPool): bigint;
+    getPriceImpactPercent(): number;
+    getSwapFees(): SwapFee[];
+    getPaymentsToAddresses(): Promise<PayToAddress[]>;
+    submit(): DexTransaction;
+    private sendSwapOrder;
+}

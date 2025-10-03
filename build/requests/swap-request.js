@@ -1,0 +1,243 @@
+import { tokensMatch } from '../utils.js';
+import { DatumParameterKey, MetadataKey, TransactionStatus } from '../constants.js';
+export class SwapRequest {
+    constructor(dexter) {
+        this._swapInAmount = 0n;
+        this._slippagePercent = 1.0;
+        this._withUtxos = [];
+        this._metadata = '';
+        this._dexter = dexter;
+    }
+    get liquidityPool() {
+        return this._liquidityPool;
+    }
+    get swapInToken() {
+        return this._swapInToken;
+    }
+    get swapOutToken() {
+        return this._swapOutToken;
+    }
+    get swapInAmount() {
+        return this._swapInAmount;
+    }
+    get slippagePercent() {
+        return this._slippagePercent;
+    }
+    forLiquidityPool(liquidityPool) {
+        if (!Object.keys(this._dexter.availableDexs).includes(liquidityPool.dex)) {
+            throw new Error(`DEX ${liquidityPool.dex} provided with the liquidity pool is not available.`);
+        }
+        this._liquidityPool = liquidityPool;
+        return this;
+    }
+    flip() {
+        if (this._swapInToken) {
+            [this._swapInToken, this._swapOutToken] = [this._swapOutToken, this._swapInToken];
+            this.withSwapOutAmount(this._swapInAmount);
+        }
+        return this;
+    }
+    withMetadata(metadata) {
+        this._metadata = metadata;
+        return this;
+    }
+    withSwapInToken(swapInToken) {
+        if (!this._liquidityPool) {
+            throw new Error('Liquidity pool must be set before providing an input token.');
+        }
+        if (tokensMatch(swapInToken, this._liquidityPool.tokenA)) {
+            this._swapOutToken = this._liquidityPool.tokenB;
+        }
+        else if (tokensMatch(swapInToken, this._liquidityPool.tokenB)) {
+            this._swapOutToken = this._liquidityPool.tokenA;
+        }
+        else {
+            throw new Error("Input token doesn't exist in the set liquidity pool.");
+        }
+        this._swapInToken = swapInToken;
+        return this;
+    }
+    withSwapOutToken(swapOutToken) {
+        if (!this._liquidityPool) {
+            throw new Error('Liquidity pool must be set before providing an input token.');
+        }
+        if (tokensMatch(swapOutToken, this._liquidityPool.tokenA)) {
+            this._swapInToken = this._liquidityPool.tokenB;
+        }
+        else if (tokensMatch(swapOutToken, this._liquidityPool.tokenB)) {
+            this._swapInToken = this._liquidityPool.tokenA;
+        }
+        else {
+            throw new Error("Output token doesn't exist in the set liquidity pool.");
+        }
+        this._swapOutToken = swapOutToken;
+        return this;
+    }
+    withSwapInAmount(swapInAmount) {
+        this._swapInAmount = swapInAmount > 0n ? swapInAmount : 0n;
+        return this;
+    }
+    withSwapOutAmount(swapOutAmount) {
+        if (swapOutAmount <= 0n) {
+            this._swapInAmount = 0n;
+        }
+        if (!this._liquidityPool) {
+            throw new Error('Liquidity pool must be set before setting a swap out amount.');
+        }
+        this._swapInAmount = this._dexter.availableDexs[this._liquidityPool.dex].estimatedGive(this._liquidityPool, this._swapOutToken, swapOutAmount);
+        return this;
+    }
+    withMinimumReceive(minReceive) {
+        if (minReceive <= 0n) {
+            this._swapInAmount = 0n;
+        }
+        if (!this._liquidityPool) {
+            throw new Error('Liquidity pool must be set before setting a swap out amount.');
+        }
+        this._swapInAmount = this._dexter.availableDexs[this._liquidityPool.dex].estimatedGive(this._liquidityPool, this._swapOutToken, BigInt(Math.ceil(Number(minReceive) * (1 + (this._slippagePercent / 100)))));
+        return this;
+    }
+    withSlippagePercent(slippagePercent) {
+        if (slippagePercent < 0) {
+            throw new Error('Slippage percent must be zero or above.');
+        }
+        this._slippagePercent = slippagePercent;
+        return this;
+    }
+    withUtxos(utxos) {
+        if (utxos.length === 0) {
+            throw new Error('Must provide valid UTxOs to use in swap.');
+        }
+        this._withUtxos = utxos;
+        return this;
+    }
+    getEstimatedReceive(liquidityPool) {
+        const poolToCheck = liquidityPool ?? this._liquidityPool;
+        if (!poolToCheck) {
+            throw new Error('Liquidity pool must be set before calculating the estimated receive.');
+        }
+        if (!this._swapInToken) {
+            throw new Error('Swap in token must be set before calculating the estimated receive.');
+        }
+        return this._dexter.availableDexs[this._liquidityPool.dex].estimatedReceive(poolToCheck, this._swapInToken, this._swapInAmount);
+    }
+    getMinimumReceive(liquidityPool) {
+        return BigInt(Math.floor(Number(this.getEstimatedReceive(liquidityPool)) / (1 + (this._slippagePercent / 100))));
+    }
+    getPriceImpactPercent() {
+        if (!this._liquidityPool) {
+            throw new Error('Liquidity pool must be set before calculating the price impact.');
+        }
+        if (!this._swapInToken) {
+            throw new Error('Swap in token must be set before calculating the price impact.');
+        }
+        return this._dexter.availableDexs[this._liquidityPool.dex].priceImpactPercent(this._liquidityPool, this._swapInToken, this._swapInAmount);
+    }
+    getSwapFees() {
+        return this._dexter.availableDexs[this._liquidityPool.dex].swapOrderFees();
+    }
+    getPaymentsToAddresses() {
+        if (!this._dexter.walletProvider) {
+            throw new Error('Wallet provider must be set before submitting a swap order.');
+        }
+        if (!this._dexter.walletProvider.isWalletLoaded) {
+            throw new Error('Wallet must be loaded before submitting a swap order.');
+        }
+        if (!this._liquidityPool) {
+            throw new Error('Liquidity pool must be set before submitting a swap order.');
+        }
+        if (!this._swapInToken) {
+            throw new Error('Swap in token must be set before submitting a swap order.');
+        }
+        if (this._swapInAmount <= 0n) {
+            throw new Error('Swap in amount must be set before submitting a swap order.');
+        }
+        // Standard parameters for a swap order
+        const defaultSwapParameters = {
+            [DatumParameterKey.Address]: this._dexter.walletProvider.address(),
+            [DatumParameterKey.SenderPubKeyHash]: this._dexter.walletProvider.publicKeyHash(),
+            [DatumParameterKey.SenderStakingKeyHash]: this._dexter.walletProvider.stakingKeyHash(),
+            [DatumParameterKey.ReceiverPubKeyHash]: this._dexter.walletProvider.publicKeyHash(),
+            [DatumParameterKey.ReceiverStakingKeyHash]: this._dexter.walletProvider.stakingKeyHash(),
+            [DatumParameterKey.PoolIdentifier]: this._liquidityPool.identifier,
+            [DatumParameterKey.SwapInAmount]: this._swapInAmount,
+            [DatumParameterKey.MinReceive]: this.getMinimumReceive(),
+            [DatumParameterKey.SwapInTokenPolicyId]: this._swapInToken === 'lovelace' ? '' : this._swapInToken.policyId,
+            [DatumParameterKey.SwapInTokenAssetName]: this._swapInToken === 'lovelace' ? '' : this._swapInToken.nameHex,
+            [DatumParameterKey.SwapOutTokenPolicyId]: this._swapOutToken === 'lovelace' ? '' : this._swapOutToken.policyId,
+            [DatumParameterKey.SwapOutTokenAssetName]: this._swapOutToken === 'lovelace' ? '' : this._swapOutToken.nameHex,
+        };
+        return this._dexter.availableDexs[this._liquidityPool.dex]
+            .buildSwapOrder(this._liquidityPool, defaultSwapParameters, this._withUtxos.map((utxo) => {
+            return {
+                utxo,
+            };
+        }));
+    }
+    submit() {
+        if (!this._dexter.walletProvider) {
+            throw new Error('Wallet provider must be set before submitting a swap order.');
+        }
+        if (!this._dexter.walletProvider.isWalletLoaded) {
+            throw new Error('Wallet must be loaded before submitting a swap order.');
+        }
+        const swapTransaction = this._dexter.walletProvider.createTransaction();
+        if (!this._dexter.config.shouldSubmitOrders) {
+            return swapTransaction;
+        }
+        this.getPaymentsToAddresses()
+            .then((payToAddresses) => {
+            this.sendSwapOrder(swapTransaction, payToAddresses);
+        });
+        return swapTransaction;
+    }
+    sendSwapOrder(swapTransaction, payToAddresses) {
+        swapTransaction.status = TransactionStatus.Building;
+        const swapInTokenName = this._swapInToken === 'lovelace' ? 'ADA' : this._swapInToken.readableTicker;
+        const swapOutTokenName = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.readableTicker;
+        swapTransaction.attachMetadata(MetadataKey.Message, {
+            msg: [
+                this._metadata !== '' ? this._metadata : `[${this._dexter.config.metadataMsgBranding}] ${this._liquidityPool.dex} ${swapInTokenName} -> ${swapOutTokenName} Swap`
+            ]
+        });
+        // Build transaction
+        swapTransaction.payToAddresses(payToAddresses)
+            .then(() => {
+            swapTransaction.status = TransactionStatus.Signing;
+            // Sign transaction
+            swapTransaction.sign()
+                .then(() => {
+                swapTransaction.status = TransactionStatus.Submitting;
+                // Submit transaction
+                swapTransaction.submit()
+                    .then(() => {
+                    swapTransaction.status = TransactionStatus.Submitted;
+                })
+                    .catch((error) => {
+                    swapTransaction.error = {
+                        step: TransactionStatus.Submitting,
+                        reason: 'Failed submitting transaction.',
+                        reasonRaw: error,
+                    };
+                    swapTransaction.status = TransactionStatus.Errored;
+                });
+            })
+                .catch((error) => {
+                swapTransaction.error = {
+                    step: TransactionStatus.Signing,
+                    reason: 'Failed to sign transaction.',
+                    reasonRaw: error,
+                };
+                swapTransaction.status = TransactionStatus.Errored;
+            });
+        })
+            .catch((error) => {
+            swapTransaction.error = {
+                step: TransactionStatus.Building,
+                reason: 'Failed to build transaction.',
+                reasonRaw: error,
+            };
+            swapTransaction.status = TransactionStatus.Errored;
+        });
+    }
+}

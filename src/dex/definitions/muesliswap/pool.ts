@@ -1,4 +1,4 @@
-import { DatumParameterKey } from '@app/constants';
+import { DatumParameterKey } from '@app/constants.js';
 
 /**
  * https://github.com/MuesliSwapTeam/muesliswap-cardano-pool-contracts/blob/main/dex/src/MuesliSwapPools/ConstantProductPool/OnChain.hs

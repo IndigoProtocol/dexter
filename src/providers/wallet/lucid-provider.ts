@@ -6,9 +6,9 @@ import {
     PayToAddress,
     SpendUTxO,
     WalletOptions
-} from '@app/types';
-import { DexTransaction } from '@dex/models/dex-transaction';
-import { BaseWalletProvider } from './base-wallet-provider';
+} from '@app/types.js';
+import { DexTransaction } from '@dex/models/dex-transaction.js';
+import { BaseWalletProvider } from './base-wallet-provider.js';
 import {
     Address,
     AddressDetails,
@@ -21,7 +21,7 @@ import {
     TxSigned,
     Unit
 } from 'lucid-cardano';
-import { AddressType } from '@app/constants';
+import { AddressType } from '@app/constants.js';
 
 export class LucidProvider extends BaseWalletProvider {
 

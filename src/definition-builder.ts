@@ -1,7 +1,7 @@
-import { DatumParameters, DefinitionConstr, DefinitionField } from './types';
-import { DatumParameterKey } from './constants';
+import { DatumParameters, DefinitionConstr, DefinitionField } from './types.js';
+import { DatumParameterKey } from './constants.js';
 import _ from 'lodash';
-import { datumJsonToCbor } from '@app/utils';
+import { datumJsonToCbor } from '@app/utils.js';
 
 export class DefinitionBuilder {
   private _definition: DefinitionConstr;
