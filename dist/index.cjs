@@ -2213,9 +2213,11 @@ var MinswapV2 = class extends BaseDex {
       ["BatcherFee" /* BatcherFee */]: 700000n,
       ["LpTokenPolicyId" /* LpTokenPolicyId */]: liquidityPool.lpToken.policyId,
       ["LpTokenAssetName" /* LpTokenAssetName */]: liquidityPool.lpToken.nameHex,
-      ["Direction" /* Direction */]: swapDirection,
-      ["ReceiverDatum" /* ReceiverDatum */]: swapDatum
+      ["Direction" /* Direction */]: swapDirection
     };
+    if (swapDatum) {
+      swapParameters["ReceiverDatum" /* ReceiverDatum */] = swapDatum;
+    }
     const datumBuilder = new DefinitionBuilder();
     await datumBuilder.loadDefinition(order_default6).then((builder) => {
       builder.pushParameters(swapParameters);

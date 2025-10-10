@@ -101,8 +101,11 @@ export class MinswapV2 extends BaseDex {
             [DatumParameterKey.LpTokenPolicyId]: liquidityPool.lpToken.policyId,
             [DatumParameterKey.LpTokenAssetName]: liquidityPool.lpToken.nameHex,
             [DatumParameterKey.Direction]: swapDirection,
-            [DatumParameterKey.ReceiverDatum]: swapDatum,
         };
+        
+        if (swapDatum) {
+            swapParameters[DatumParameterKey.ReceiverDatum] = swapDatum;
+        }
 
         const datumBuilder: DefinitionBuilder = new DefinitionBuilder();
         await datumBuilder.loadDefinition(order)
