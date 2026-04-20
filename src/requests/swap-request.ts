@@ -1,10 +1,9 @@
-import { LiquidityPool } from '@dex/models/liquidity-pool';
-import { Token } from '@dex/models/asset';
 import { Dexter } from '@app/dexter';
 import { tokensMatch } from '@app/utils';
 import { DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO } from '@app/types';
 import { DatumParameterKey, MetadataKey, TransactionStatus } from '@app/constants';
 import { DexTransaction } from '@dex/models/dex-transaction';
+import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 
 export class SwapRequest {
 
@@ -71,10 +70,10 @@ export class SwapRequest {
             throw new Error('Liquidity pool must be set before providing an input token.');
         }
 
-        if (tokensMatch(swapInToken, this._liquidityPool.assetA)) {
-            this._swapOutToken = this._liquidityPool.assetB;
-        } else if (tokensMatch(swapInToken, this._liquidityPool.assetB)) {
-            this._swapOutToken = this._liquidityPool.assetA;
+        if (tokensMatch(swapInToken, this._liquidityPool.tokenA)) {
+            this._swapOutToken = this._liquidityPool.tokenB;
+        } else if (tokensMatch(swapInToken, this._liquidityPool.tokenB)) {
+            this._swapOutToken = this._liquidityPool.tokenA;
         } else {
             throw new Error("Input token doesn't exist in the set liquidity pool.");
         }
@@ -89,10 +88,10 @@ export class SwapRequest {
             throw new Error('Liquidity pool must be set before providing an input token.');
         }
 
-        if (tokensMatch(swapOutToken, this._liquidityPool.assetA)) {
-            this._swapInToken = this._liquidityPool.assetB;
-        } else if (tokensMatch(swapOutToken, this._liquidityPool.assetB)) {
-            this._swapInToken = this._liquidityPool.assetA;
+        if (tokensMatch(swapOutToken, this._liquidityPool.tokenA)) {
+            this._swapInToken = this._liquidityPool.tokenB;
+        } else if (tokensMatch(swapOutToken, this._liquidityPool.tokenB)) {
+            this._swapInToken = this._liquidityPool.tokenA;
         } else {
             throw new Error("Output token doesn't exist in the set liquidity pool.");
         }
@@ -248,7 +247,6 @@ export class SwapRequest {
                         utxo,
                     }
                 }) as SpendUTxO[],
-                this._dexter.dataProvider
             );
     }
 
@@ -277,8 +275,8 @@ export class SwapRequest {
     private sendSwapOrder(swapTransaction: DexTransaction, payToAddresses: PayToAddress[]) {
         swapTransaction.status = TransactionStatus.Building;
 
-        const swapInTokenName: string = this._swapInToken === 'lovelace' ? 'ADA' : this._swapInToken.assetName;
-        const swapOutTokenName: string = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.assetName;
+        const swapInTokenName: string = this._swapInToken === 'lovelace' ? 'ADA' : this._swapInToken.readableTicker;
+        const swapOutTokenName: string = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.readableTicker;
         swapTransaction.attachMetadata(MetadataKey.Message, {
             msg: [
                 this._metadata !== '' ? this._metadata : `[${this._dexter.config.metadataMsgBranding}] ${this._liquidityPool.dex} ${swapInTokenName} -> ${swapOutTokenName} Swap`

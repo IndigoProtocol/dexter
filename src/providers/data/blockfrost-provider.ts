@@ -9,9 +9,9 @@ import {
     Transaction,
     UTxO
 } from '@app/types';
-import { Asset } from '@dex/models/asset';
 import Bottleneck from 'bottleneck';
 import { appendSlash } from '@app/utils';
+import { Asset } from '@indigo-labs/iris-sdk';
 
 const API_BURST_SIZE: number = 500;
 const API_COOLDOWN_SIZE: number = 10;

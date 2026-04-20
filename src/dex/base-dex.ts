@@ -1,33 +1,14 @@
-import { LiquidityPool } from './models/liquidity-pool';
-import { BaseDataProvider } from '@providers/data/base-data-provider';
-import { Asset, Token } from './models/asset';
 import { AssetBalance, DatumParameters, PayToAddress, SpendUTxO, SwapFee, UTxO } from '@app/types';
 import { DatumParameterKey } from '@app/constants';
 import { tokensMatch } from '@app/utils';
-import { BaseApi } from '@dex/api/base-api';
-import { BaseWalletProvider } from '@providers/wallet/base-wallet-provider';
+import { Asset, LiquidityPool, Token } from '@indigo-labs/iris-sdk';
+import { Dexter } from '@app/dexter';
 
 export abstract class BaseDex {
 
-    /**
-     * API connection for the DEX.
-     */
-    public abstract readonly api: BaseApi;
-
-    /**
-     * Fetch addresses mapped to a liquidity pool.
-     */
-    abstract liquidityPoolAddresses(provider?: BaseDataProvider): Promise<string[]>;
-
-    /**
-     * Fetch all liquidity pools.
-     */
-    abstract liquidityPools(provider: BaseDataProvider, wallet?: BaseWalletProvider): Promise<LiquidityPool[]>;
-
-    /**
-     * Craft liquidity pool state from a valid UTxO.
-     */
-    abstract liquidityPoolFromUtxo(provider: BaseDataProvider, utxo: UTxO, wallet?: BaseWalletProvider): Promise<LiquidityPool | undefined>;
+    constructor(
+        protected dexter: Dexter,
+    ) {}
 
     /**
      * Estimated swap in amount given for a swap out token & amount on a liquidity pool.
@@ -47,12 +28,12 @@ export abstract class BaseDex {
     /**
      * Craft a swap order for this DEX.
      */
-    abstract buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos?: SpendUTxO[], dataProvider?: BaseDataProvider): Promise<PayToAddress[]>;
+    abstract buildSwapOrder(liquidityPool: LiquidityPool, swapParameters: DatumParameters, spendUtxos?: SpendUTxO[]): Promise<PayToAddress[]>;
 
     /**
      * Craft a swap order cancellation for this DEX.
      */
-    abstract buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string, wallet?: BaseWalletProvider): Promise<PayToAddress[]>;
+    abstract buildCancelSwapOrder(txOutputs: UTxO[], returnAddress: string): Promise<PayToAddress[]>;
 
     /**
      * Fees associated with submitting a swap order.

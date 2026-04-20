@@ -1,10 +1,9 @@
-import { LiquidityPool } from '@dex/models/liquidity-pool';
-import { Token } from '@dex/models/asset';
 import { Dexter } from '@app/dexter';
 import { PayToAddress, SwapFee, SwapInAmountMapping, SwapOutAmountMapping, UTxO } from '@app/types';
 import { MetadataKey, TransactionStatus } from '@app/constants';
 import { DexTransaction } from '@dex/models/dex-transaction';
 import { SwapRequest } from '@requests/swap-request';
+import { LiquidityPool, Token } from '@indigo-labs/iris-sdk';
 
 export class SplitSwapRequest {
 
@@ -193,8 +192,8 @@ export class SplitSwapRequest {
     private sendSplitSwapOrder(splitSwapTransaction: DexTransaction, payToAddresses: PayToAddress[]) {
         splitSwapTransaction.status = TransactionStatus.Building;
 
-        const swapInTokenName: string = this._swapInToken === 'lovelace' ? 'ADA' : this._swapInToken.assetName;
-        const swapOutTokenName: string = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.assetName;
+        const swapInTokenName: string = this._swapInToken === 'lovelace' ? 'ADA' : this._swapInToken.readableTicker;
+        const swapOutTokenName: string = this._swapOutToken === 'lovelace' ? 'ADA' : this._swapOutToken.readableTicker;
         splitSwapTransaction.attachMetadata(MetadataKey.Message, {
             msg: [
                 this._metadata !== '' ? this._metadata : `[${this._dexter.config.metadataMsgBranding}] Split ${swapInTokenName} -> ${swapOutTokenName} Swap`

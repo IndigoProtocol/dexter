@@ -1,5 +1,5 @@
 import { AssetAddress, DefinitionField, Transaction, UTxO } from '@app/types';
-import { Asset } from '@dex/models/asset';
+import { Asset } from '@indigo-labs/iris-sdk';
 
 export abstract class BaseDataProvider {
 
