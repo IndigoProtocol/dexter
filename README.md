@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> This repository is archived and no longer maintained.
+
 <div align="center">
     <h1 align="center">Dexter</h1>
     <p align="center">Customizable Typescript SDK for interacting with Cardano DEXs.</p>
